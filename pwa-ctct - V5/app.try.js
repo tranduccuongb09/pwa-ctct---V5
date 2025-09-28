@@ -1,5 +1,5 @@
-// app.try.js — Khối ÔN + THI THỬ tách riêng (không ảnh hưởng app.js của trang Thi chính thức)
-// Ngày: 2025-09-28
+// app.try.js — Khối ÔN + THI THỬ (độc lập với app.js của thi chính thức)
+// Cập nhật: tách trang review sang review-try.html
 
 (() => {
   'use strict';
@@ -8,30 +8,24 @@
   const CFG = (window.CTCT_CONFIG || {});
   const SHEET_API_MAIN = CFG.SHEET_API || '';
   const SHEET_API_TRY  = CFG.TRY_SHEET_API || '';
+  const SHEET_API = SHEET_API_TRY || SHEET_API_MAIN; // ưu tiên TRY
 
-  // Bắt buộc ưu tiên TRY cho khối này; fallback sang MAIN nếu chưa cấu hình
-  const SHEET_API = SHEET_API_TRY || SHEET_API_MAIN;
+  const TOPIC_FOLDERS = { DQTV: CFG.BANK_DQTV || '', LLTT: CFG.BANK_LLTT || '' };
 
-  // Thư mục ngân hàng theo đối tượng
-  const TOPIC_FOLDERS = {
-    DQTV: CFG.BANK_DQTV || '',
-    LLTT: CFG.BANK_LLTT || ''
-  };
-
-  // Tham số đề thi
-  const TOTAL_QUESTIONS  = 50;           // 50 câu
-  const DURATION_MINUTES = 30;           // 30 phút
-  const MIX_PER_FILE_MAX = 0;            // 0 = server chọn đều
+  const TOTAL_QUESTIONS  = 50;
+  const DURATION_MINUTES = 30;
+  const MIX_PER_FILE_MAX = 0;           // 0 = server chọn đều
   const DEFAULT_TAB      = 'Câu hỏi';
   const PRACTICE_DEFAULT_COUNT = 50;
+  const IS_TRY = true;
 
-  // LocalStorage (namespace riêng để không đè app cũ)
+  // LocalStorage namespaces (riêng khối TRY)
   const LS_STATE = 'ctct_try_state';
   const LS_QUEUE = 'ctct_try_result_queue';
   const LS_LAST  = 'ctct_try_last_result';
 
   /* ============================ STATE ============================== */
-  let mode = 'exam';                     // 'exam' | 'practice'
+  let mode = 'exam';             // 'exam' | 'practice'
   let questions = [];
   let selections = {};
   let currentIndex = 0;
@@ -44,13 +38,25 @@
   let practiceCount = PRACTICE_DEFAULT_COUNT;
 
   /* ============================ TIỆN ÍCH ============================ */
+  (function injectStyle(){
+    const css = `
+      #qText, .opt-text { text-align: justify; text-wrap: pretty; }
+      label.option { display:block; }
+      .try-menu { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:.5rem }
+      .try-menu a { padding:.25rem .5rem; border-radius:.375rem; background:#f3f4f6; text-decoration:none; color:#111827; font-weight:500 }
+      .try-menu a:hover { background:#e5e7eb }
+      .rv-item .q { font-weight:600; margin:.5rem 0 .25rem }
+      .rv-item .exp { margin:.25rem 0 .75rem; color:#374151 }
+    `;
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+  })();
+
   const pad = n => (n < 10 ? '0' + n : '' + n);
   const classify = (s, t) => { const r=s/t; return r>=.9?'Giỏi':r>=.8?'Khá':r>=.6?'Đạt yêu cầu':'Chưa đạt'; };
-  const genCode = () => {
-    const base = (Date.now() % 9000) + 1000;
-    const rnd = Math.floor(Math.random()*9);
-    return String((base + rnd) % 9000 + 1000);
-  };
+  const genCode = () => String((((Date.now() % 9000) + 1000) + Math.floor(Math.random()*9)) % 9000 + 1000);
+
   async function apiJson(url){
     const res = await fetch(url, { cache:'no-store' });
     if (!res.ok) throw new Error('HTTP '+res.status);
@@ -64,26 +70,17 @@
     const letters = ['A','B','C','D'].filter(k => (opts[k]??'').toString().trim());
     const pairs = letters.map(k => ({ key:k, text:opts[k] }));
     shuffle_(pairs);
-    const out = {}, newLetters = ['A','B','C','D'];
-    let newAnswer = 'A';
-    pairs.forEach((p,idx)=>{
-      const L = newLetters[idx];
-      out[L] = p.text;
-      if (p.key === q.answer) newAnswer = L;
-    });
+    const out = {}, newLetters = ['A','B','C','D']; let newAnswer = 'A';
+    pairs.forEach((p,idx)=>{ const L=newLetters[idx]; out[L]=p.text; if(p.key===q.answer) newAnswer=L; });
     return { ...q, options: out, answer: newAnswer };
   }
-  function shuffleQuestionsAndOptions(arr){
-    const shuffled = shuffle_(arr.slice());
-    return shuffled.map(shuffleOptionsOne);
-  }
+  const shuffleQuestionsAndOptions = arr => shuffle_(arr.slice()).map(shuffleOptionsOne);
 
   // Hàng đợi offline khi POST thất bại
-  function getQueue(){ try{ return JSON.parse(localStorage.getItem(LS_QUEUE)||'[]'); }catch{ return []; } }
-  function setQueue(list){ localStorage.setItem(LS_QUEUE, JSON.stringify(list)); }
+  const getQueue = () => { try{ return JSON.parse(localStorage.getItem(LS_QUEUE)||'[]'); }catch{ return []; } };
+  const setQueue = list => localStorage.setItem(LS_QUEUE, JSON.stringify(list));
   async function flushQueue(){
-    const q = getQueue();
-    if(!q.length) return;
+    const q = getQueue(); if(!q.length) return;
     const remain = [];
     for (const item of q){
       try{
@@ -102,8 +99,9 @@
   async function loadMixedQuestionsFromFolder(folderId, limit){
     const url = `${SHEET_API}?action=mixQuestions&folderId=${encodeURIComponent(folderId)}&limit=${limit}&perFile=${MIX_PER_FILE_MAX}&tab=${encodeURIComponent(DEFAULT_TAB)}`;
     const data = await apiJson(url);
+    if (data?.error) throw new Error(`API lỗi: ${data.error}${data.detail ? ' — ' + data.detail : ''}`);
     const bank = Array.isArray(data.questions) ? data.questions : [];
-    if (!bank.length) throw new Error('Không lấy được câu hỏi từ thư mục ngân hàng.');
+    if (!bank.length) throw new Error('Không lấy được câu hỏi: pool rỗng (có thể thư mục chỉ có .xlsx hoặc thiếu quyền).');
     questions = shuffleQuestionsAndOptions(bank).slice(0, limit);
     const prog = document.getElementById('progress'); if (prog) prog.textContent = `0/${questions.length}`;
     const fill = document.getElementById('progressFill'); if (fill) fill.style.width = '0%';
@@ -114,8 +112,6 @@
     if(!folderId) throw new Error('Chưa cấu hình thư mục cho đối tượng: ' + topic);
     const url = `${SHEET_API}?action=listBanks&folderId=${encodeURIComponent(folderId)}`;
     const data = await apiJson(url);
-
-    // Chuẩn hoá cho đủ 2 kiểu trả về (banks/items)
     const items = Array.isArray(data.items) ? data.items
                 : (Array.isArray(data.banks) ? data.banks.map(b => ({
                     id:b.id, name:b.title, mimeType: b.type==='xlsx'
@@ -133,24 +129,21 @@
   }
 
   async function loadQuestionsFromFile(file){
-    let url;
-    if (isExcel(file.mimeType)){
-      url = `${SHEET_API}?action=questionsXlsx&fileId=${encodeURIComponent(file.id)}&tab=${encodeURIComponent(DEFAULT_TAB)}`;
-    } else {
-      url = `${SHEET_API}?action=questions&sheetId=${encodeURIComponent(file.id)}&tab=${encodeURIComponent(DEFAULT_TAB)}`;
-    }
+    const url = isExcel(file.mimeType)
+      ? `${SHEET_API}?action=questionsXlsx&fileId=${encodeURIComponent(file.id)}&tab=${encodeURIComponent(DEFAULT_TAB)}`
+      : `${SHEET_API}?action=questions&sheetId=${encodeURIComponent(file.id)}&tab=${encodeURIComponent(DEFAULT_TAB)}`;
     const data = await apiJson(url);
-    let bank = Array.isArray(data.questions) ? data.questions : (Array.isArray(data) ? data : []);
+    const bank = Array.isArray(data.questions) ? data.questions : (Array.isArray(data) ? data : []);
     if(!bank.length) throw new Error('File không có dữ liệu câu hỏi: ' + (file.name||file.title||''));
     questions = shuffleQuestionsAndOptions(bank).slice(0, practiceCount);
     const prog = document.getElementById('progress'); if (prog) prog.textContent = `0/${questions.length}`;
     const fill = document.getElementById('progressFill'); if (fill) fill.style.width = '0%';
   }
 
-  // Thống kê câu hay sai (hiển thị nếu trang có #wrongList)
+  // “Câu hay trả lời sai”
   async function loadTopWrong(topic){
     const box = document.getElementById('wrongList');
-    if (!box) return;
+    if (!box) return; box.textContent = 'Đang tải…';
     try{
       const url = `${SHEET_API}?action=topWrong&topic=${encodeURIComponent(topic)}&limit=5`;
       const data = await apiJson(url);
@@ -161,6 +154,44 @@
       </div>`).join('');
     }catch{
       box.textContent = 'Không tải được thống kê.';
+    }
+  }
+  function initTopWrongFilter(){
+    const box = document.getElementById('wrongList');
+    if (!box || box.dataset.inited === '1') return;
+    box.dataset.inited = '1';
+    const wrap = document.createElement('div');
+    wrap.style.margin = '8px 0';
+    wrap.innerHTML = `
+      <label>Đối tượng:
+        <select id="wrongTopicSel">
+          <option value="DQTV">DQTV</option>
+          <option value="LLTT">LLTT</option>
+        </select>
+      </label>`;
+    box.parentNode.insertBefore(wrap, box);
+
+    const sel = wrap.querySelector('#wrongTopicSel');
+    sel.value = (document.getElementById('examTopic')?.value) || practiceTopic || 'DQTV';
+    const reload = () => loadTopWrong(sel.value);
+    sel.addEventListener('change', reload);
+    reload();
+  }
+  function getWrongSection(){
+    const list = document.getElementById('wrongList');
+    if (!list) return null;
+    return list.closest('#wrongSection, .card, .section, .panel') || list.parentElement;
+  }
+  function setTopWrongVisibility(show){
+    const section = getWrongSection();
+    if (!section) return;
+    section.hidden = !show;
+    if (show){
+      initTopWrongFilter();
+      const topicFromSelect = document.getElementById('wrongTopicSel')?.value;
+      const topicFallback   = document.getElementById('wrongTopic')?.value;
+      const topic = topicFromSelect || topicFallback || document.getElementById('examTopic')?.value || 'DQTV';
+      loadTopWrong(topic).catch(()=>{});
     }
   }
 
@@ -189,7 +220,7 @@
     const progEl=document.getElementById('progress'); if (progEl) progEl.textContent=`${currentIndex+1}/${questions.length}`;
     const fill=document.getElementById('progressFill'); if (fill) fill.style.width=`${((currentIndex+1)/questions.length)*100}%`;
 
-    saveState(); // autosave
+    saveState();
   }
 
   function startTimer(){
@@ -212,7 +243,7 @@
     const payload = { ts: Date.now(), examCode, currentIndex, remainingSeconds, selections, questions, mode, practiceTopic, practiceBank, practiceCount };
     localStorage.setItem(LS_STATE, JSON.stringify(payload));
   }
-  function hasState(){ return !!localStorage.getItem(LS_STATE); }
+  const hasState = () => !!localStorage.getItem(LS_STATE);
   function loadState(){
     try{
       const st=JSON.parse(localStorage.getItem(LS_STATE)||'{}');
@@ -227,7 +258,7 @@
       return true;
     }catch{ return false; }
   }
-  function clearState(){ localStorage.removeItem(LS_STATE); }
+  const clearState = () => localStorage.removeItem(LS_STATE);
 
   /* ============================= SUBMIT ============================ */
   async function submitQuiz(){
@@ -249,11 +280,13 @@
     const unit=(document.getElementById('unit')?.value||'').trim();
     const position=(document.getElementById('position')?.value||'').trim();
 
-    const head = (mode==='practice') ? `Ôn tập — ` : 'Thi thử — ';
+    const head = (mode === 'practice') ? 'Ôn tập — ' : (IS_TRY ? 'Thi thử — ' : 'Thi chính thức — ');
     const resultText = document.getElementById('resultText');
     if (resultText){
-      resultText.textContent = `${head}${name?name+' - ':''}${unit?unit+' ':''}${position?('('+position+') '):''}| Mã đề ${examCode}: ${score}/${total} điểm`;
+      if (mode === 'practice') resultText.textContent = `${head}${score}/${total} điểm`;
+      else resultText.textContent = `${head}${name?name+' - ':''}${unit?unit+' ':''}${position?('('+position+') '):''}| Mã đề ${examCode}: ${score}/${total} điểm`;
     }
+
     const clsEl = document.getElementById('classification');
     if (clsEl){ clsEl.textContent = (mode==='practice') ? 'Chế độ ôn tập (không lưu điểm chính thức).' : ('Xếp loại: ' + classify(score,total)); }
 
@@ -262,17 +295,39 @@
     if (quizBox) quizBox.hidden = true;
     if (resultCard) resultCard.hidden = false;
 
-    // Lưu để review
-    localStorage.setItem(LS_LAST, JSON.stringify({ name, unit, position, examCode, score, total, details, mode, practiceTopic, practiceBank }));
+    // Lưu gói review cho review-try.html (kèm nhãn đối tượng)
+    const topicValue = (document.getElementById('examTopic')?.value || '').trim();
+    const topicSel = document.getElementById('examTopic');
+    const topicLabel = topicSel ? (topicSel.options[topicSel.selectedIndex]?.text || topicValue) : topicValue;
+
+    localStorage.setItem(LS_LAST, JSON.stringify({
+      name, unit, position,
+      topic: topicValue, topicLabel,
+      examCode, score, total, details,
+      mode, practiceTopic, practiceBank
+    }));
     clearState();
 
-    // Chỉ gửi Sheets khi là thi thử
+    // Điều chỉnh link "Xem lại & giải thích" -> review-try.html (không phụ thuộc id cụ thể)
+    (function setReviewLink(){
+      const container = resultCard || document;
+      const candidates = Array.from(container.querySelectorAll('a,button'));
+      const vn = s => (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,'');
+      for (const el of candidates){
+        const t = vn(el.textContent);
+        if (t.includes('xem lai') && t.includes('giai thich')){
+          if (el.tagName === 'A') el.setAttribute('href','review-try.html');
+          el.addEventListener('click', (e)=>{ if(el.tagName!=='A'){ e.preventDefault(); location.href='review-try.html'; }});
+        }
+      }
+    })();
+
+    // Gửi Sheets khi thi thử
     if (mode === 'exam'){
-      const topic = (document.getElementById('examTopic')?.value || '').trim(); // QUAN TRỌNG: gửi đối tượng
       const payload = {
         action: 'submitResult',
         examCode, name, unit, position, score, total, details,
-        topic,
+        topic: topicValue,
         timestamp: new Date().toISOString()
       };
       try{
@@ -287,15 +342,28 @@
     }
   }
 
-  /* =========================== BOOTSTRAP =========================== */
+  /* =========================== KHỞI ĐỘNG =========================== */
+  function buildTryMenu(){
+    const host = document.querySelector('.try-menu');
+    if (!host) return;
+    host.innerHTML = `
+      <a href="practice.html">Ôn trắc nghiệm</a>
+      <a href="try.html">Thi thử</a>
+      <a href="my-results.html">Kết quả của tôi</a>
+    `;
+  }
+
   window.addEventListener('DOMContentLoaded', ()=>{
-    // Nếu thiếu TRY_SHEET_API thì vẫn chạy theo SHEET_API_MAIN, nhưng nên cấu hình TRY cho đúng.
     flushQueue();
+    buildTryMenu();
+
+    // Lúc vào trang: hiển thị box “Câu hay trả lời sai”
+    initTopWrongFilter();
+    setTopWrongVisibility(true);
 
     const isPracticePage = /practice\.html/i.test(location.pathname) || !!document.getElementById('practiceTopic');
     const isQuizLayout   = !!(document.getElementById('quizBox') && document.getElementById('startBtn'));
-
-    if (!isPracticePage && !isQuizLayout) return; // không phải 2 trang đích
+    if (!isPracticePage && !isQuizLayout) return;
 
     mode = isPracticePage ? 'practice' : 'exam';
 
@@ -324,7 +392,7 @@
 
         try{
           await loadMixedQuestionsFromFolder(folderId, TOTAL_QUESTIONS);
-          loadTopWrong(topic).catch(()=>{});
+          setTopWrongVisibility(false); // ẨN ngay khi bắt đầu thi thử
         }catch(e){ alert(e.message || 'Lỗi tải câu hỏi.'); return; }
 
         if (startCard) startCard.hidden = true;
@@ -343,6 +411,7 @@
         if (quizBox)   quizBox.hidden = false;
         renderQuestion();
         if (timeEl) timeEl.textContent = '∞';
+        setTopWrongVisibility(true);
       }
     });
 
@@ -355,6 +424,7 @@
       renderQuestion();
 
       if (mode==='exam'){
+        setTopWrongVisibility(false);
         const el=document.getElementById('time');
         const tick=()=>{
           const m=Math.floor(remainingSeconds/60), s=remainingSeconds%60;
@@ -367,6 +437,7 @@
         };
         tick(); timer=setInterval(tick,1000);
       }else{
+        setTopWrongVisibility(true);
         if (timeEl) timeEl.textContent = '∞';
       }
     });
@@ -391,6 +462,13 @@
     });
 
     // Nộp bài
-    document.getElementById('submitBtn')?.addEventListener('click', submitQuiz);
+    document.getElementById('submitBtn')?.addEventListener('click', () => {
+      try { submitQuiz(); } catch(e){ console.error(e); alert('Lỗi nộp bài: '+ e.message); }
+    });
+
+    // Khi đổi đối tượng trong box “Câu hay trả lời sai”
+    document.getElementById('wrongTopic')?.addEventListener('change', (e)=>{
+      loadTopWrong(e.target.value);
+    });
   });
 })();

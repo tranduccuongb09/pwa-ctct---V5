@@ -225,3 +225,107 @@ html, body { margin:0; padding:0; background:transparent; }
 .nav__item[data-menu="lam-thi"]:hover > .dropdown,
 .nav__item[data-menu="ket-qua"]:hover > .dropdown,
 .nav__item.open > .dropdown { display: flex; }       /* chỉ mở đúng mục + hỗ trợ mobile (.open) */
+
+/* =========================
+   THEME CHO THANH NAV
+   ========================= */
+/* DARK (cho nền đỏ như trang chủ) */
+.nav.nav-light .brand{ color:#111827; }
+.nav.nav-light .nav__links a{ color:#111827; }
+.nav.nav-light .nav__links a:hover{ color:var(--brand); }
+.nav.nav-light .nav__links a.is-active{ color:var(--brand); }
+.nav.nav-light .dropdown{background: rgba(0,0,0,.88);border: 1px solid rgba(255,255,255,.08);}
+.nav.nav-light .dropdown a{ color:#fff; }
+.nav.nav-light .dropdown a:hover{ color: var(--yellow); background: rgba(255,255,255,.10); }
+
+/* =========================
+   FIX: KHÔNG gạch vàng ở dropdown
+   ========================= */
+.nav .dropdown a.is-active,
+.nav .nav__links li ul a.is-active{
+  position: static !important;
+}
+.nav .dropdown a.is-active::after,
+.nav .nav__links li ul a.is-active::after{
+  content:none !important;
+  display:none !important;
+}
+/* =========================
+   MOBILE NAV (≤ 768px)
+   ========================= */
+.nav { position:sticky; top:0; z-index:50; }
+.nav__inner { display:flex; align-items:center; gap:14px; padding:10px 12px; }
+.nav__links { display:flex; gap:14px; align-items:center; }
+.nav__links li{ position:relative; list-style:none; }
+.nav__links ul{ position:absolute; top:100%; left:0; display:none; }
+
+/* Nút hamburger (ẩn trên desktop) */
+.nav__toggle {
+  display:none; border:0; background:transparent; font-size:0;
+  width:40px; height:40px; border-radius:10px; cursor:pointer;
+}
+.nav__toggle span{ display:block; width:22px; height:2px; margin:5px auto; border-radius:2px; }
+
+/* Màu thanh hamburger theo theme */
+.nav.nav-dark .nav__toggle span { background:#fff; }
+.nav.nav-light .nav__toggle span { background:#111827; }
+
+/* Mobile layout */
+@media (max-width:768px){
+  .nav__toggle{ display:block; }
+  .nav__links{
+    position:fixed; inset:56px 12px auto 12px;  /* dưới thanh nav */
+    display:none; flex-direction:column; gap:6px;
+    padding:12px; border-radius:12px;
+    max-height:calc(100vh - 72px); overflow:auto;
+    box-shadow:0 12px 28px rgba(0,0,0,.18);
+  }
+  /* Nền & chữ links theo theme */
+  .nav.nav-dark .nav__links{ background:rgba(0,0,0,.85); }
+  .nav.nav-dark .nav__links a{ color:#fff; }
+  .nav.nav-dark .nav__links a:hover{ color:#facc15; }
+
+  .nav.nav-light .nav__links{ background:#fff; border:1px solid #e5e7eb; }
+  .nav.nav-light .nav__links a{ color:#111827; }
+  .nav.nav-light .nav__links a:hover{ color:#A41919; }
+
+  /* Mở menu */
+  .nav.is-open .nav__links{ display:flex; }
+  /* Submenu trong mobile bung inline, dễ đọc */
+  .nav__links li ul{
+    position:static; display:block; background:transparent; box-shadow:none; padding-left:12px;
+  }
+}
+
+/* Submenu (desktop) – đồng bộ theo theme */
+.nav.nav-light .nav__links li:hover > ul,
+.nav.nav-light .nav__links li:focus-within > ul{
+  display:block; background:#fff; border:1px solid #e5e7eb;
+  border-radius:10px; box-shadow:0 12px 28px rgba(0,0,0,.15); padding:6px; min-width:220px;
+}
+.nav.nav-light .nav__links li ul a{ color:#111827; display:block; padding:10px 12px; border-radius:8px; white-space:nowrap; }
+.nav.nav-light .nav__links li ul a:hover{ background:#f5f6f8; color:#A41919; }
+
+.nav.nav-dark .nav__links li:hover > ul,
+.nav.nav-dark .nav__links li:focus-within > ul{
+  display:block; background:rgba(0,0,0,.92);
+  border:1px solid rgba(255,255,255,.08); border-radius:10px;
+  box-shadow:0 12px 28px rgba(0,0,0,.4); padding:6px; min-width:220px;
+}
+.nav.nav-dark .nav__links li ul a{ color:#fff; display:block; padding:10px 12px; border-radius:8px; white-space:nowrap; }
+.nav.nav-dark .nav__links li ul a:hover{ background:rgba(255,255,255,.07); color:#facc15; }
+
+/* BỎ gạch vàng ở mục con trong DROPDOWN (cả dark & light) */
+.nav .has-dropdown .dropdown a.is-active{
+  border-bottom: 0 !important;
+  text-decoration: none !important;
+
+  /* phòng trường hợp gạch vàng tạo bằng background gradient */
+  background-image: none !important;
+  background-size: 0 0 !important;
+  box-shadow: none !important;
+}
+
+/* (giữ màu chữ khi active trong dropdown) */
+.nav.nav-light .has-dropdown .dropdown a.is-active{ color:#A41919 !important; }
+.nav.nav-dark  .has-dropdown .dropdown a.is-active{ color:#facc15 !important; }

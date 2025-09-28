@@ -257,3 +257,9 @@ body.home{
   .ai-tray__panel{ width: 96vw; height: 75vh; }
   .msg{ max-width: 92%; }
 }
+
+/* căn đều phần câu hỏi & đáp án ở UI */
+#qText, .opt-text, .explanation { text-align: justify; }
+
+/* chi tiết bảng xem lại nếu dùng bảng text */
+.review-question { text-align: justify; }

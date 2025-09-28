@@ -16,7 +16,7 @@ window.CTCT_CONFIG = {
   UPLOAD_FOLDER_ID: '1MlQBO1_PAR6wNUPsEzMgIKWBKUlEZQBC',
 
   // API THI THỬ – URL của web app vừa deploy ở trên
-  TRY_SHEET_API: 'https://script.google.com/macros/s/AKfycbyY7DDrverfh_2QyhurZD5N75y4HRpfJozCN8LO_qUiX8HbsfWRy5Xng-hoN7h_HcH8/exec',
+  TRY_SHEET_API: 'https://script.google.com/macros/s/AKfycbz1kfFnl_G1NihDvbBcE-p_UuLvzRq11LKnQg5BgoztV3y1xHoXi2BiF1AOdwL6zr49/exec',
 
   // (khuyến nghị) FOLDER ngân hàng đề cho 2 đối tượng
   BANK_DQTV: '1RGLds-9IKHztD3_GxRrE5mSDFsjML3j9',

@@ -25,48 +25,17 @@
     }
 
     /* Ưu tiên cho NAV của trang chủ */
-    body.home .nav,
-    body.home .nav * {
+    body.home .nav, body.home .nav * {
       font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
     }
 
     /* HERO */
-    .hero {
-      padding: 100px 20px 80px;
-      text-align: center;
-      color: #fff;
-    }
-    .hero h1 {
-      font-size: clamp(36px, 6vw, 84px);
-      font-weight: 800;
-      margin-bottom: 16px;
-      line-height: 1.15;
-    }
-    .hero p {
-      font-size: 18px;
-      margin-bottom: 32px;
-      opacity: .95;
-    }
-    .hero__actions {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .btn-ghost {
-      padding: 12px 20px;
-      border: 2px solid #fff;
-      border-radius: 10px;
-      font-weight: 600;
-      color: #fff;
-      background: transparent;
-      transition: all .2s ease;
-    }
-    .btn-ghost:hover {
-      background: #FFD966;
-      color: #111;
-      border-color: #FFD966;
-    }
+    .hero {padding: 100px 20px 80px; text-align: center; color: #fff;}
+    .hero h1 {font-size: clamp(36px, 6vw, 84px); font-weight: 800; margin-bottom: 16px; line-height: 1.15;}
+    .hero p {font-size: 18px; margin-bottom: 32px; opacity: .95;}
+    .hero__actions {display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;}
+    .btn-ghost {padding: 12px 20px; border: 2px solid #fff; border-radius: 10px; font-weight: 600; color: #fff; background: transparent; transition: all .2s ease; }
+    .btn-ghost:hover {background: #FFD966; color: #111; border-color: #FFD966; }
   </style>
 
   <script>
@@ -79,13 +48,21 @@
 </head>
 <body class="home">
   <!-- NAV -->
-  <header class="nav">
+  <header class="nav nav-dark">
     <div class="nav__inner">
       <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false"><span></span><span></span><span></span></button>
       <nav class="nav__links">
         <a href="index.html" class="is-active">Trang chủ</a>
         <a href="materials.html">Tài liệu học tập</a>
-        <a href="quiz.html">Làm bài kiểm tra</a>
+        <div class="nav__item has-dropdown">
+          <a href="exam.html">Làm bài kiểm tra ▾</a>
+          <div class="dropdown">
+            <a href="exam.html">Kiểm tra nhận thức</a>
+            <a href="practice.html">Ôn trắc nghiệm</a>
+            <a href="quiz.html">Thi thử</a>
+          </div>
+        </div>
         <div class="nav__item has-dropdown">
           <a href="results.html">Kết quả kiểm tra ▾</a>
           <div class="dropdown">
@@ -94,15 +71,10 @@
           </div>
         </div>
       </nav>
-
-      <!-- Search -->
       <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
-        <input class="search__input" type="search" name="q"
-               placeholder="Tìm tài liệu, câu hỏi, chủ đề…"
-               autocomplete="off">
+        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, câu hỏi, chủ đề…" autocomplete="off">
         <button class="search__btn" type="submit">Tìm kiếm</button>
       </form>
-
       <div class="nav__actions">
         <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
       </div>

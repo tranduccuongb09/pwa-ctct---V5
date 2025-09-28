@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>XEM LẠI & GIẢI THÍCH (Ôn tập)</title>
+  <style>
+    :root{--bg:#f6f7fb;--text:#111827;--muted:#6b7280;--border:#e5e7eb}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1100px;margin:20px auto;padding:0 12px}
+    .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+    .correct{color:#16a34a;font-weight:600} .wrong{color:#dc2626;font-weight:600}
+    .muted{color:var(--muted)}
+    .topnav{margin:10px 0 16px}
+    .topnav a{text-decoration:none}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="topnav"><a href="practice.html">← Quay lại Ôn trắc nghiệm</a></div>
+    <div id="reviewBox"></div>
+  </main>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem('ctct_try_last_result')||'{}');
+    const box = document.getElementById('reviewBox');
+    if (!data.details || !Array.isArray(data.details) || data.details.length===0){
+      box.innerHTML = '<div class="card">Không có dữ liệu xem lại.</div>';
+    } else {
+      box.innerHTML = data.details.map((d,i)=>{
+        const ok = d.chosen === d.correct;
+        return `<div class="card">
+          <div style="margin-bottom:6px"><b>Câu ${i+1}</b>: ${d.question||''}</div>
+          <div>${ok ?
+            `<span class="correct">✔ Đúng — Bạn chọn: ${d.chosen} • Đúng: ${d.correct}</span>` :
+            `<span class="wrong">✘ Sai — Bạn chọn: ${d.chosen||'—'} • Đúng: ${d.correct}</span>`}
+          </div>
+          ${d.explanation?`<div class="muted" style="margin-top:6px">Giải thích: ${d.explanation}</div>`:''}
+        </div>`;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
