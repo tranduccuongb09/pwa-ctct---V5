@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xem lại & giải thích</title>
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Font Roboto đồng bộ toàn site (có thể bỏ nếu đã nạp trong style.css) -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --brand:#A41919; --brand-600:#8B1616;
+      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
+      --ok:#16a34a; --ng:#dc2626;
+    }
+    *{box-sizing:border-box}
+    html,body{
+      margin:0; background:var(--bg); color:var(--text);
+      font-family:'Roboto', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      display:flex; align-items:center; gap:12px;
+      background:var(--brand); color:#fff; padding:14px 16px;
+    }
+    .topbar a{ color:#fff; text-decoration:none }
+    .topbar a:hover{ text-decoration:underline }
+    .topbar strong{ font-weight:900 }
+
+    /* Layout */
+    .container{ max-width:980px; margin:16px auto; padding:0 12px }
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.06);
+      padding:18px; margin:12px auto;
+    }
+
+    /* Header kết quả */
+    .summary{
+      display:flex; flex-wrap:wrap; gap:10px 16px;
+      padding-bottom:10px; border-bottom:1px dashed var(--border);
+      margin-bottom:6px;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border:1px solid var(--border); border-radius:999px;
+      background:#fff; font-weight:700;
+    }
+
+    /* Mỗi câu hỏi */
+    .qa{ padding:14px 0; border-top:1px solid var(--border) }
+    .qa:first-of-type{ border-top:none }
+    .qa h4{ margin:0 0 6px; font-size:16px; font-weight:700 }
+    .qtext{ margin:0 0 10px; line-height:1.6; text-align:justify }
+    .result{ margin:0 0 6px }
+    .muted{ color:var(--muted) }
+    .ok{ color:var(--ok); font-weight:700 }
+    .ng{ color:var(--ng); font-weight:700 }
+
+    /* Nút điều hướng cuối trang */
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
+    .btn{
+      padding:10px 16px; border-radius:10px; border:1px solid var(--border);
+      background:#fff; color:#111; cursor:pointer; text-decoration:none; font-weight:700;
+    }
+    .btn:hover{ box-shadow:0 2px 8px rgba(0,0,0,.08) }
+    .btn-primary{ background:var(--brand); color:#fff; border:none }
+    .btn-primary:hover{ background:var(--brand-600) }
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        try{ navigator.serviceWorker.register('./sw.js'); }catch(e){}
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <strong>XEM LẠI & GIẢI THÍCH</strong>
+  </div>
+
+  <main class="container">
+    <section class="card" id="box">Đang tải…</section>
+    <section class="card">
+      <div class="actions">
+        <a class="btn" href="quiz.html">Làm lại</a>
+        <a class="btn" href="leaderboard.html">Xem bảng xếp hạng</a>
+        <a class="btn btn-primary" href="materials.html">Về tài liệu học tập</a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function(){
+      const box = document.getElementById('box');
+      let data = null;
+      try{
+        data = JSON.parse(localStorage.getItem('ctct_last_result_for_review') || 'null');
+      }catch(_){ data = null; }
+
+      if(!data){
+        box.textContent = 'Chưa có lần nộp gần đây.';
+        return;
+      }
+
+      const head = `
+        <div class="summary">
+          <span class="chip">👤 <b>${escapeHtml(data.name||'')}</b></span>
+          <span class="chip">🏢 ${escapeHtml(data.unit||'')}</span>
+          <span class="chip">🎖 ${escapeHtml(data.position||'')}</span>
+          <span class="chip">🧾 Mã đề: <b>${escapeHtml(data.examCode||'----')}</b></span>
+          <span class="chip">🧮 Điểm: <b>${Number(data.score||0)}/${Number(data.total||0)}</b></span>
+        </div>
+      `;
+
+      const list = (Array.isArray(data.details)?data.details:[]).map(d=>{
+        const ok = (d.chosen||'') === (d.correct||'');
+        const explain = (d.explanation||'').trim();
+        return `
+          <div class="qa">
+            <h4>Câu ${Number(d.index)||''}</h4>
+            <p class="qtext">${escapeHtml(d.question||'')}</p>
+            <p class="result ${ok?'ok':'ng'}">
+              ${ok?'✔ Đúng':'✘ Sai'} — Bạn chọn: <b>${escapeHtml(d.chosen||'-')}</b> • Đúng: <b>${escapeHtml(d.correct||'-')}</b>
+            </p>
+            ${explain ? `<p class="muted"><i>Giải thích:</i> ${escapeHtml(explain)}</p>` : ''}
+          </div>
+        `;
+      }).join('');
+
+      box.innerHTML = head + list;
+
+      function escapeHtml(s){
+        return String(s||'').replace(/[&<>"']/g, m => ({
+          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'
+        }[m]));
+      }
+    })();
+  </script>
+</body>
+</html>

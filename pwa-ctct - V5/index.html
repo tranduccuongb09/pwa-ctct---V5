@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PTKV3 – Trung tâm Giáo dục Chính trị số</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- CSS dùng chung -->
+  <link rel="stylesheet" href="style.css?v=20250918">
+  <link rel="stylesheet" href="nav.css?v=20250918">
+
+  <!-- Preload -->
+  <link rel="preload" as="image" href="assets/bg-desktop.png">
+
+  <!-- Font CHỈ cho trang chủ -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Ép toàn bộ trang chủ dùng Be Vietnam Pro */
+    body.home, body.home *:not(code):not(kbd) {
+      font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+    }
+
+    /* Ưu tiên cho NAV của trang chủ */
+    body.home .nav,
+    body.home .nav * {
+      font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 100px 20px 80px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 84px);
+      font-weight: 800;
+      margin-bottom: 16px;
+      line-height: 1.15;
+    }
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 32px;
+      opacity: .95;
+    }
+    .hero__actions {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-ghost {
+      padding: 12px 20px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #fff;
+      background: transparent;
+      transition: all .2s ease;
+    }
+    .btn-ghost:hover {
+      background: #FFD966;
+      color: #111;
+      border-color: #FFD966;
+    }
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      });
+    }
+  </script>
+</head>
+<body class="home">
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+      <nav class="nav__links">
+        <a href="index.html" class="is-active">Trang chủ</a>
+        <a href="materials.html">Tài liệu học tập</a>
+        <a href="quiz.html">Làm bài kiểm tra</a>
+        <div class="nav__item has-dropdown">
+          <a href="results.html">Kết quả kiểm tra ▾</a>
+          <div class="dropdown">
+            <a href="my-results.html">Kết quả của tôi</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Search -->
+      <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
+        <input class="search__input" type="search" name="q"
+               placeholder="Tìm tài liệu, câu hỏi, chủ đề…"
+               autocomplete="off">
+        <button class="search__btn" type="submit">Tìm kiếm</button>
+      </form>
+
+      <div class="nav__actions">
+        <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main>
+    <section class="hero">
+      <h1>Giáo dục chính trị số<br>BAN CHỈ HUY PTKV3</h1>
+      <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra & phân tích chất lượng.</p>
+      <div class="hero__actions">
+        <a href="materials.html" class="btn-ghost">Bắt đầu học tập</a>
+        <button id="ai-toggle" type="button" class="btn-ghost">Trợ lý AI</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- KHAY TRÒ CHUYỆN GÓC PHẢI -->
+  <div id="ai-tray" class="ai-tray" hidden>
+    <div class="ai-tray__panel">
+      <header class="ai-tray__head">
+        <strong>Trợ lý AI</strong>
+        <div class="ai-head-actions">
+          <button id="ai-minify" class="ai-head-btn" type="button" title="Thu nhỏ" aria-label="Thu nhỏ">–</button>
+          <button id="ai-close"  class="ai-head-btn" type="button" title="Đóng" aria-label="Đóng">✕</button>
+        </div>
+      </header>
+
+      <div id="ai-messages" class="ai-tray__messages" aria-live="polite">
+        </div>
+      <div id="ai-previews" class="ai-previews" hidden></div>
+      <form id="ai-form" class="ai-tray__form">
+        <input id="ai-input" type="text" placeholder="Nhập câu hỏi…" autocomplete="off"/>
+        <button type="submit">Gửi</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Nút dock -->
+  <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
+
+  <!-- Script -->
+  <script src="navbar.js" defer></script>
+  <script src="search.js" defer></script>
+  <script src="config.js" defer></script>
+  <script src="ai.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
