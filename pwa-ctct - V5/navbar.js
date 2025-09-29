@@ -237,3 +237,108 @@
   // Tự đóng khi resize về desktop
   window.addEventListener('resize', ()=>{ if (window.innerWidth>768) openMenu(false); });
 })();
+/* ====== Mobile “Bali style” drawer toggle (an toàn, không đụng logic cũ) ====== */
+(function () {
+  'use strict';
+
+  // Nếu đã có nav__drawer (tránh tạo trùng)
+  const nav = document.querySelector('.nav');
+  if (!nav) return;
+
+  // Tạo scrim + drawer nếu chưa có
+  let scrim   = document.querySelector('.nav__scrim');
+  let drawer  = document.querySelector('.nav__drawer');
+  const toggleBtn = document.querySelector('.nav__toggle');
+
+  if (!toggleBtn) return; // desktop-only layout
+
+  if (!scrim){
+    scrim = document.createElement('div');
+    scrim.className = 'nav__scrim';
+    document.body.appendChild(scrim);
+  }
+
+  if (!drawer){
+    drawer = document.createElement('div');
+    drawer.className = 'nav__drawer';
+    // nội dung: clone các link đã có + build dropdown (phần build dropdown ở trên vẫn chạy bình thường)
+    const brand = document.querySelector('.brand')?.textContent || 'MENU';
+    drawer.innerHTML = `
+      <div class="drawer__brand">${brand}</div>
+      <div class="drawer__links" id="drawerLinks"></div>
+    `;
+    document.body.appendChild(drawer);
+
+    // dựng danh sách từ .nav__links (nếu có)
+    const src = document.querySelector('.nav__links');
+    const dst = drawer.querySelector('#drawerLinks');
+    if (src && dst){
+      // nhóm có dropdown
+      src.querySelectorAll(':scope > .nav__item, :scope > a').forEach(node=>{
+        if (node.classList?.contains('nav__item')) {
+          const a = node.querySelector(':scope > a');
+          if (!a) return;
+          const wrap = document.createElement('div');
+          wrap.className = 'has-sub';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = a.textContent.replace(/▾|▼/g,'').trim();
+          wrap.appendChild(btn);
+          const sub = document.createElement('div');
+          sub.className = 'sub';
+          wrap.appendChild(sub);
+          node.querySelectorAll(':scope .dropdown a').forEach(x=>{
+            const link = document.createElement('a');
+            link.href = x.getAttribute('href') || '#';
+            link.textContent = x.textContent.trim();
+            sub.appendChild(link);
+          });
+          dst.appendChild(wrap);
+        } else if (node.tagName === 'A') {
+          const link = document.createElement('a');
+          link.href = node.getAttribute('href') || '#';
+          link.textContent = node.textContent.trim();
+          dst.appendChild(link);
+        }
+      });
+    }
+
+    // mở/đóng submenu trong drawer
+    drawer.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.has-sub > button');
+      if (!btn) return;
+      const holder = btn.parentElement;
+      holder.classList.toggle('open');
+    });
+
+    // click link trong drawer -> đóng
+    drawer.addEventListener('click', (e)=>{
+      const a = e.target.closest('a[href]');
+      if (a) closeMenu();
+    });
+  }
+
+  function lockScroll(on){
+    document.documentElement.style.overflow = on ? 'hidden' : '';
+    document.body.style.overflow = on ? 'hidden' : '';
+  }
+
+  function openMenu(){
+    nav.classList.add('is-open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    lockScroll(true);
+  }
+  function closeMenu(){
+    nav.classList.remove('is-open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    lockScroll(false);
+  }
+  function toggleMenu(){
+    if (nav.classList.contains('is-open')) closeMenu(); else openMenu();
+  }
+
+  toggleBtn.addEventListener('click', toggleMenu);
+  scrim.addEventListener('click', closeMenu);
+  window.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeMenu(); });
+  window.addEventListener('resize', ()=>{ if (innerWidth>900) closeMenu(); });
+})();
