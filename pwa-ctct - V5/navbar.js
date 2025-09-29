@@ -1,13 +1,10 @@
-/* ===== CTĐ, CTCT – Navbar chuẩn (desktop giữ nguyên, mobile panel căn phải) ===== */
+/* ===== CTĐ, CTCT – Navbar chuẩn (fixed) ===== */
 (function () {
   'use strict';
 
-  /* ---------- Hồ sơ đơn giản (localStorage) ---------- */
+  // ---------- Hồ sơ đơn giản ----------
   const LS_KEY = 'ctct_profile';
-  const J = {
-    parse:(s,fb=null)=>{ try{ return JSON.parse(s); }catch{ return fb; } },
-    str:o=>{ try{ return JSON.stringify(o); }catch{ return ''; } }
-  };
+  const J = { parse:(s,fb=null)=>{try{return JSON.parse(s);}catch{return fb;}}, str:o=>{try{return JSON.stringify(o);}catch{return'';}} };
   const getProfile = () => J.parse(localStorage.getItem(LS_KEY), null);
   const setProfile = (p)=>{
     if(!p||typeof p!=='object') return false;
@@ -18,44 +15,45 @@
     return true;
   };
   const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){} };
+  window.ctctProfile = getProfile;
 
-  /* ---------- Phần tử ---------- */
-  const nav       = document.querySelector('.nav');
-  const btnToggle = document.getElementById('navToggle');
-  const panel     = document.getElementById('navPanel');
+  const linksWrap  = document.querySelector('.nav__links');
+  const navActions = document.querySelector('.nav__actions');
+  const btnLogin   = document.getElementById('btnLogin');
+  const btnLogout  = document.getElementById('btnLogout');
+  const navProfile = document.getElementById('navProfile');
 
-  const btnLogin  = document.getElementById('btnLogin');
-  const btnLogout = document.getElementById('btnLogout');
-  const navProfile= document.getElementById('navProfile');
-
-  const panelLogin  = document.getElementById('panelLogin');
-  const panelLogout = document.getElementById('panelLogout');
-
-  /* ---------- Render profile nút đăng nhập/đăng xuất ---------- */
-  function renderAuth(){
-    const me = getProfile();
-    const ok = !!(me && me.name);
-    // Desktop
-    if (btnLogin)  btnLogin.hidden  =  ok;
-    if (btnLogout) btnLogout.hidden = !ok;
+  function renderNav(){
+    const authDisabled = !!(navActions && (navActions.hidden || navActions.hasAttribute('hidden')));
+    if (authDisabled) return;
+    const me = getProfile(), ok = !!(me && me.name);
     if (navProfile){
       navProfile.hidden = !ok;
       if (ok) navProfile.textContent = `${me.name}${me.unit?` • ${me.unit}`:''}`;
     }
-    // Mobile panel
-    if (panelLogin)  panelLogin.hidden  =  ok;
-    if (panelLogout) panelLogout.hidden = !ok;
+    if (btnLogin)  btnLogin.hidden  = ok;
+    if (btnLogout) btnLogout.hidden = !ok;
   }
-  renderAuth();
-  window.addEventListener('storage', e=>{ if(e.key===LS_KEY) renderAuth(); });
 
+  // Active link
+  try{
+    if (linksWrap){
+      const here = location.pathname.split('/').pop() || 'index.html';
+      linksWrap.querySelectorAll('a[href]').forEach(a=>{
+        const f=(a.getAttribute('href')||'').split('/').pop();
+        if (f===here) a.classList.add('is-active');
+      });
+    }
+  }catch(_){}
+
+  // Login/Logout prompt
   function doLogin(){
     const cur=getProfile()||{};
     const name=(prompt('Họ và tên:',cur.name||'')||'').trim(); if(!name) return;
     const unit=(prompt('Đơn vị:',cur.unit||'')||'').trim(); if(!unit) return;
     const position=(prompt('Chức vụ (tùy chọn):',cur.position||'')||'').trim();
     if (setProfile({name,unit,position})){
-      renderAuth();
+      renderNav();
       try{
         const f=document.getElementById('fullname'), u=document.getElementById('unit'), p=document.getElementById('position');
         if (f && !f.value) f.value=name; if (u && !u.value) u.value=unit; if (p && !p.value) p.value=position;
@@ -63,53 +61,200 @@
       alert('Đăng nhập thành công!');
     }
   }
-  function doLogout(){ if(!confirm('Đăng xuất tài khoản hiện tại?')) return; clearProfile(); renderAuth(); }
+  function doLogout(){ if(!confirm('Đăng xuất tài khoản hiện tại?')) return; clearProfile(); renderNav(); }
 
-  btnLogin   && btnLogin.addEventListener('click', doLogin);
-  btnLogout  && btnLogout.addEventListener('click', doLogout);
-  panelLogin && panelLogin.addEventListener('click', ()=>{ doLogin(); closePanel(); });
-  panelLogout&& panelLogout.addEventListener('click', ()=>{ doLogout(); closePanel(); });
+  btnLogin  && btnLogin.addEventListener('click', doLogin);
+  btnLogout && btnLogout.addEventListener('click', doLogout);
+  window.addEventListener('storage', e=>{ if(e.key===LS_KEY) renderNav(); });
+  renderNav();
 
-  /* ---------- Mobile panel toggle ---------- */
-  function openPanel(){ if (!nav) return; nav.classList.add('is-open'); btnToggle?.setAttribute('aria-expanded','true'); }
-  function closePanel(){ if (!nav) return; nav.classList.remove('is-open'); btnToggle?.setAttribute('aria-expanded','false'); }
-  function togglePanel(){ nav?.classList.toggle('is-open'); btnToggle?.setAttribute('aria-expanded', nav?.classList.contains('is-open') ? 'true' : 'false'); }
+  // Autofill form nếu có
+  try{
+    const me=getProfile(); if(me){
+      const f=document.getElementById('fullname'), u=document.getElementById('unit'), p=document.getElementById('position');
+      if (f && !f.value) f.value=me.name||''; if (u && !u.value) u.value=me.unit||''; if (p && !p.value) p.value=me.position||'';
+    }
+  }catch(_){}
+})();
 
-  btnToggle && btnToggle.addEventListener('click', togglePanel);
+/* ===== Patch Dropdown CHUẨN (wrap anchor đúng chỗ) ===== */
+(function(){
+  const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
-  // Đóng khi click link trong panel
-  panel && panel.addEventListener('click', (e)=>{
-    if (e.target.matches('a.panel-link, .panel-sub a')) closePanel();
-  });
+  function findAnchorByText(text){
+    const want = norm(text);
+    const roots = document.querySelectorAll('.nav, nav, header');
+    for (const root of roots){
+      const as = root.querySelectorAll('a');
+      for (const a of as) {
+        const t = norm(a.textContent || '');
+        if (t.includes(want)) return a; // nới lỏng khớp (kể cả có ký tự ▾)
+      }
+    }
+    return null;
+  }
 
-  // ESC đóng panel
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closePanel(); });
+  // ⬇️ QUAN TRỌNG: bọc <a> vào div.nav__item nếu chưa có
+  function wrapAsNavItem(anchor){
+    let holder = anchor.closest('.nav__item, li');
+    if (holder) return holder;
+    holder = document.createElement('div');
+    holder.className = 'nav__item has-dropdown';
+    const parent = anchor.parentNode;
+    parent.insertBefore(holder, anchor);
+    holder.appendChild(anchor);
+    return holder;
+  }
 
-  // Accordion cho mục con
-  document.querySelectorAll('.panel-acc').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const key = btn.dataset.acc;
-      const sub = document.querySelector(`[data-acc-content="${key}"]`);
-      const opened = btn.classList.toggle('open');
-      if (sub) sub.style.display = opened ? 'block' : 'none';
+  function ensureDropdownFor(anchor, dataKey){
+    if (!anchor) return null;
+    const li = wrapAsNavItem(anchor);               // luôn là .nav__item riêng
+    li.classList.add('has-dropdown');
+    li.dataset.menu = dataKey;
+
+    // chỉ 1 dropdown
+    li.querySelectorAll(':scope > .dropdown').forEach((x,i)=>{ if(i>0) x.remove(); });
+
+    let panel = li.querySelector(':scope > .dropdown');
+    if (!panel){
+      const sample = document.querySelector('.nav__item.has-dropdown .dropdown');
+      const tag = (sample && sample.tagName.toLowerCase()==='ul') ? 'ul' : 'div';
+      panel = document.createElement(tag);
+      panel.className = sample ? sample.className : 'dropdown';
+      li.appendChild(panel);
+    }
+    return { li, panel, anchor };
+  }
+
+  function addItem(panel, href, text){
+    let a = [...panel.querySelectorAll('a')].find(x => norm(x.textContent)===norm(text));
+    if (!a){
+      if (panel.tagName.toLowerCase()==='ul'){
+        const li=document.createElement('li'); a=document.createElement('a'); li.appendChild(a); panel.appendChild(li);
+      } else {
+        a=document.createElement('a'); a.className='dropdown__item'; panel.appendChild(a);
+      }
+    }
+    a.href=href; a.textContent=text;
+  }
+
+  function clearOther(panel, keep){
+    const set = new Set(keep.map(norm));
+    panel.querySelectorAll('a').forEach(a=>{ if(!set.has(norm(a.textContent))) a.remove(); });
+    panel.querySelectorAll('li').forEach(li=>{ if(!li.querySelector('a')) li.remove(); });
+  }
+
+  function disableNavigate(titleAnchor){
+    if (!titleAnchor) return;
+    titleAnchor.setAttribute('href', '#'); // không điều hướng
+    titleAnchor.style.cursor = 'default';
+    const li = titleAnchor.closest('.nav__item, li');
+    titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
+  }
+
+  function ensureChevron(a){
+    if (!a.querySelector('.chev') && !(/\u25BE|\u25BC|▾|▼/.test(a.textContent))) {
+      const s=document.createElement('span'); s.className='chev'; s.textContent=' ▾'; a.appendChild(s);
+    }
+  }
+
+  function buildMenus(){
+    // === LÀM BÀI KIỂM TRA ===
+    const aQuiz = findAnchorByText('Làm bài kiểm tra');
+    if (aQuiz){
+      const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
+      clearOther(panel, ['Kiểm tra nhận thức','Ôn trắc nghiệm','Thi thử']);
+      addItem(panel, 'exam.html',     'Kiểm tra nhận thức');
+      addItem(panel, 'practice.html', 'Ôn trắc nghiệm');
+      addItem(panel, 'quiz.html',     'Thi thử');
+      disableNavigate(anchor);
+      ensureChevron(anchor);
+    }
+
+    // === KẾT QUẢ KIỂM TRA ===
+    const aRes = findAnchorByText('Kết quả kiểm tra');
+    if (aRes){
+      const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
+      clearOther(panel, ['Kết quả của tôi','Bảng xếp hạng']);
+      addItem(panel, 'my-results.html',  'Kết quả của tôi');
+      addItem(panel, 'leaderboard.html', 'Bảng xếp hạng');
+      disableNavigate(anchor);
+      ensureChevron(anchor);
+    }
+
+    // chuyển thẳng mọi link cũ results.html -> my-results.html
+    document.querySelectorAll('a[href]').forEach(a=>{
+      const href=(a.getAttribute('href')||'').trim();
+      if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
     });
-  });
 
-  /* ---------- Điều chỉnh “Kết quả kiểm tra” -> my-results nếu link cũ ---------- */
-  document.querySelectorAll('a[href]').forEach(a=>{
-    const href=(a.getAttribute('href')||'').trim();
-    if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
-  });
-
-  /* ---------- (Tuỳ chọn) Mở khay AI từ panel ---------- */
-  const aiLink = document.getElementById('panel-ai');
-  if (aiLink){
-    aiLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      closePanel();
-      try{
-        document.getElementById('ai-toggle')?.click();
-      }catch(_){}
+    // click ra ngoài -> đóng
+    document.addEventListener('click', (e)=>{
+      document.querySelectorAll('.nav__item.has-dropdown').forEach(li=>{
+        if (!li.contains(e.target)) li.classList.remove('open');
+      });
     });
   }
+
+  window.addEventListener('load', ()=>setTimeout(buildMenus, 100));
+})();
+
+/* === Thêm mới: Toggle panel & submenu cho mobile === */
+(function(){
+  const nav = document.querySelector('.nav');
+  const toggleBtn = document.querySelector('.nav__toggle');
+  const links = document.querySelector('.nav__links');
+  if (!nav || !toggleBtn || !links) return;
+
+  function setPanel(open){
+    nav.classList.toggle('is-open', open);
+    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('no-scroll', open);
+    // icon
+    if (open) {
+      toggleBtn.innerHTML = '<span aria-hidden="true">✕</span>';
+    } else {
+      toggleBtn.innerHTML = '<span></span><span></span><span></span>';
+    }
+  }
+
+  toggleBtn.addEventListener('click', () => setPanel(!nav.classList.contains('is-open')));
+
+  // Submenu toggle
+  function isMobile(){ return window.matchMedia('(max-width:768px)').matches; }
+  document.querySelectorAll('.nav__item.has-dropdown > a').forEach(a=>{
+    if (!a.querySelector('.chev')) {
+      const s=document.createElement('span');
+      s.className='chev'; s.textContent='▾';
+      a.appendChild(s);
+    }
+    a.addEventListener('click', e=>{
+      if (!isMobile()) return; // desktop giữ nguyên
+      e.preventDefault();
+      const holder=a.closest('.nav__item');
+      const isOpen=holder.classList.contains('open');
+      document.querySelectorAll('.nav__item.has-dropdown.open').forEach(li=>{
+        if (li!==holder) li.classList.remove('open');
+      });
+      holder.classList.toggle('open', !isOpen);
+    });
+  });
+
+  // Đóng panel khi chọn link thường
+  links.addEventListener('click', e=>{
+    const a=e.target.closest('a');
+    if (!a) return;
+    const parent=a.closest('.nav__item.has-dropdown');
+    if (!parent && isMobile()) setPanel(false);
+  });
+
+  // ESC hoặc click ngoài để đóng
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') setPanel(false); });
+  document.addEventListener('click', e=>{
+    if (!isMobile()) return;
+    if (nav.classList.contains('is-open')){
+      const inside=e.target.closest('.nav__inner');
+      if (!inside) setPanel(false);
+    }
+  });
 })();
