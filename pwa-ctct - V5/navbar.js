@@ -1,8 +1,8 @@
-/* ===== CTĐ, CTCT – Navbar chuẩn (fixed) ===== */
+/* ===== CTĐ, CTCT – Navbar chuẩn (profile + dropdown + mobile drawer) ===== */
 (function () {
   'use strict';
 
-  // ---------- Hồ sơ đơn giản ----------
+  /* ---------- Hồ sơ đơn giản ---------- */
   const LS_KEY = 'ctct_profile';
   const J = { parse:(s,fb=null)=>{try{return JSON.parse(s);}catch{return fb;}}, str:o=>{try{return JSON.stringify(o);}catch{return'';}} };
   const getProfile = () => J.parse(localStorage.getItem(LS_KEY), null);
@@ -75,128 +75,140 @@
       if (f && !f.value) f.value=me.name||''; if (u && !u.value) u.value=me.unit||''; if (p && !p.value) p.value=me.position||'';
     }
   }catch(_){}
-})();
 
-/* ===== Dropdown builder + Mobile hamburger ===== */
-(function(){
-  const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  /* ===== Patch Dropdown CHUẨN (bao bọc đúng, không phá HTML gốc) ===== */
+  (function(){
+    const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
-  function findAnchorByText(text){
-    const want = norm(text);
-    const roots = document.querySelectorAll('.nav, nav, header');
-    for (const root of roots){
-      const as = root.querySelectorAll('a');
-      for (const a of as) {
-        const t = norm(a.textContent || '');
-        if (t.includes(want)) return a; // cho phép chứa kí tự ▾
+    function findAnchorByText(text){
+      const want = norm(text);
+      const roots = document.querySelectorAll('.nav, nav, header');
+      for (const root of roots){
+        const as = root.querySelectorAll('a');
+        for (const a of as) {
+          const t = norm(a.textContent || '');
+          if (t.includes(want)) return a; // cho phép có ký tự ▾
+        }
+      }
+      return null;
+    }
+
+    function wrapAsNavItem(anchor){
+      let holder = anchor.closest('.nav__item, li');
+      if (holder) return holder;
+      holder = document.createElement('div');
+      holder.className = 'nav__item has-dropdown';
+      const parent = anchor.parentNode;
+      parent.insertBefore(holder, anchor);
+      holder.appendChild(anchor);
+      return holder;
+    }
+
+    function ensureDropdownFor(anchor, dataKey){
+      if (!anchor) return null;
+      const li = wrapAsNavItem(anchor);
+      li.classList.add('has-dropdown');
+      li.dataset.menu = dataKey;
+      li.querySelectorAll(':scope > .dropdown').forEach((x,i)=>{ if(i>0) x.remove(); });
+
+      let panel = li.querySelector(':scope > .dropdown');
+      if (!panel){
+        const sample = document.querySelector('.nav__item.has-dropdown .dropdown');
+        const tag = (sample && sample.tagName.toLowerCase()==='ul') ? 'ul' : 'div';
+        panel = document.createElement(tag);
+        panel.className = sample ? sample.className : 'dropdown';
+        li.appendChild(panel);
+      }
+      return { li, panel, anchor };
+    }
+
+    function addItem(panel, href, text){
+      const n = s => (s||'').toLowerCase().trim();
+      let a = [...panel.querySelectorAll('a')].find(x => n(x.textContent)===n(text));
+      if (!a){
+        if (panel.tagName.toLowerCase()==='ul'){
+          const li=document.createElement('li'); a=document.createElement('a'); li.appendChild(a); panel.appendChild(li);
+        } else {
+          a=document.createElement('a'); a.className='dropdown__item'; panel.appendChild(a);
+        }
+      }
+      a.href=href; a.textContent=text;
+    }
+    function clearOther(panel, keep){
+      const set = new Set(keep.map(x=>x.toLowerCase()));
+      panel.querySelectorAll('a').forEach(a=>{ if(!set.has(a.textContent.toLowerCase())) a.remove(); });
+      panel.querySelectorAll('li').forEach(li=>{ if(!li.querySelector('a')) li.remove(); });
+    }
+    function disableNavigate(titleAnchor){
+      if (!titleAnchor) return;
+      titleAnchor.setAttribute('href', '#');
+      titleAnchor.style.cursor = 'default';
+      const li = titleAnchor.closest('.nav__item, li');
+      titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
+    }
+    function ensureChevron(a){
+      if (!a.querySelector('.chev') && !(/\u25BE|\u25BC|▾|▼/.test(a.textContent))) {
+        const s=document.createElement('span'); s.className='chev'; s.textContent=' ▾'; a.appendChild(s);
       }
     }
-    return null;
-  }
-  function wrapAsNavItem(anchor){
-    let holder = anchor.closest('.nav__item, li');
-    if (holder) return holder;
-    holder = document.createElement('div');
-    holder.className = 'nav__item has-dropdown';
-    const parent = anchor.parentNode;
-    parent.insertBefore(holder, anchor);
-    holder.appendChild(anchor);
-    return holder;
-  }
-  function ensureDropdownFor(anchor, dataKey){
-    if (!anchor) return null;
-    const li = wrapAsNavItem(anchor);
-    li.classList.add('has-dropdown');
-    li.dataset.menu = dataKey;
-    li.querySelectorAll(':scope > .dropdown').forEach((x,i)=>{ if(i>0) x.remove(); });
 
-    let panel = li.querySelector(':scope > .dropdown');
-    if (!panel){
-      const sample = document.querySelector('.nav__item.has-dropdown .dropdown');
-      const tag = (sample && sample.tagName.toLowerCase()==='ul') ? 'ul' : 'div';
-      panel = document.createElement(tag);
-      panel.className = sample ? sample.className : 'dropdown';
-      li.appendChild(panel);
-    }
-    return { li, panel, anchor };
-  }
-  function addItem(panel, href, text){
-    let a = [...panel.querySelectorAll('a')].find(x => norm(x.textContent)===norm(text));
-    if (!a){
-      if (panel.tagName.toLowerCase()==='ul'){
-        const li=document.createElement('li'); a=document.createElement('a'); li.appendChild(a); panel.appendChild(li);
-      } else {
-        a=document.createElement('a'); a.className='dropdown__item'; panel.appendChild(a);
-      }
-    }
-    a.href=href; a.textContent=text;
-  }
-  function clearOther(panel, keep){
-    const set = new Set(keep.map(norm));
-    panel.querySelectorAll('a').forEach(a=>{ if(!set.has(norm(a.textContent))) a.remove(); });
-    panel.querySelectorAll('li').forEach(li=>{ if(!li.querySelector('a')) li.remove(); });
-  }
-  function disableNavigate(titleAnchor){
-    if (!titleAnchor) return;
-    titleAnchor.setAttribute('href', '#');
-    titleAnchor.style.cursor = 'default';
-    const li = titleAnchor.closest('.nav__item, li');
-    titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
-  }
-  function ensureChevron(a){
-    if (!a.querySelector('.chev') && !(/\u25BE|\u25BC|▾|▼/.test(a.textContent))) {
-      const s=document.createElement('span'); s.className='chev'; s.textContent=' ▾'; a.appendChild(s);
-    }
-  }
-
-  function buildMenus(){
-    // === LÀM BÀI KIỂM TRA ===
-    const aQuiz = findAnchorByText('làm bài kiểm tra');
+    // Làm bài kiểm tra
+    const aQuiz = findAnchorByText('Làm bài kiểm tra');
     if (aQuiz){
       const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
       clearOther(panel, ['Kiểm tra nhận thức','Ôn trắc nghiệm','Thi thử']);
-      addItem(panel, 'exam.html',     'Kiểm tra nhận thức');
-      addItem(panel, 'practice.html', 'Ôn trắc nghiệm');
-      addItem(panel, 'quiz.html',     'Thi thử');
+      addItem(panel,'exam.html','Kiểm tra nhận thức');
+      addItem(panel,'practice.html','Ôn trắc nghiệm');
+      addItem(panel,'quiz.html','Thi thử');
       disableNavigate(anchor);
       ensureChevron(anchor);
     }
-    // === KẾT QUẢ KIỂM TRA ===
-    const aRes = findAnchorByText('kết quả kiểm tra');
+
+    // Kết quả kiểm tra
+    const aRes = findAnchorByText('Kết quả kiểm tra');
     if (aRes){
       const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
       clearOther(panel, ['Kết quả của tôi','Bảng xếp hạng']);
-      addItem(panel, 'my-results.html',  'Kết quả của tôi');
-      addItem(panel, 'leaderboard.html', 'Bảng xếp hạng');
+      addItem(panel,'my-results.html','Kết quả của tôi');
+      addItem(panel,'leaderboard.html','Bảng xếp hạng');
       disableNavigate(anchor);
       ensureChevron(anchor);
     }
-    // Chuyển link cũ
+
+    // Chuyển alias cũ results.html -> my-results.html
     document.querySelectorAll('a[href]').forEach(a=>{
       const href=(a.getAttribute('href')||'').trim();
       if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
     });
-  }
+  })();
 
-  // ===== Mobile Hamburger =====
-  function setupHamburger(){
+  /* ===== Mobile Drawer (toggle + overlay + ESC) ===== */
+  (function(){
     const nav = document.querySelector('.nav');
-    const toggle = nav ? nav.querySelector('.nav__toggle') : null;
-    const links = nav ? nav.querySelector('.nav__links') : null;
-    if (!nav || !toggle || !links) return;
+    const toggle = document.querySelector('.nav__toggle');
+    const links  = document.querySelector('.nav__links');
+    const overlay = document.querySelector('.nav__overlay');
+    if (!nav || !toggle || !links || !overlay) return;
 
-    const close = ()=>{ nav.classList.remove('is-open'); toggle.setAttribute('aria-expanded','false'); };
-    toggle.addEventListener('click', ()=>{
-      const opened = nav.classList.toggle('is-open');
-      toggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+    const open = (state)=>{
+      nav.classList.toggle('is-open', state);
+      toggle.setAttribute('aria-expanded', state ? 'true' : 'false');
+      document.body.classList.toggle('no-scroll', state);
+      // đổi icon: X khi mở
+      if (state) toggle.innerHTML = '<span aria-hidden="true">✕</span>';
+      else toggle.innerHTML = '<span></span><span></span><span></span>';
+    };
+
+    toggle.addEventListener('click', ()=> open(!nav.classList.contains('is-open')));
+    overlay.addEventListener('click', ()=> open(false));
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') open(false); });
+    // Click link trong drawer -> đóng
+    links.addEventListener('click', e=>{ if(e.target.closest('a')) open(false); });
+
+    // Mục “Trợ lý AI” trong menu
+    document.getElementById('nav-ai')?.addEventListener('click', e=>{
+      e.preventDefault(); open(false);
+      document.getElementById('ai-toggle')?.click();
     });
-    // Tự đóng khi chọn link / bấm Esc
-    links.querySelectorAll('a').forEach(a=> a.addEventListener('click', close));
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
-  }
-
-  window.addEventListener('load', ()=>{
-    buildMenus();
-    setupHamburger();
-  });
+  })();
 })();
