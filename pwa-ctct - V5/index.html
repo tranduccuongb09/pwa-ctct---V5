@@ -81,6 +81,48 @@
     </div>
   </header>
 
+  <!-- MOBILE DRAWER (panel menu – chỉ hiển thị trên điện thoại) -->
+<aside id="mobileDrawer" class="mobile-drawer" aria-hidden="true">
+  <div class="drawer__head">
+    <div class="drawer__brand">BAN CHỈ HUY PTKV3</div>
+  </div>
+
+  <nav class="drawer__nav" role="navigation" aria-label="Menu di động">
+    <a class="drawer__link" href="index.html">
+      <span class="home-icon" aria-hidden="true">🏠</span> Trang chủ
+    </a>
+
+    <a class="drawer__link" href="materials.html">Tài liệu học tập</a>
+
+    <button class="drawer__link has-caret" data-sub="thi">
+      Làm bài kiểm tra <span class="caret" aria-hidden="true">▸</span>
+    </button>
+    <div class="drawer__sub" id="sub-thi" hidden>
+      <a href="exam.html" class="drawer__sublink">Kiểm tra nhận thức</a>
+      <a href="practice.html" class="drawer__sublink">Ôn trắc nghiệm</a>
+      <a href="quiz.html" class="drawer__sublink">Thi thử</a>
+    </div>
+
+    <button class="drawer__link has-caret" data-sub="ketqua">
+      Kết quả kiểm tra <span class="caret" aria-hidden="true">▸</span>
+    </button>
+    <div class="drawer__sub" id="sub-ketqua" hidden>
+      <a href="my-results.html" class="drawer__sublink">Kết quả của tôi</a>
+      <a href="leaderboard.html" class="drawer__sublink">Bảng xếp hạng</a>
+    </div>
+
+    <a class="drawer__link" href="#" id="drawer-ai">Trợ lý AI</a>
+  </nav>
+
+  <div class="drawer__auth">
+    <a class="btn btn-outline-yellow" href="#" id="drawer-login">Đăng nhập</a>
+    <a class="btn btn-outline-yellow" href="#" id="drawer-register">Đăng ký</a>
+  </div>
+</aside>
+
+<!-- Lớp nền mờ để đóng menu khi chạm -->
+<div id="drawerScrim" class="drawer-scrim" hidden></div>
+  
   <!-- HERO -->
   <main>
     <section class="hero">

@@ -198,63 +198,73 @@
 
   window.addEventListener('load', ()=>setTimeout(buildMenus, 100));
 })();
-
-/* === Thêm mới: Toggle panel & submenu cho mobile === */
+/* =========================================================
+   MOBILE DRAWER CONTROL – mở/đóng panel, toggle submenu
+   ========================================================= */
 (function(){
-  const nav = document.querySelector('.nav');
-  const toggleBtn = document.querySelector('.nav__toggle');
-  const links = document.querySelector('.nav__links');
-  if (!nav || !toggleBtn || !links) return;
+  const toggleBtn   = document.querySelector('.nav__toggle'); // nút 3 gạch sẵn có
+  const drawer      = document.getElementById('mobileDrawer');
+  const scrim       = document.getElementById('drawerScrim');
+  if (!toggleBtn || !drawer || !scrim) return;
 
-  function setPanel(open){
-    nav.classList.toggle('is-open', open);
-    toggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    document.body.classList.toggle('no-scroll', open);
-    // icon
-    if (open) {
-      toggleBtn.innerHTML = '<span aria-hidden="true">✕</span>';
-    } else {
-      toggleBtn.innerHTML = '<span></span><span></span><span></span>';
-    }
+  const body = document.body;
+
+  function openDrawer(){
+    drawer.classList.add('is-open');
+    scrim.hidden = false;
+    body.classList.add('drawer-open');
+    toggleBtn.setAttribute('aria-expanded','true');
+  }
+  function closeDrawer(){
+    drawer.classList.remove('is-open');
+    scrim.hidden = true;
+    body.classList.remove('drawer-open');
+    toggleBtn.setAttribute('aria-expanded','false');
   }
 
-  toggleBtn.addEventListener('click', () => setPanel(!nav.classList.contains('is-open')));
+  toggleBtn.addEventListener('click', (e)=>{
+    e.preventDefault();
+    (drawer.classList.contains('is-open') ? closeDrawer() : openDrawer());
+  });
+  scrim.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeDrawer(); });
 
-  // Submenu toggle
-  function isMobile(){ return window.matchMedia('(max-width:768px)').matches; }
-  document.querySelectorAll('.nav__item.has-dropdown > a').forEach(a=>{
-    if (!a.querySelector('.chev')) {
-      const s=document.createElement('span');
-      s.className='chev'; s.textContent='▾';
-      a.appendChild(s);
-    }
-    a.addEventListener('click', e=>{
-      if (!isMobile()) return; // desktop giữ nguyên
-      e.preventDefault();
-      const holder=a.closest('.nav__item');
-      const isOpen=holder.classList.contains('open');
-      document.querySelectorAll('.nav__item.has-dropdown.open').forEach(li=>{
-        if (li!==holder) li.classList.remove('open');
-      });
-      holder.classList.toggle('open', !isOpen);
+  // Toggle submenu
+  drawer.querySelectorAll('.drawer__link.has-caret').forEach(btn=>{
+    const key = btn.getAttribute('data-sub');
+    const panel = document.getElementById('sub-'+key);
+    if (!panel) return;
+    btn.setAttribute('aria-expanded','false');
+    btn.addEventListener('click', ()=>{
+      const isOpen = !panel.hasAttribute('hidden');
+      drawer.querySelectorAll('.drawer__sub').forEach(s=>s.setAttribute('hidden',''));
+      drawer.querySelectorAll('.drawer__link.has-caret').forEach(b=>b.setAttribute('aria-expanded','false'));
+      if (!isOpen){
+        panel.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded','true');
+      }
     });
   });
 
-  // Đóng panel khi chọn link thường
-  links.addEventListener('click', e=>{
-    const a=e.target.closest('a');
-    if (!a) return;
-    const parent=a.closest('.nav__item.has-dropdown');
-    if (!parent && isMobile()) setPanel(false);
-  });
+  // Trợ lý AI trong menu: đóng panel rồi kích hoạt AI
+  const aiInDrawer = document.getElementById('drawer-ai');
+  if (aiInDrawer){
+    aiInDrawer.addEventListener('click', (e)=>{
+      e.preventDefault();
+      closeDrawer();
+      const t = document.getElementById('ai-toggle');
+      if (t) t.click();
+    });
+  }
 
-  // ESC hoặc click ngoài để đóng
-  document.addEventListener('keydown', e=>{ if(e.key==='Escape') setPanel(false); });
-  document.addEventListener('click', e=>{
-    if (!isMobile()) return;
-    if (nav.classList.contains('is-open')){
-      const inside=e.target.closest('.nav__inner');
-      if (!inside) setPanel(false);
-    }
-  });
+  // (tuỳ chọn) xử lý Login/Register nếu anh đã có flow riêng
+  const dLogin = document.getElementById('drawer-login');
+  const dReg   = document.getElementById('drawer-register');
+  dLogin && dLogin.addEventListener('click', (e)=>{ e.preventDefault(); closeDrawer(); document.getElementById('btnAuth')?.click(); });
+  dReg   && dReg.addEventListener('click', (e)=>{ e.preventDefault(); closeDrawer(); document.getElementById('btnAuth')?.click(); });
+
+  // Vuốt để đóng (nhẹ nhàng)
+  let startX = null;
+  drawer.addEventListener('touchstart', (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
+  drawer.addEventListener('touchmove',  (e)=>{ if(startX!=null && (startX - e.touches[0].clientX) < -40) closeDrawer(); }, {passive:true});
 })();
