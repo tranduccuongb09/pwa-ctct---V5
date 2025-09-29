@@ -14,7 +14,7 @@
     try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}
     return true;
   };
-  const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}}; 
+  const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){} };
   window.ctctProfile = getProfile;
 
   const linksWrap  = document.querySelector('.nav__links');
@@ -144,7 +144,7 @@
 
   function disableNavigate(titleAnchor){
     if (!titleAnchor) return;
-    titleAnchor.setAttribute('href', '#');
+    titleAnchor.setAttribute('href', '#'); // không điều hướng
     titleAnchor.style.cursor = 'default';
     const li = titleAnchor.closest('.nav__item, li');
     titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
@@ -157,6 +157,7 @@
   }
 
   function buildMenus(){
+    // === LÀM BÀI KIỂM TRA ===
     const aQuiz = findAnchorByText('Làm bài kiểm tra');
     if (aQuiz){
       const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
@@ -168,6 +169,7 @@
       ensureChevron(anchor);
     }
 
+    // === KẾT QUẢ KIỂM TRA ===
     const aRes = findAnchorByText('Kết quả kiểm tra');
     if (aRes){
       const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
@@ -178,11 +180,13 @@
       ensureChevron(anchor);
     }
 
+    // chuyển thẳng mọi link cũ results.html -> my-results.html
     document.querySelectorAll('a[href]').forEach(a=>{
       const href=(a.getAttribute('href')||'').trim();
       if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
     });
 
+    // click ra ngoài -> đóng
     document.addEventListener('click', (e)=>{
       document.querySelectorAll('.nav__item.has-dropdown').forEach(li=>{
         if (!li.contains(e.target)) li.classList.remove('open');
@@ -193,66 +197,74 @@
   window.addEventListener('load', ()=>setTimeout(buildMenus, 100));
 })();
 
-/* ===== MOBILE Drawer & Shortcuts (bổ sung; desktop không bị ảnh hưởng) ===== */
+/* =========================================================
+   ➤ MOBILE DRAWER (Mockup B)
+   ========================================================= */
 (function(){
-  const nav = document.querySelector('.nav');
-  const toggle = document.querySelector('.nav__toggle');
-  const links  = document.querySelector('.nav__links');
+  const mq = window.matchMedia('(max-width: 768px)');
+  const toggleBtn = document.querySelector('.nav__toggle');
+  const drawer = document.getElementById('mDrawer');
 
-  if (!nav || !toggle || !links) return;
+  if (!toggleBtn || !drawer) return;
 
-  function isMobile(){ return window.matchMedia('(max-width: 768px)').matches; }
+  const open = (yes)=> {
+    drawer.classList.toggle('open', !!yes);
+    document.body.classList.toggle('noscroll', !!yes);
+    toggleBtn.setAttribute('aria-expanded', yes ? 'true' : 'false');
+  };
 
-  function openDrawer(on){
-    if (!isMobile()) return;
-    nav.classList.toggle('is-open', !!on);
-    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
-    document.documentElement.classList.toggle('no-scroll', !!on);
-  }
-
-  toggle.addEventListener('click', ()=> openDrawer(!nav.classList.contains('is-open')));
-
-  // Đóng khi chọn link trong panel (mobile)
-  links.addEventListener('click', (e)=>{
-    const a = e.target.closest('a');
-    if (!a) return;
-    if (isMobile()){
-      // mở/đóng submenu nếu là tiêu đề "has-dropdown"
-      const holder = a.closest('.has-dropdown');
-      if (holder && holder.contains(a) && a.nextElementSibling){
-        e.preventDefault();
-        holder.classList.toggle('open');
-        return;
-      }
-      // còn lại: đóng panel
-      openDrawer(false);
-    }
+  toggleBtn.addEventListener('click', ()=> {
+    if (!mq.matches) return;          // chỉ hoạt động mobile
+    open(!drawer.classList.contains('open'));
   });
 
-  // Click ngoài panel để đóng
+  // đóng khi chạm ngoài vùng panel
   document.addEventListener('click', (e)=>{
-    if (!isMobile()) return;
-    if (!nav.classList.contains('is-open')) return;
-    if (!links.contains(e.target) && e.target!==toggle) openDrawer(false);
+    if (!mq.matches) return;
+    if (!drawer.classList.contains('open')) return;
+    const withinDrawer = drawer.contains(e.target);
+    const withinToggle = toggleBtn.contains(e.target);
+    if (!withinDrawer && !withinToggle) open(false);
   });
 
-  // ESC để đóng
-  document.addEventListener('keydown', (e)=>{
-    if (e.key==='Escape') openDrawer(false);
+  // các dropdown trong Drawer
+  drawer.querySelectorAll('.m-drop').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.getAttribute('data-target');
+      const panel = id ? drawer.querySelector(id) : null;
+      if (!panel) return;
+      const show = panel.style.display !== 'block';
+      btn.classList.toggle('active', show);
+      panel.style.display = show ? 'block' : 'none';
+    });
   });
 
-  // “Trợ lý AI” trong menu
-  const aiLink = document.getElementById('open-ai');
+  // điều hướng trong Drawer -> đóng panel
+  drawer.querySelectorAll('a[href]').forEach(a=>{
+    a.addEventListener('click', ()=> open(false));
+  });
+
+  // Trợ lý AI trong Drawer
+  const aiLink = document.getElementById('m-ai');
   if (aiLink){
     aiLink.addEventListener('click', (e)=>{
       e.preventDefault();
-      openDrawer(false);
-      // kích hoạt nút mở AI nếu có
-      try{
-        const dock = document.getElementById('ai-dock');
-        const btn  = document.getElementById('ai-toggle');
-        (btn||dock)?.click();
-      }catch(_){}
+      open(false);
+      const t = document.getElementById('ai-toggle');
+      if (t) t.click();
     });
   }
+
+  // Auth nút trong Drawer (dùng prompt đơn giản như desktop)
+  const loginBtn = document.getElementById('m-login');
+  const registerBtn = document.getElementById('m-register');
+  [loginBtn, registerBtn].forEach(btn=>{
+    btn && btn.addEventListener('click', ()=>{
+      open(false);
+      alert('Mời dùng nút Đăng nhập/Đăng ký (giả lập).');
+      const evt = new Event('click');
+      // nếu anh có id #btnAuth riêng, có thể kích hoạt:
+      try{ document.getElementById('btnAuth').dispatchEvent(evt); }catch(_){}
+    });
+  });
 })();
