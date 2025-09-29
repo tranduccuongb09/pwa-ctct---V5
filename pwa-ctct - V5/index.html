@@ -43,47 +43,48 @@
 <body class="home">
   <!-- NAV -->
   <header class="nav nav-dark">
-    <div class="nav__inner">
-      <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+  <div class="nav__inner">
+    <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
 
-      <!-- Nút menu mobile -->
-      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+    <!-- hamburger -->
+    <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
 
-      <!-- Menu chính -->
-      <nav class="nav__links">
-        <a href="index.html" class="is-active">Trang chủ</a>
-        <a href="materials.html">Tài liệu học tập</a>
-        <div class="nav__item has-dropdown">
-          <a href="exam.html">Làm bài kiểm tra ▾</a>
-          <div class="dropdown">
-            <a href="exam.html">Kiểm tra nhận thức</a>
-            <a href="practice.html">Ôn trắc nghiệm</a>
-            <a href="quiz.html">Thi thử</a>
-          </div>
+    <!-- links -->
+    <nav class="nav__links">
+      <a href="index.html" class="is-active">Trang chủ</a>
+      <a href="materials.html">Tài liệu học tập</a>
+
+      <div class="nav__item has-dropdown">
+        <a href="exam.html">Làm bài kiểm tra ▾</a>
+        <div class="dropdown">
+          <a href="exam.html">Kiểm tra nhận thức</a>
+          <a href="practice.html">Ôn trắc nghiệm</a>
+          <a href="quiz.html">Thi thử</a>
         </div>
-        <div class="nav__item has-dropdown">
-          <a href="results.html">Kết quả kiểm tra ▾</a>
-          <div class="dropdown">
-            <a href="my-results.html">Kết quả của tôi</a>
-            <a href="leaderboard.html">Bảng xếp hạng</a>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Search -->
-      <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
-        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, câu hỏi, chủ đề…" autocomplete="off">
-        <button class="search__btn" type="submit">Tìm kiếm</button>
-      </form>
-
-      <!-- Đăng nhập -->
-      <div class="nav__actions">
-        <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
       </div>
+
+      <div class="nav__item has-dropdown">
+        <a href="results.html">Kết quả kiểm tra ▾</a>
+        <div class="dropdown">
+          <a href="my-results.html">Kết quả của tôi</a>
+          <a href="leaderboard.html">Bảng xếp hạng</a>
+        </div>
+      </div>
+    </nav>
+
+    <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
+      <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, câu hỏi, chủ đề…" autocomplete="off">
+      <button class="search__btn" type="submit">Tìm kiếm</button>
+    </form>
+
+    <div class="nav__actions">
+      <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <!-- HERO -->
   <main>

@@ -229,11 +229,12 @@ html, body { margin:0; padding:0; background:transparent; }
 /* =========================
    THEME CHO THANH NAV
    ========================= */
-/* DARK (cho nền đỏ như trang chủ) */
+/* LIGHT */
 .nav.nav-light .brand{ color:#111827; }
 .nav.nav-light .nav__links a{ color:#111827; }
 .nav.nav-light .nav__links a:hover{ color:var(--brand); }
 .nav.nav-light .nav__links a.is-active{ color:var(--brand); }
+/* dropdown của LIGHT dùng nền tối để nổi bật như anh yêu cầu */
 .nav.nav-light .dropdown{background: rgba(0,0,0,.88);border: 1px solid rgba(255,255,255,.08);}
 .nav.nav-light .dropdown a{ color:#fff; }
 .nav.nav-light .dropdown a:hover{ color: var(--yellow); background: rgba(255,255,255,.10); }
@@ -250,6 +251,7 @@ html, body { margin:0; padding:0; background:transparent; }
   content:none !important;
   display:none !important;
 }
+
 /* =========================
    MOBILE NAV (≤ 768px)
    ========================= */
@@ -289,8 +291,9 @@ html, body { margin:0; padding:0; background:transparent; }
   .nav.nav-light .nav__links a{ color:#111827; }
   .nav.nav-light .nav__links a:hover{ color:#A41919; }
 
-  /* Mở menu */
+  /* Mở menu khi .nav có .is-open */
   .nav.is-open .nav__links{ display:flex; }
+
   /* Submenu trong mobile bung inline, dễ đọc */
   .nav__links li ul{
     position:static; display:block; background:transparent; box-shadow:none; padding-left:12px;
@@ -319,8 +322,6 @@ html, body { margin:0; padding:0; background:transparent; }
 .nav .has-dropdown .dropdown a.is-active{
   border-bottom: 0 !important;
   text-decoration: none !important;
-
-  /* phòng trường hợp gạch vàng tạo bằng background gradient */
   background-image: none !important;
   background-size: 0 0 !important;
   box-shadow: none !important;
@@ -330,47 +331,5 @@ html, body { margin:0; padding:0; background:transparent; }
 .nav.nav-light .has-dropdown .dropdown a.is-active{ color:#A41919 !important; }
 .nav.nav-dark  .has-dropdown .dropdown a.is-active{ color:#facc15 !important; }
 
-
-/* Ẩn menu trên mobile mặc định */
-.nav-links {
-  display: none;
-  flex-direction: column;
-  background: var(--brand, #a41919);
-  position: absolute;
-  top: 60px; /* chiều cao header */
-  right: 0;
-  width: 70%;
-  max-width: 280px;
-  padding: 1rem;
-  z-index: 999;
-}
-
-.nav-links a {
-  color: #fff;
-  padding: 0.75rem 1rem;
-  display: block;
-  border-bottom: 1px solid rgba(255,255,255,.2);
-}
-
-.nav-links.show {
-  display: flex;
-}
-
-/* Nút hamburger */
-.hamburger {
-  display: none;
-  font-size: 1.8rem;
-  cursor: pointer;
-  color: #fff;
-  background: none;
-  border: none;
-}
-
-@media (max-width: 768px) {
-  .nav-links {
-    display: none;
-  }
-  .hamburger {
-    display: block;
-  }
-}
+/* ===== XÓA XUNG ĐỘT LEGACY (hamburger/nav-links cũ) ===== */
+.nav-links, .hamburger { display:none !important; }

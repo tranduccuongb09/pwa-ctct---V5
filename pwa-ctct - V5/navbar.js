@@ -72,7 +72,7 @@
   try{
     const me=getProfile(); if(me){
       const f=document.getElementById('fullname'), u=document.getElementById('unit'), p=document.getElementById('position');
-      if (f && !f.value) f.value=me.name||''; if (u && !u.value) u.value=me.unit||''; if (p && !p.value) p.value=me.position||'';
+      if (f && !f.value) f.value=me.name||''; if (u && !u.value) u.value=me.unit||''; if (p && !p.value) p.value=me.position||''; 
     }
   }catch(_){}
 })();
@@ -88,13 +88,12 @@
       const as = root.querySelectorAll('a');
       for (const a of as) {
         const t = norm(a.textContent || '');
-        if (t.includes(want)) return a; // nới lỏng khớp (kể cả có ký tự ▾)
+        if (t.includes(want)) return a;
       }
     }
     return null;
   }
 
-  // ⬇️ QUAN TRỌNG: bọc <a> vào div.nav__item nếu chưa có
   function wrapAsNavItem(anchor){
     let holder = anchor.closest('.nav__item, li');
     if (holder) return holder;
@@ -108,11 +107,10 @@
 
   function ensureDropdownFor(anchor, dataKey){
     if (!anchor) return null;
-    const li = wrapAsNavItem(anchor);               // luôn là .nav__item riêng
+    const li = wrapAsNavItem(anchor);
     li.classList.add('has-dropdown');
     li.dataset.menu = dataKey;
 
-    // chỉ 1 dropdown
     li.querySelectorAll(':scope > .dropdown').forEach((x,i)=>{ if(i>0) x.remove(); });
 
     let panel = li.querySelector(':scope > .dropdown');
@@ -146,7 +144,7 @@
 
   function disableNavigate(titleAnchor){
     if (!titleAnchor) return;
-    titleAnchor.setAttribute('href', '#'); // không điều hướng
+    titleAnchor.setAttribute('href', '#');
     titleAnchor.style.cursor = 'default';
     const li = titleAnchor.closest('.nav__item, li');
     titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
@@ -160,7 +158,7 @@
 
   function buildMenus(){
     // === LÀM BÀI KIỂM TRA ===
-    const aQuiz = findAnchorByText('Làm bài kiểm tra');
+    const aQuiz = findAnchorByText('làm bài kiểm tra');
     if (aQuiz){
       const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
       clearOther(panel, ['Kiểm tra nhận thức','Ôn trắc nghiệm','Thi thử']);
@@ -172,7 +170,7 @@
     }
 
     // === KẾT QUẢ KIỂM TRA ===
-    const aRes = findAnchorByText('Kết quả kiểm tra');
+    const aRes = findAnchorByText('kết quả kiểm tra');
     if (aRes){
       const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
       clearOther(panel, ['Kết quả của tôi','Bảng xếp hạng']);
@@ -182,13 +180,13 @@
       ensureChevron(anchor);
     }
 
-    // chuyển thẳng mọi link cũ results.html -> my-results.html
+    // Điều chỉnh link cũ
     document.querySelectorAll('a[href]').forEach(a=>{
       const href=(a.getAttribute('href')||'').trim();
       if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
     });
 
-    // click ra ngoài -> đóng
+    // click ngoài -> đóng
     document.addEventListener('click', (e)=>{
       document.querySelectorAll('.nav__item.has-dropdown').forEach(li=>{
         if (!li.contains(e.target)) li.classList.remove('open');
@@ -197,4 +195,45 @@
   }
 
   window.addEventListener('load', ()=>setTimeout(buildMenus, 100));
+})();
+
+/* ===== Mobile Hamburger: mở/đóng menu, a11y, ESC ===== */
+(function(){
+  const nav    = document.querySelector('.nav');
+  const toggle = document.querySelector('.nav__toggle');
+  const links  = document.querySelector('.nav__links');
+  if (!nav || !toggle || !links) return;
+
+  const openMenu = (on) => {
+    nav.classList.toggle('is-open', on);
+    document.body.style.overflow = on ? 'hidden' : '';
+    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
+    toggle.innerHTML = on ? '✕' : '<span></span><span></span><span></span>';
+  };
+
+  toggle.addEventListener('click', ()=> openMenu(!nav.classList.contains('is-open')));
+
+  // Đóng khi click link (trừ khi mở accordion dropdown ở mobile)
+  links.addEventListener('click', (e)=>{
+    const a = e.target.closest('a');
+    if (!a) return;
+
+    // Nếu là tiêu đề dropdown ở mobile -> thành accordion
+    const item = a.parentElement;
+    const isDropdownTitle = item && item.classList.contains('has-dropdown');
+    const isMobile = window.matchMedia('(max-width:768px)').matches;
+
+    if (isMobile && isDropdownTitle) {
+      e.preventDefault();
+      item.classList.toggle('open');
+      return;
+    }
+    openMenu(false);
+  });
+
+  // ESC để đóng
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') openMenu(false); });
+
+  // Tự đóng khi resize về desktop
+  window.addEventListener('resize', ()=>{ if (window.innerWidth>768) openMenu(false); });
 })();
