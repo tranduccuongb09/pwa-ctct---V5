@@ -22,6 +22,22 @@
     body.home .nav, body.home .nav * {
       font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
     }
+    /* BG desktop + mobile */
+    body.home{
+      background: url('assets/bg-desktop.png') no-repeat center/cover fixed;
+    }
+    @media (max-width:768px){
+      body.home{
+        background-image: url('assets/bg-mobile.png');   /* dùng ảnh mobile */
+        background-attachment: scroll;                   /* iOS mượt hơn */
+      }
+    }
+
+    /* Giảm cỡ chữ dòng đầu để luôn nằm một hàng trên mobile */
+    @media (max-width:480px){
+      .hero{ padding-top: 68px; }
+      .hero h1{ font-size: clamp(26px, 7.5vw, 32px); line-height:1.15; }
+    }
 
     /* HERO */
     .hero {padding: 100px 20px 80px; text-align: center; color: #fff;}
@@ -121,37 +137,7 @@
   <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
 
   <!-- SCRIPT -->
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.querySelector('.nav__toggle');
-    const links  = document.querySelector('.nav__links');
-    if (!toggle || !links) return;
 
-    const open = (state) => {
-      links.classList.toggle('is-open', state);
-      toggle.classList.toggle('is-open', state);
-      toggle.setAttribute('aria-expanded', state ? 'true' : 'false');
-      if (state) {
-        toggle.innerHTML = '<span aria-hidden="true">✕</span>';
-      } else {
-        toggle.innerHTML = '<span></span><span></span><span></span>';
-      }
-      document.body.classList.toggle('no-scroll', state);
-    };
-
-    toggle.addEventListener('click', () => {
-      open(!links.classList.contains('is-open'));
-    });
-
-    links.addEventListener('click', (e) => {
-      if (e.target.closest('a')) open(false);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') open(false);
-    });
-  });
-  </script>
 
   <script src="navbar.js" defer></script>
   <script src="search.js" defer></script>
