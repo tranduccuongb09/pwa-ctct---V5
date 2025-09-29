@@ -10,32 +10,61 @@
 
   <!-- CSS dùng chung -->
   <link rel="stylesheet" href="style.css?v=20250918">
-  <link rel="stylesheet" href="nav.css?v=20250918">
+  <link rel="stylesheet" href="nav.css?v=20250930"> <!-- <— cập nhật version -->
 
-  <!-- Preload -->
+  <!-- Preload desktop bg -->
   <link rel="preload" as="image" href="assets/bg-desktop.png">
 
   <!-- Font CHỈ cho trang chủ -->
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* Ép toàn bộ trang chủ dùng Be Vietnam Pro */
-    body.home, body.home *:not(code):not(kbd) {
-      font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+    /* Trang chủ dùng Be Vietnam Pro */
+    body.home, body.home *:not(code):not(kbd){
+      font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
     }
+    body.home .nav, body.home .nav *{ font-family:inherit!important; }
 
-    /* Ưu tiên cho NAV của trang chủ */
-    body.home .nav, body.home .nav * {
-      font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+    /* HERO – desktop (giữ nguyên bố cục cũ) */
+    .hero{ padding:100px 20px 80px; text-align:center; color:#fff; }
+    .hero h1{ font-size:clamp(36px,6vw,84px); font-weight:800; margin-bottom:16px; line-height:1.15; }
+    .hero p{ font-size:18px; margin-bottom:32px; opacity:.95; }
+    .hero__actions{ display:flex; justify-content:center; gap:20px; flex-wrap:wrap; }
+    .btn-ghost{ padding:12px 20px; border:2px solid #fff; border-radius:10px; font-weight:600; color:#fff; background:transparent; transition:all .2s; }
+    .btn-ghost:hover{ background:#FFD966; color:#111; border-color:#FFD966; }
+
+    /* ===== MOBILE-ONLY (≤768px) ===== */
+    @media (max-width:768px){
+      /* 1) Background mobile + overlay đỏ */
+      body.home{
+        background:
+          linear-gradient(0deg, rgba(164,25,25,.40), rgba(164,25,25,.40)),
+          url('assets/bg-mobile.png') center/cover no-repeat;
+        background-attachment:scroll;
+      }
+
+      /* 2) Hero căn giữa theo trục dọc, canh trái, in hoa */
+      .hero{
+        min-height:calc(100svh - 56px);         /* 56px ~ chiều cao thanh nav trên mobile */
+        display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+        text-align:left; padding:24px 20px 36px;
+      }
+      .hero h1{
+        text-transform:uppercase;                /* “GIÁO DỤC CHÍNH TRỊ SỐ” */
+        font-size:clamp(28px,7.2vw,34px);
+        margin-bottom:12px;
+      }
+      /* Ẩn dòng BAN CHỈ HUY PTKV3 trong H1 nếu có br */
+      .hero h1 br + *{ display:none; }
+
+      .hero p{
+        max-width:36ch;                          /* 2 dòng gọn */
+        font-size:16px; line-height:1.5; margin-bottom:22px;
+      }
+      .hero__actions{ justify-content:flex-start; gap:12px; }
+      /* Ẩn nút Trợ lý AI ở body trên mobile (đưa vào menu) */
+      .hero__actions #ai-toggle{ display:none; }
     }
-
-    /* HERO */
-    .hero {padding: 100px 20px 80px; text-align: center; color: #fff;}
-    .hero h1 {font-size: clamp(36px, 6vw, 84px); font-weight: 800; margin-bottom: 16px; line-height: 1.15;}
-    .hero p {font-size: 18px; margin-bottom: 32px; opacity: .95;}
-    .hero__actions {display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;}
-    .btn-ghost {padding: 12px 20px; border: 2px solid #fff; border-radius: 10px; font-weight: 600; color: #fff; background: transparent; transition: all .2s ease; }
-    .btn-ghost:hover {background: #FFD966; color: #111; border-color: #FFD966; }
   </style>
 
   <script>
@@ -50,11 +79,19 @@
   <!-- NAV -->
   <header class="nav nav-dark">
     <div class="nav__inner">
+      <!-- Logo/text bên trái (desktop & mobile) -->
       <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
-      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <nav class="nav__links">
+
+      <!-- Nút menu (ở BÊN PHẢI trên mobile; desktop ẩn) -->
+      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- Danh mục (desktop: horizontal; mobile: panel trượt từ trái) -->
+      <nav class="nav__links" id="navLinks">
         <a href="index.html" class="is-active">Trang chủ</a>
         <a href="materials.html">Tài liệu học tập</a>
+
         <div class="nav__item has-dropdown">
           <a href="exam.html">Làm bài kiểm tra ▾</a>
           <div class="dropdown">
@@ -63,6 +100,7 @@
             <a href="quiz.html">Thi thử</a>
           </div>
         </div>
+
         <div class="nav__item has-dropdown">
           <a href="results.html">Kết quả kiểm tra ▾</a>
           <div class="dropdown">
@@ -70,63 +108,33 @@
             <a href="leaderboard.html">Bảng xếp hạng</a>
           </div>
         </div>
+
+        <!-- MOBILE-ONLY: Trợ lý AI + 2 nút Auth trong panel -->
+        <a href="#" id="open-ai" class="only-mobile">Trợ lý AI</a>
+        <div class="only-mobile mobile-auth">
+          <a href="#" id="mLogin" class="auth-btn">Đăng nhập</a>
+          <a href="#" id="mSignup" class="auth-btn alt">Đăng ký</a>
+        </div>
       </nav>
+
+      <!-- TÌM KIẾM (desktop hiển thị; mobile ẩn bằng CSS) -->
       <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
         <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, câu hỏi, chủ đề…" autocomplete="off">
         <button class="search__btn" type="submit">Tìm kiếm</button>
       </form>
+
+      <!-- Auth desktop (mobile ẩn, vì đã nằm trong panel) -->
       <div class="nav__actions">
         <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
       </div>
     </div>
   </header>
 
-  <!-- MOBILE DRAWER (panel menu – chỉ hiển thị trên điện thoại) -->
-<aside id="mobileDrawer" class="mobile-drawer" aria-hidden="true">
-  <div class="drawer__head">
-    <div class="drawer__brand">BAN CHỈ HUY PTKV3</div>
-  </div>
-
-  <nav class="drawer__nav" role="navigation" aria-label="Menu di động">
-    <a class="drawer__link" href="index.html">
-      <span class="home-icon" aria-hidden="true">🏠</span> Trang chủ
-    </a>
-
-    <a class="drawer__link" href="materials.html">Tài liệu học tập</a>
-
-    <button class="drawer__link has-caret" data-sub="thi">
-      Làm bài kiểm tra <span class="caret" aria-hidden="true">▸</span>
-    </button>
-    <div class="drawer__sub" id="sub-thi" hidden>
-      <a href="exam.html" class="drawer__sublink">Kiểm tra nhận thức</a>
-      <a href="practice.html" class="drawer__sublink">Ôn trắc nghiệm</a>
-      <a href="quiz.html" class="drawer__sublink">Thi thử</a>
-    </div>
-
-    <button class="drawer__link has-caret" data-sub="ketqua">
-      Kết quả kiểm tra <span class="caret" aria-hidden="true">▸</span>
-    </button>
-    <div class="drawer__sub" id="sub-ketqua" hidden>
-      <a href="my-results.html" class="drawer__sublink">Kết quả của tôi</a>
-      <a href="leaderboard.html" class="drawer__sublink">Bảng xếp hạng</a>
-    </div>
-
-    <a class="drawer__link" href="#" id="drawer-ai">Trợ lý AI</a>
-  </nav>
-
-  <div class="drawer__auth">
-    <a class="btn btn-outline-yellow" href="#" id="drawer-login">Đăng nhập</a>
-    <a class="btn btn-outline-yellow" href="#" id="drawer-register">Đăng ký</a>
-  </div>
-</aside>
-
-<!-- Lớp nền mờ để đóng menu khi chạm -->
-<div id="drawerScrim" class="drawer-scrim" hidden></div>
-  
   <!-- HERO -->
   <main>
     <section class="hero">
-      <h1>Giáo dục chính trị số<br>BAN CHỈ HUY PTKV3</h1>
+      <!-- Đổi text H1 thành đúng yêu cầu; dòng sau (PTKV3) sẽ bị ẩn trên mobile -->
+      <h1>GIÁO DỤC CHÍNH TRỊ SỐ<br>BAN CHỈ HUY PTKV3</h1>
       <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra & phân tích chất lượng.</p>
       <div class="hero__actions">
         <a href="materials.html" class="btn-ghost">Bắt đầu học tập</a>
@@ -135,7 +143,7 @@
     </section>
   </main>
 
-  <!-- KHAY TRÒ CHUYỆN GÓC PHẢI -->
+  <!-- KHAY TRỢ LÝ AI -->
   <div id="ai-tray" class="ai-tray" hidden>
     <div class="ai-tray__panel">
       <header class="ai-tray__head">
@@ -145,9 +153,7 @@
           <button id="ai-close"  class="ai-head-btn" type="button" title="Đóng" aria-label="Đóng">✕</button>
         </div>
       </header>
-
-      <div id="ai-messages" class="ai-tray__messages" aria-live="polite">
-        </div>
+      <div id="ai-messages" class="ai-tray__messages" aria-live="polite"></div>
       <div id="ai-previews" class="ai-previews" hidden></div>
       <form id="ai-form" class="ai-tray__form">
         <input id="ai-input" type="text" placeholder="Nhập câu hỏi…" autocomplete="off"/>
@@ -156,11 +162,11 @@
     </div>
   </div>
 
-  <!-- Nút dock -->
+  <!-- FAB AI -->
   <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
 
   <!-- Script -->
-  <script src="navbar.js" defer></script>
+  <script src="navbar.js?v=20250930" defer></script>
   <script src="search.js" defer></script>
   <script src="config.js" defer></script>
   <script src="ai.js" defer></script>

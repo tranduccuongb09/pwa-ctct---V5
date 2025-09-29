@@ -14,7 +14,7 @@
     try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}
     return true;
   };
-  const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){} };
+  const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}}; 
   window.ctctProfile = getProfile;
 
   const linksWrap  = document.querySelector('.nav__links');
@@ -94,7 +94,6 @@
     return null;
   }
 
-  // ⬇️ QUAN TRỌNG: bọc <a> vào div.nav__item nếu chưa có
   function wrapAsNavItem(anchor){
     let holder = anchor.closest('.nav__item, li');
     if (holder) return holder;
@@ -108,11 +107,10 @@
 
   function ensureDropdownFor(anchor, dataKey){
     if (!anchor) return null;
-    const li = wrapAsNavItem(anchor);               // luôn là .nav__item riêng
+    const li = wrapAsNavItem(anchor);
     li.classList.add('has-dropdown');
     li.dataset.menu = dataKey;
 
-    // chỉ 1 dropdown
     li.querySelectorAll(':scope > .dropdown').forEach((x,i)=>{ if(i>0) x.remove(); });
 
     let panel = li.querySelector(':scope > .dropdown');
@@ -146,7 +144,7 @@
 
   function disableNavigate(titleAnchor){
     if (!titleAnchor) return;
-    titleAnchor.setAttribute('href', '#'); // không điều hướng
+    titleAnchor.setAttribute('href', '#');
     titleAnchor.style.cursor = 'default';
     const li = titleAnchor.closest('.nav__item, li');
     titleAnchor.addEventListener('click', e=>{ e.preventDefault(); li.classList.toggle('open'); });
@@ -159,7 +157,6 @@
   }
 
   function buildMenus(){
-    // === LÀM BÀI KIỂM TRA ===
     const aQuiz = findAnchorByText('Làm bài kiểm tra');
     if (aQuiz){
       const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
@@ -171,7 +168,6 @@
       ensureChevron(anchor);
     }
 
-    // === KẾT QUẢ KIỂM TRA ===
     const aRes = findAnchorByText('Kết quả kiểm tra');
     if (aRes){
       const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
@@ -182,13 +178,11 @@
       ensureChevron(anchor);
     }
 
-    // chuyển thẳng mọi link cũ results.html -> my-results.html
     document.querySelectorAll('a[href]').forEach(a=>{
       const href=(a.getAttribute('href')||'').trim();
       if (/results\.html(\?|#|$)/i.test(href)) a.setAttribute('href','my-results.html');
     });
 
-    // click ra ngoài -> đóng
     document.addEventListener('click', (e)=>{
       document.querySelectorAll('.nav__item.has-dropdown').forEach(li=>{
         if (!li.contains(e.target)) li.classList.remove('open');
@@ -198,73 +192,67 @@
 
   window.addEventListener('load', ()=>setTimeout(buildMenus, 100));
 })();
-/* =========================================================
-   MOBILE DRAWER CONTROL – mở/đóng panel, toggle submenu
-   ========================================================= */
+
+/* ===== MOBILE Drawer & Shortcuts (bổ sung; desktop không bị ảnh hưởng) ===== */
 (function(){
-  const toggleBtn   = document.querySelector('.nav__toggle'); // nút 3 gạch sẵn có
-  const drawer      = document.getElementById('mobileDrawer');
-  const scrim       = document.getElementById('drawerScrim');
-  if (!toggleBtn || !drawer || !scrim) return;
+  const nav = document.querySelector('.nav');
+  const toggle = document.querySelector('.nav__toggle');
+  const links  = document.querySelector('.nav__links');
 
-  const body = document.body;
+  if (!nav || !toggle || !links) return;
 
-  function openDrawer(){
-    drawer.classList.add('is-open');
-    scrim.hidden = false;
-    body.classList.add('drawer-open');
-    toggleBtn.setAttribute('aria-expanded','true');
-  }
-  function closeDrawer(){
-    drawer.classList.remove('is-open');
-    scrim.hidden = true;
-    body.classList.remove('drawer-open');
-    toggleBtn.setAttribute('aria-expanded','false');
+  function isMobile(){ return window.matchMedia('(max-width: 768px)').matches; }
+
+  function openDrawer(on){
+    if (!isMobile()) return;
+    nav.classList.toggle('is-open', !!on);
+    toggle.setAttribute('aria-expanded', on ? 'true' : 'false');
+    document.documentElement.classList.toggle('no-scroll', !!on);
   }
 
-  toggleBtn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    (drawer.classList.contains('is-open') ? closeDrawer() : openDrawer());
-  });
-  scrim.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeDrawer(); });
+  toggle.addEventListener('click', ()=> openDrawer(!nav.classList.contains('is-open')));
 
-  // Toggle submenu
-  drawer.querySelectorAll('.drawer__link.has-caret').forEach(btn=>{
-    const key = btn.getAttribute('data-sub');
-    const panel = document.getElementById('sub-'+key);
-    if (!panel) return;
-    btn.setAttribute('aria-expanded','false');
-    btn.addEventListener('click', ()=>{
-      const isOpen = !panel.hasAttribute('hidden');
-      drawer.querySelectorAll('.drawer__sub').forEach(s=>s.setAttribute('hidden',''));
-      drawer.querySelectorAll('.drawer__link.has-caret').forEach(b=>b.setAttribute('aria-expanded','false'));
-      if (!isOpen){
-        panel.removeAttribute('hidden');
-        btn.setAttribute('aria-expanded','true');
+  // Đóng khi chọn link trong panel (mobile)
+  links.addEventListener('click', (e)=>{
+    const a = e.target.closest('a');
+    if (!a) return;
+    if (isMobile()){
+      // mở/đóng submenu nếu là tiêu đề "has-dropdown"
+      const holder = a.closest('.has-dropdown');
+      if (holder && holder.contains(a) && a.nextElementSibling){
+        e.preventDefault();
+        holder.classList.toggle('open');
+        return;
       }
-    });
+      // còn lại: đóng panel
+      openDrawer(false);
+    }
   });
 
-  // Trợ lý AI trong menu: đóng panel rồi kích hoạt AI
-  const aiInDrawer = document.getElementById('drawer-ai');
-  if (aiInDrawer){
-    aiInDrawer.addEventListener('click', (e)=>{
+  // Click ngoài panel để đóng
+  document.addEventListener('click', (e)=>{
+    if (!isMobile()) return;
+    if (!nav.classList.contains('is-open')) return;
+    if (!links.contains(e.target) && e.target!==toggle) openDrawer(false);
+  });
+
+  // ESC để đóng
+  document.addEventListener('keydown', (e)=>{
+    if (e.key==='Escape') openDrawer(false);
+  });
+
+  // “Trợ lý AI” trong menu
+  const aiLink = document.getElementById('open-ai');
+  if (aiLink){
+    aiLink.addEventListener('click', (e)=>{
       e.preventDefault();
-      closeDrawer();
-      const t = document.getElementById('ai-toggle');
-      if (t) t.click();
+      openDrawer(false);
+      // kích hoạt nút mở AI nếu có
+      try{
+        const dock = document.getElementById('ai-dock');
+        const btn  = document.getElementById('ai-toggle');
+        (btn||dock)?.click();
+      }catch(_){}
     });
   }
-
-  // (tuỳ chọn) xử lý Login/Register nếu anh đã có flow riêng
-  const dLogin = document.getElementById('drawer-login');
-  const dReg   = document.getElementById('drawer-register');
-  dLogin && dLogin.addEventListener('click', (e)=>{ e.preventDefault(); closeDrawer(); document.getElementById('btnAuth')?.click(); });
-  dReg   && dReg.addEventListener('click', (e)=>{ e.preventDefault(); closeDrawer(); document.getElementById('btnAuth')?.click(); });
-
-  // Vuốt để đóng (nhẹ nhàng)
-  let startX = null;
-  drawer.addEventListener('touchstart', (e)=>{ startX = e.touches[0].clientX; }, {passive:true});
-  drawer.addEventListener('touchmove',  (e)=>{ if(startX!=null && (startX - e.touches[0].clientX) < -40) closeDrawer(); }, {passive:true});
 })();
