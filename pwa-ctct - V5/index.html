@@ -12,69 +12,75 @@
   <link rel="stylesheet" href="style.css?v=20250918">
   <link rel="stylesheet" href="nav.css?v=20250930">
 
-  <!-- Font cho trang chủ -->
+  <!-- Font riêng cho trang chủ -->
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* Toàn trang chủ dùng Be Vietnam Pro */
+    /* Toàn bộ trang chủ dùng Be Vietnam Pro */
     body.home, body.home *:not(code):not(kbd){
-      font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
-    }
-    body.home .nav, body.home .nav *{
-      font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
+      font-family: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
     }
 
-    /* Nền desktop + mobile (mobile có overlay gradient nhẹ) */
+    /* Background + lớp gradient nhẹ cho mobile để tăng tương phản chữ */
     body.home{
-      background: url('assets/bg-desktop.png') no-repeat center/cover fixed;
+      background: url('assets/bg-desktop.png') center/cover no-repeat fixed;
+      position: relative;
     }
     @media (max-width:768px){
       body.home{
-        background: linear-gradient(180deg, rgba(125,0,0,.45), rgba(125,0,0,.35)),
-                    url('assets/bg-mobile.png') no-repeat center/cover;
-        background-attachment: scroll;
+        background: url('assets/bg-mobile.png') center/cover no-repeat;
+      }
+      body.home::before{
+        /* lớp phủ gradient trong, không che hết nền */
+        content:"";
+        position: fixed; inset: 0;
+        background:
+          radial-gradient(120% 80% at 70% 10%, rgba(0,0,0,.12) 0%, rgba(0,0,0,0) 45%),
+          linear-gradient(to bottom, rgba(0,0,0,.18), rgba(0,0,0,.08) 35%, rgba(0,0,0,0) 65%);
+        pointer-events: none;
+        z-index: 0;
       }
     }
 
     /* HERO */
-    .hero{ padding: 100px 20px 80px; color:#fff; }
-    .hero h1{ font-size: clamp(36px, 6vw, 84px); font-weight: 800; margin-bottom: 16px; line-height: 1.15; text-align:center; }
-    .hero p{ font-size:18px; margin-bottom:32px; opacity:.95; text-align:center; }
-    .hero__actions{ display:flex; justify-content:center; gap:20px; flex-wrap:wrap; }
-    .btn-ghost{ padding:12px 20px; border:2px solid #fff; border-radius:10px; font-weight:600; color:#fff; background:transparent; transition:all .2s ease; }
+    .hero{ position: relative; z-index: 1; color:#fff; text-align:center; padding: 96px 20px 84px; }
+    .hero h1{ font-size: clamp(36px, 6vw, 84px); font-weight: 800; line-height: 1.15; margin: 0 0 18px; letter-spacing:.2px; }
+    .hero p{ font-size: 18px; margin: 0 0 28px; opacity:.96; }
+    .hero__actions{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
+    .btn-ghost{ padding:12px 22px; border:2px solid #fff; border-radius:12px; font-weight:700; color:#fff; background:transparent; transition:.2s; }
     .btn-ghost:hover{ background:#FFD966; color:#111; border-color:#FFD966; }
 
-    /* Chỉ mobile: căn TRÁI, ẩn nút Trợ lý AI trong hero */
+    /* MOBILE – căn trái + đẩy headline lên, mô tả sát dưới */
     @media (max-width:768px){
-      .hero{ padding-top: 72px; }
-      .hero h1{ font-size: clamp(28px, 7.2vw, 34px); text-align:left; }
-      .hero p{ text-align:left; max-width: 38ch; }
+      .hero{ padding-top: 64px; text-align:left; max-width: 680px; margin-inline:auto; }
+      .hero h1{ font-size: clamp(28px, 8.2vw, 36px); margin-bottom: 8px; }
+      .hero p{ font-size: 16px; margin-bottom: 18px; }
       .hero__actions{ justify-content:flex-start; }
-      .hero__actions .btn-ai-in-hero{ display:none; }
     }
   </style>
 
   <script>
+    // SW (không đổi)
     if ('serviceWorker' in navigator) {
-      addEventListener('load', () => {
+      window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(()=>{});
       });
     }
   </script>
 </head>
 <body class="home">
-  <!-- NAVBAR (desktop giữ nguyên) -->
-  <header class="nav nav-dark" role="banner">
+  <!-- ===== NAVBAR ===== -->
+  <header class="nav nav-dark" role="navigation">
     <div class="nav__inner">
       <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
 
-      <!-- Nút mobile -->
-      <button class="nav__toggle" id="navToggle" aria-label="Mở menu" aria-expanded="false">
+      <!-- Nút hamburger (mobile) -->
+      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
 
-      <!-- Liên kết desktop -->
-      <nav class="nav__links" aria-label="Điều hướng chính">
+      <!-- Links (desktop) -->
+      <nav class="nav__links" aria-label="Liên kết chính">
         <a href="index.html" class="is-active">Trang chủ</a>
         <a href="materials.html">Tài liệu học tập</a>
 
@@ -96,74 +102,62 @@
         </div>
       </nav>
 
-      <!-- Hành động (desktop) -->
+      <!-- Tìm kiếm + Đăng nhập (desktop) -->
+      <form id="globalSearch" class="nav__search" role="search" aria-label="Tìm kiếm">
+        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, câu hỏi, chủ đề…" autocomplete="off">
+        <button class="search__btn" type="submit">Tìm kiếm</button>
+      </form>
       <div class="nav__actions">
-        <button id="btnLogin"  class="btn btn-auth">Đăng nhập/Đăng ký</button>
-        <button id="btnLogout" class="btn btn-auth" hidden>Đăng xuất</button>
+        <button id="btnLogin" class="btn btn-auth" type="button">Đăng nhập/Đăng ký</button>
+        <button id="btnLogout" class="btn btn-auth" type="button" hidden>Đăng xuất</button>
         <span id="navProfile" class="nav__me" hidden></span>
       </div>
-
-      <!-- PANEL MENU (mobile, căn phải – chỉ hiện khi .nav.is-open) -->
-      <nav class="nav__panel" id="navPanel" aria-label="Menu">
-        <a class="panel-link" href="index.html">Trang chủ</a>
-        <a class="panel-link" href="materials.html">Tài liệu học tập</a>
-
-        <button class="panel-acc" data-acc="exam">Làm bài kiểm tra</button>
-        <div class="panel-sub" data-acc-content="exam">
-          <a href="exam.html">Kiểm tra nhận thức</a>
-          <a href="practice.html">Ôn trắc nghiệm</a>
-          <a href="quiz.html">Thi thử</a>
-        </div>
-
-        <button class="panel-acc" data-acc="results">Kết quả kiểm tra</button>
-        <div class="panel-sub" data-acc-content="results">
-          <a href="my-results.html">Kết quả của tôi</a>
-          <a href="leaderboard.html">Bảng xếp hạng</a>
-        </div>
-
-        <a class="panel-link" href="#" id="panel-ai">Trợ lý AI</a>
-
-        <button class="panel-login" id="panelLogin">Đăng nhập/Đăng ký</button>
-        <button class="panel-login" id="panelLogout" hidden>Đăng xuất</button>
-      </nav>
     </div>
+
+    <!-- ===== Mobile Panel (không ảnh hưởng desktop) ===== -->
+    <aside class="nav__panel" aria-hidden="true">
+      <button class="panel__close" aria-label="Đóng menu">✕</button>
+      <ul class="panel__list" role="menu" aria-label="Menu di động">
+        <li><a role="menuitem" href="index.html">Trang chủ</a></li>
+        <li><a role="menuitem" href="materials.html">Tài liệu học tập</a></li>
+
+        <li class="panel__item has-sub">
+          <button class="panel__trigger" aria-expanded="false">Làm bài kiểm tra <span class="caret">▼</span></button>
+          <ul class="panel__sub">
+            <li><a href="exam.html">Kiểm tra nhận thức</a></li>
+            <li><a href="practice.html">Ôn trắc nghiệm</a></li>
+            <li><a href="quiz.html">Thi thử</a></li>
+          </ul>
+        </li>
+
+        <li class="panel__item has-sub">
+          <button class="panel__trigger" aria-expanded="false">Kết quả kiểm tra <span class="caret">▼</span></button>
+          <ul class="panel__sub">
+            <li><a href="my-results.html">Kết quả của tôi</a></li>
+            <li><a href="leaderboard.html">Bảng xếp hạng</a></li>
+          </ul>
+        </li>
+
+        <li><a role="menuitem" href="ai.html">Trợ lý AI</a></li>
+        <li><a role="menuitem" id="panelAuth" href="javascript:void(0)">Đăng nhập/Đăng ký</a></li>
+      </ul>
+    </aside>
   </header>
 
-  <!-- HERO -->
+  <!-- ===== HERO ===== -->
   <main>
-    <section class="hero" aria-labelledby="heroTitle">
-      <h1 id="heroTitle">GIÁO DỤC CHÍNH TRỊ SỐ</h1>
-      <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra & phân tích chất lượng.</p>
+    <section class="hero" aria-labelledby="hero-title">
+      <h1 id="hero-title">GIÁO DỤC CHÍNH TRỊ SỐ</h1>
+      <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra &amp; phân tích chất lượng.</p>
       <div class="hero__actions">
-        <a href="materials.html" class="btn-ghost">Bắt đầu học tập</a>
-        <button id="ai-toggle" type="button" class="btn-ghost btn-ai-in-hero">Trợ lý AI</button>
+        <a class="btn-ghost" href="materials.html">Bắt đầu học tập</a>
       </div>
     </section>
   </main>
 
-  <!-- Khay AI -->
-  <div id="ai-tray" class="ai-tray" hidden>
-    <div class="ai-tray__panel">
-      <header class="ai-tray__head">
-        <strong>Trợ lý AI</strong>
-        <div class="ai-head-actions">
-          <button id="ai-minify" class="ai-head-btn" type="button" title="Thu nhỏ" aria-label="Thu nhỏ">–</button>
-          <button id="ai-close"  class="ai-head-btn" type="button" title="Đóng" aria-label="Đóng">✕</button>
-        </div>
-      </header>
-      <div id="ai-messages" class="ai-tray__messages" aria-live="polite"></div>
-      <div id="ai-previews" class="ai-previews" hidden></div>
-      <form id="ai-form" class="ai-tray__form">
-        <input id="ai-input" type="text" placeholder="Nhập câu hỏi…" autocomplete="off"/>
-        <button type="submit">Gửi</button>
-      </form>
-    </div>
-  </div>
+  <!-- (Nếu cần khay AI riêng, vẫn dùng như cũ; đặt ẩn trên mobile nếu vào menu) -->
 
-  <!-- Nút dock AI -->
-  <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
-
-  <!-- JS -->
+  <!-- Scripts -->
   <script src="navbar.js?v=20250930" defer></script>
   <script src="search.js" defer></script>
   <script src="config.js" defer></script>
