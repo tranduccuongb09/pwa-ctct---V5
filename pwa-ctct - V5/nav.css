@@ -329,3 +329,48 @@ html, body { margin:0; padding:0; background:transparent; }
 /* (giữ màu chữ khi active trong dropdown) */
 .nav.nav-light .has-dropdown .dropdown a.is-active{ color:#A41919 !important; }
 .nav.nav-dark  .has-dropdown .dropdown a.is-active{ color:#facc15 !important; }
+
+
+/* Ẩn menu trên mobile mặc định */
+.nav-links {
+  display: none;
+  flex-direction: column;
+  background: var(--brand, #a41919);
+  position: absolute;
+  top: 60px; /* chiều cao header */
+  right: 0;
+  width: 70%;
+  max-width: 280px;
+  padding: 1rem;
+  z-index: 999;
+}
+
+.nav-links a {
+  color: #fff;
+  padding: 0.75rem 1rem;
+  display: block;
+  border-bottom: 1px solid rgba(255,255,255,.2);
+}
+
+.nav-links.show {
+  display: flex;
+}
+
+/* Nút hamburger */
+.hamburger {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #fff;
+  background: none;
+  border: none;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  .hamburger {
+    display: block;
+  }
+}
