@@ -34,18 +34,22 @@ html, body { margin:0; padding:0; background:transparent; }
 .nav__item > a{ cursor:pointer; display:inline-block; }
 .dropdown{
   position:absolute; top:calc(100% + 8px); left:0;
-  background:rgba(0,0,0,.84); border-radius:10px; min-width:220px; padding:8px 0;
-  display:none; flex-direction:column; box-shadow:0 10px 28px rgba(0,0,0,.35); z-index:999;
+  min-width:220px; padding:8px 0;
+  background:rgba(0,0,0,.92); color:#fff;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:10px; box-shadow:0 12px 28px rgba(0,0,0,.35);
+  display:none; flex-direction:column; z-index:20;
 }
-.nav__item:hover .dropdown, .nav__item:focus-within .dropdown{ display:flex; }
+.nav__item:hover .dropdown,
+.nav__item:focus-within .dropdown{ display:flex; }
 .dropdown a{
-  font-weight:600; font-size:16px; padding:10px 16px; color:#fff; text-decoration:none; transition:transform .16s, background .16s, color .16s;
+  color:#fff; padding:10px 14px; font-weight:700;
 }
-.dropdown a:hover{ background:rgba(255,255,255,.10); color:var(--yellow); transform:scale(1.04); }
+.dropdown a:hover{ background:rgba(255,255,255,.08); color:#ffd966; }
 
 /* Search + Auth (desktop) */
 .nav__search{ margin-left:auto; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,.14); border-radius:999px; padding:4px; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
-.search__input{ width:clamp(160px,20vw,220px); height:32px; border:0; outline:0; background:transparent; color:#fff; padding:0 12px; font-size:16px; font-weight:500; }
+.search__input{ width:clamp(160px,20vw,160px); height:32px; border:0; outline:0; background:transparent; color:#fff; padding:0 12px; font-size:16px; font-weight:500; }
 .search__input::placeholder{ color:#f1f1f1; opacity:.85; }
 .search__btn{ min-width:99px; height:32px; padding:0 12px; border:0; border-radius:999px; cursor:pointer; font-weight:600; font-size:15px; color:#111; background:var(--yellow); transition:transform .15s, box-shadow .15s, background .2s; }
 .search__btn:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.18); background:#ffe27e; }
@@ -58,7 +62,13 @@ html, body { margin:0; padding:0; background:transparent; }
   outline:2px solid rgba(255,217,102,.85); outline-offset:2px; border-radius:6px;
 }
 /* Auth button */
-.btn-auth{ height:38px; padding:0 18px; border-radius:999px; border:2px solid #fff; background:transparent; color:#fff; font-weight:600; font-size:18px; cursor:pointer; transition:background .2s, color .2s, box-shadow .2s; }
+.btn-auth{ height:38px; padding:0 18px; border-radius:999px; border:2px solid #fff; 
+  background:transparent; color:#fff; font-weight:600; font-size:18px; 
+  cursor:pointer; transition:background .2s, color .2s, box-shadow .2s; 
+
+  /* FIX chữ xuống dòng */
+  white-space: nowrap;
+}
 .btn-auth:hover{ background:var(--yellow); color:#fff; box-shadow:0 8px 18px rgba(0,0,0,.18); }
 
 /* Responsive nhỏ */
@@ -77,8 +87,11 @@ html, body { margin:0; padding:0; background:transparent; }
 
 /* Ẩn dropdown desktop trên mobile */
 @media (max-width:768px){
-  .nav__toggle{ display:block; }
-  .nav__links{ display:none; }
+  .nav{ position:sticky; top:0; z-index:50; }
+  .nav__inner{ padding:10px 12px; gap:12px; justify-content:flex-start; }
+  .brand{ margin-left:0; }                      /* <-- LOGO sát mép trái */
+  .nav__toggle{ display:block; margin-left:auto; } /* <-- MENU sát mép phải */
+  .nav__search, .nav__actions{ display:none!important; }
 }
 
 /* =========================================================
@@ -126,3 +139,38 @@ html, body { margin:0; padding:0; background:transparent; }
 
 /* Chặn scroll khi mở Drawer */
 body.noscroll{ overflow:hidden; }
+
+/* =========================================================
+   ➤ MOBILE: NỀN + HERO căn giữa (H1 1 dòng)
+   ========================================================= */
+@media (max-width: 768px){
+  /* [BG mobile + overlay] – chỉ khai báo ở đây để tránh trùng */
+  body.home{
+    background:
+      linear-gradient(0deg, rgba(164,25,25,.45), rgba(164,25,25,.45)), /* đỏ mờ */
+      url('assets/bg-mobile.png') center/cover no-repeat;
+    background-attachment: scroll;
+  }
+
+  /* [Hero căn giữa] */
+  .hero{
+    min-height:calc(100vh - 88px);
+    display:flex; flex-direction:column; justify-content:center;
+    padding:0 20px 32px; text-align:left;
+  }
+  .h1-line1, .hero .h1-main{
+    display:inline-block; white-space:nowrap;   /* <-- H1 luôn 1 dòng */
+    font-size:clamp(26px, 7.2vw, 32px);
+    letter-spacing:.3px;
+    text-transform:uppercase;
+  }
+  .hero .h1-sub{ display:block; font-size: clamp(22px, 6.8vw, 30px); font-weight:800; color:#FFD966; line-height:1.15;}               /* Ẩn “BAN CHỈ HUY PTKV3” ở body */
+  .hero p{ font-size:16px; line-height:1.45; max-width:480px; margin:6px 0 18px; }
+  .hero__actions{ justify-content:flex-start; }
+}
+
+/* Desktop đảm bảo nav__links hiển thị bình thường */
+@media (min-width:769px){
+  .nav__toggle{ display:none; }
+  .nav__links{ display:flex; }
+}

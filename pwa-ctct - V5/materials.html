@@ -5,10 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tài liệu học tập – PTKV3</title>
 
-<!-- Font dùng chung lấy từ style.css (đừng override font ở trang này) -->
+<!-- Font + style chung của site -->
 <link rel="stylesheet" href="style.css">
-<!-- Nếu anh có nav.css dùng chung thì để thêm dòng này -->
-<!-- <link rel="stylesheet" href="nav.css"> -->
+
+<!-- Cách 1 cần navbar chung (desktop + mobile drawer) -->
+<link rel="stylesheet" href="nav.css?v=20250930">
+<style>
+/* ===== MATERIALS-ONLY (không ảnh hưởng trang khác) ===== */
+
+/* 2.1 Màu chữ menu trên nền sáng ở trang Tài liệu học tập */
+body.materials .nav.nav-dark { background:#fff; }              /* nền trắng (riêng trang này) */
+body.materials .nav.nav-dark .brand { color:#111827; }          /* logo chữ đậm */
+body.materials .nav.nav-dark .nav__links a { color:#111827; }   /* link menu đậm */
+body.materials .nav.nav-dark .nav__links a.is-active {
+  color:#A41919;                                                /* mục đang chọn = đỏ thương hiệu */
+  font-weight:800;
+}
+/* Giữ dropdown nền tối, chữ trắng để tương phản tốt */
+body.materials .nav .dropdown{
+  background:rgba(0,0,0,.90);
+  border:1px solid rgba(255,255,255,.08);
+}
+body.materials .nav .dropdown a{
+  color:#fff !important;                 /* bắt buộc trắng để không bị rule khác ghi đè */
+  font-weight:600;
+}
+body.materials .nav .dropdown a:hover{
+  background:rgba(255,255,255,.10);
+  color:#FFD966 !important;
+}
+/* 2.2 Ẩn nút hamburger/close trên desktop để không còn dấu “×” góc trái */
+@media (min-width:769px){
+  body.materials .nav__toggle { display:none !important; }
+}
+
+/* 2.3 Giữ trải nghiệm mobile như cũ (không đụng tới các trang khác) */
+@media (max-width:768px){
+  /* Trang này vẫn dùng giao diện mobile hiện tại của anh */
+  body.materials .nav__links { display:none; }  /* nếu dùng drawer/mobile bar thì ẩn menu ngang */
+}
+
+/* ===== MODAL chỉ dành cho materials ===== */
+body.materials .modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;               /* ẩn mặc định */
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+body.materials .modal.show { display:flex; }
+
+body.materials .modal__in {background: #fff; border-radius: 12px; max-width: 800px;
+  width: 90%; max-height: 90%; display: flex; flex-direction: column; overflow: hidden;}
+
+body.materials .modal__hd {display:flex; justify-content: space-between;align-items:center;
+  padding:12px 16px; border-bottom:1px solid #e5e7eb; background:#f9fafb;}
+
+body.materials .modal__hd h3 {font-size:18px; font-weight:800; margin:0;}
+
+body.materials .modal__hd .x { border:none; background:none; font-size:14px; font-weight:600;
+  color:#a41919; cursor:pointer;}
+
+</style>
+
+<script src="navbar.js?v=20250930" defer></script>
 
 <style>
   :root{
@@ -17,22 +79,10 @@
     --pill:#f1f5f9;
   }
   *{box-sizing:border-box}
-  html,body{
-    margin:0; background:var(--bg); color:var(--text);
-    /* KHÔNG set font-family ở đây để kế thừa từ style.css (Be Vietnam Pro) */
-  }
+  html,body{ margin:0; background:var(--bg); color:var(--text); }
   a{text-decoration:none;color:inherit}
 
-  /* NAV (giản lược – nếu đã có nav.css thì có thể bỏ khối này) */
-  .nav{position:sticky;top:0;z-index:10;background:linear-gradient(90deg,#8f1717,#a41919);color:#fff}
-  .nav__in{max-width:1120px;margin:auto;padding:12px 14px;display:flex;align-items:center;gap:18px}
-  .brand{font-weight:800;white-space:nowrap}
-  .nav__links{display:flex;gap:20px;flex:1}
-  .nav__links a{color:#fff;opacity:.92}
-  .nav__links a.active{color:#ffd966;position:relative}
-  .nav__links a.active:after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;background:#ffd966;border-radius:999px}
-  .btn-auth{border:1px solid rgba(255,255,255,.7);background:transparent;color:#fff;padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer}
-  .btn-auth:hover{background:#ffd966;color:#111;border-color:#ffd966}
+  /* ====== (Giữ nguyên các style phần materials như anh đang có) ====== */
 
   .container{max-width:1120px;margin:16px auto;padding:0 12px}
 
@@ -41,44 +91,21 @@
   .news__hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
   .news__title{display:flex;align-items:center;gap:8px;font-weight:900}
   .news__badge{background:#eef2ff;border:1px solid #e5e7eb;border-radius:999px;padding:3px 8px;font-size:12px;color:#1f2937}
-  .news__src{color:var(--muted);font-size:12px;opacity:.9}
 
-  /* ===== Hàng chip ngay dưới tiêu đề ===== */
   .news__toolbar{display:flex;gap:12px;align-items:center;margin:8px 0 12px}
-
-  /* Chip ngày */
-  .chip-date{
-    display:inline-flex; align-items:center; gap:12px;
-    height:44px; padding:6px 12px;
-    background:#f3f4f6; color:#111827;
-    border:1px solid var(--border); border-radius:4px;
-    font-size:13px; line-height:1;
-  }
-  .cal-ico{display:inline-block; width:16px; height:16px}
+  .chip-date{display:inline-flex;align-items:center;gap:12px;height:44px;padding:6px 12px;background:#f3f4f6;border:1px solid var(--border);border-radius:4px;font-size:13px}
+  .cal-ico{display:inline-block;width:16px;height:16px}
   .cal-ico svg{width:16px;height:16px;display:block}
 
-  /* Ticker inline */
-  .inline-ticker{
-    position:relative; height:44px; flex:1; min-width:260px;
-    border:1px solid var(--border); border-radius:4px;
-    background:#fff; overflow:hidden;
-  }
-  .inline-track{
-    position:absolute; inset:0 auto 0 0;
-    display:flex; align-items:center; gap:30px; white-space:nowrap;
-    padding:0 12px; height:44px;
-    animation:tickerMove 40s linear infinite; /* tốc độ chạy */
-  }
-  @keyframes tickerMove{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
-  .inline-ticker:hover .inline-track,
-  .inline-ticker:focus-within .inline-track{ animation-play-state:paused }
-  @media (prefers-reduced-motion:reduce){ .inline-track{ animation:none; position:static; overflow:auto } }
+  .inline-ticker{position:relative;height:44px;flex:1;min-width:260px;border:1px solid var(--border);border-radius:4px;background:#fff;overflow:hidden}
+  .inline-track{position:absolute;inset:0 auto 0 0;display:flex;align-items:center;gap:30px;white-space:nowrap;padding:0 12px;height:44px;animation:tickerMove 40s linear infinite}
+  @keyframes tickerMove{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+  .inline-ticker:hover .inline-track,.inline-ticker:focus-within .inline-track{animation-play-state:paused}
+  @media (prefers-reduced-motion:reduce){.inline-track{animation:none;position:static;overflow:auto}}
 
   .titem{display:inline-flex;align-items:center;gap:10px}
   .t-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block}
-  .t-link{font-weight:700;font-size:15px;line-height:1.1} /* cỡ chữ ticker */
-
-  /* Huy hiệu NEW (sao đỏ, chữ vàng) */
+  .t-link{font-weight:700;font-size:15px;line-height:1.1}
   .t-burst{display:inline-block;width:18px;height:18px;vertical-align:middle}
   .t-burst svg{display:block;width:18px;height:18px}
   .t-burst text{font-size:8px;font-weight:900;fill:#ffd966}
@@ -86,7 +113,6 @@
   .news__grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
   @media (max-width:980px){.news__grid{grid-template-columns:repeat(2,1fr)}}
   @media (max-width:640px){.news__grid{grid-template-columns:1fr}}
-
   .news__card{display:grid;grid-template-columns:112px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
   .news__thumb{width:112px;height:86px;object-fit:cover;background:#f3f4f6;display:block}
   .news__info{padding:10px 10px 10px 0;display:flex;flex-direction:column}
@@ -118,40 +144,43 @@
   .btn-ghost:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
   .empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:#64748b}
 
-  /* MODAL */
-  .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50}
-  .modal__in{background:#fff;max-width:980px;margin:36px auto;padding:14px;border-radius:14px;max-height:90vh;overflow:auto}
-  .modal__hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-  .x{border:none;background:#ef4444;color:#fff;border-radius:8px;padding:6px 10px;font-weight:800;cursor:pointer}
-  .frame{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000}
-  .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  /* Ẩn badge đếm bài nếu không dùng */
+  #newsCount{display:none!important}
 
-  /* Ẩn badge đếm bài nếu anh không muốn hiện */
-  #newsCount { display:none !important; }
-
-   #newsGrid .news__titlelink {
-    font-size: 15px;
-    line-height: 1.4;
-  }
+  /* (Giữ nhỏ tiêu đề tin như anh đang dùng) */
+  #newsGrid .news__titlelink{font-size:15px;line-height:1.4}
 </style>
 </head>
-<body>
+<body class="materials">
 
-<header class="nav">
-  <div class="nav__in">
+<!-- ====== HEADER CHUẨN CÁCH 1 (KHÔNG mbar) ====== -->
+<header class="nav nav-dark">
+  <div class="nav__inner">
+    <!-- Logo -->
     <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+
+    <!-- Hamburger (mobile) -->
+    <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Links (desktop). JS sẽ biến 2 mục dài thành dropdown -->
     <nav class="nav__links">
       <a href="index.html">Trang chủ</a>
-      <a href="materials.html" class="active">Tài liệu học tập</a>
-      <a href="quiz.html">Làm bài kiểm tra</a>
+      <a href="materials.html" class="is-active">Tài liệu học tập</a>
+      <a href="exam.html">Làm bài kiểm tra</a>
       <a href="leaderboard.html">Bảng xếp hạng</a>
     </nav>
-    <button class="btn-auth">Đăng nhập/Đăng ký</button>
+
+    <!-- Auth desktop (mobile đã có trong drawer của navbar.js) -->
+    <div class="nav__actions hide-sm">
+      <button id="btnAuth" class="btn btn-auth">Đăng nhập/Đăng ký</button>
+    </div>
   </div>
 </header>
+<!-- ====== /HEADER ====== -->
 
 <main class="container">
-
   <!-- ===== Tin tức ===== -->
   <section class="news" id="newsBlock">
     <div class="news__hd">
@@ -162,11 +191,9 @@
       </div>
     </div>
 
-    <!-- Hàng chip theo mẫu -->
     <div class="news__toolbar">
       <span class="chip-date">
         <span class="cal-ico" aria-hidden="true">
-          <!-- SVG lịch -->
           <svg viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="4" width="18" height="18" rx="3"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -217,18 +244,15 @@
 <script src="config.js"></script>
 
 <script>
-/* ================== LẤY CẤU HÌNH TỪ config.js ================== */
+/* ================== Hôm nay + ticker + news (giữ như anh) ================== */
 const { SHEET_API, MATERIALS_FOLDER_ID } = window.CTCT_CONFIG || {};
-const API_BASE = SHEET_API || ""; // nếu rỗng sẽ hiện nút "Thử lại"
-
-/* Helpers */
+const API_BASE = SHEET_API || "";
 const $ = (sel, ctx=document)=>ctx.querySelector(sel);
 const fmtTime = s => new Date(s).toLocaleString('vi-VN');
 function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
 function isSafeHttpUrl(u){ try { const x=new URL(u); return x.protocol==='http:'||x.protocol==='https:'; } catch { return false; } }
 function debounce(fn, ms=220){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; }
 
-/* Hôm nay */
 function renderToday(){
   const el = $('#todayText'); if(!el) return;
   const d = new Date();
@@ -240,7 +264,6 @@ function renderToday(){
 }
 renderToday();
 
-/* Fetch+retry+cache cho News */
 function fetchWithTimeout(url, opts={}, ms=8000){
   const ctrl = new AbortController(); const id = setTimeout(()=>ctrl.abort(), ms);
   return fetch(url, { ...opts, signal: ctrl.signal }).finally(()=>clearTimeout(id));
@@ -252,12 +275,10 @@ async function tryFetchJSON(url, {tries=3, timeout=8000}={}){
       const res = await fetchWithTimeout(url, { cache:'no-store' }, timeout);
       const txt = await res.text();
       if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}: ${txt.slice(0,200)}`);
-      // bắt lỗi khi server trả HTML
       if (!/^ *\{|\[/.test(txt)) throw new Error('Not JSON: ' + txt.slice(0,200));
       return JSON.parse(txt);
     }catch(err){
       lastErr = err;
-      console.warn('[news] attempt', i+1, err);
       if(i < tries-1) await new Promise(r=>setTimeout(r, (i+1)*1200));
     }
   }
@@ -272,7 +293,6 @@ const NewsCache = {
   write(items){ try{ localStorage.setItem(this.KEY, JSON.stringify({ts:Date.now(),items})); }catch{} }
 };
 
-/* NEW burst icon */
 function newBurstSVG(){
   return `
     <span class="t-burst" aria-label="Tin mới">
@@ -284,7 +304,6 @@ function newBurstSVG(){
     </span>`;
 }
 
-/* Ticker inline */
 function renderInlineTicker(items){
   const track = $('#inlineTrack'); if(!track) return;
   const list = (items||[]).slice(0, 30);
@@ -292,7 +311,7 @@ function renderInlineTicker(items){
     track.innerHTML = `<span class="titem" style="padding:0 12px;color:#64748b">Đang cập nhật…</span>`;
     return;
   }
-  const tpl = it => {
+  const stripe = list.map(it=>{
     const url = isSafeHttpUrl(it.url) ? it.url : '#';
     return `
       <span class="titem">
@@ -300,30 +319,20 @@ function renderInlineTicker(items){
         <a class="t-link" href="${url}" target="_blank" rel="noopener">${escapeHtml(it.title||'Tin mới')}</a>
         ${newBurstSVG()}
       </span>`;
-  };
-  const stripe = list.map(tpl).join('');
-  track.innerHTML = stripe + stripe; // lặp để chạy liên tục
+  }).join('');
+  track.innerHTML = stripe + stripe;
 }
 
-/* NEWS */
 document.addEventListener('DOMContentLoaded', loadNewsToGrid);
-
 async function loadNewsToGrid(){
-  const grid = $('#newsGrid');
-  const counter = $('#newsCount');
-
-  const showSkeleton = () => {
-    if(counter) counter.textContent = '…';
-    grid.innerHTML = `<div class="news__skeleton"></div><div class="news__skeleton"></div><div class="news__skeleton"></div>`;
-  };
-  function bindOpenNews(container){
-    container.querySelectorAll('.news__card').forEach(card=>{
-      const open = ()=>{ const href = card.getAttribute('data-href'); if (isSafeHttpUrl(href)) window.open(href, '_blank', 'noopener,noreferrer'); };
-      card.addEventListener('click', open);
-      card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); }});
-    });
-  }
-  function renderRetry(msg){
+  const grid = $('#newsGrid'), counter = $('#newsCount');
+  const showSkeleton = ()=>{ if(counter) counter.textContent='…'; grid.innerHTML = `<div class="news__skeleton"></div><div class="news__skeleton"></div><div class="news__skeleton"></div>`; };
+  const bindOpenNews = (container)=> container.querySelectorAll('.news__card').forEach(card=>{
+    const open = ()=>{ const href = card.getAttribute('data-href'); if (isSafeHttpUrl(href)) window.open(href,'_blank','noopener,noreferrer'); };
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); }});
+  });
+  const renderRetry = (msg)=>{
     if(counter) counter.textContent = '0 bài';
     grid.innerHTML = `
       <div class="news__card" style="grid-column:1/-1; display:flex; align-items:center; justify-content:center; padding:12px">
@@ -336,19 +345,17 @@ async function loadNewsToGrid(){
         </div>
       </div>`;
     document.getElementById('newsRetry')?.addEventListener('click', ()=>{ showSkeleton(); loadNewsToGrid(); });
-  }
+  };
 
   if(!API_BASE){ renderRetry('Chưa cấu hình API tin tức (SHEET_API).'); return; }
 
   const cached = NewsCache.read();
-  if(cached && cached.length){
+  if(cached?.length){
     if(counter) counter.textContent = `${cached.length} bài`;
     grid.innerHTML = cached.slice(0,9).map(renderNewsCard).join('');
     bindOpenNews(grid);
     renderInlineTicker(cached);
-  } else {
-    showSkeleton();
-  }
+  } else { showSkeleton(); }
 
   try{
     const url = `${API_BASE}?action=news&limitPer=5&total=18`;
@@ -364,8 +371,7 @@ async function loadNewsToGrid(){
       renderRetry('Chưa có bài phù hợp từ nguồn.');
     }
   }catch(err){
-    if(!cached){ renderRetry('Lỗi mạng hoặc máy chủ chậm.'); }
-    console.warn('[news] error', err);
+    if(!cached) renderRetry('Lỗi mạng hoặc máy chủ chậm.');
   }
 }
 
@@ -381,13 +387,10 @@ function renderNewsCard(n){
       </a>
       <div class="news__info">
         <a class="news__titlelink" href="${url}" target="_blank" rel="noopener">${escapeHtml(n.title||'')}</a>
-        <div class="news__meta">
-          <span>${time}</span>
-        </div>
+        <div class="news__meta"><span>${time}</span></div>
       </div>
     </article>`;
 }
-
 
 /* ===== Materials (API hoặc MOCK) ===== */
 const ICON = { pdf:'📄', video:'📺', audio:'🎧', slide:'🖼', news:'📰' };
@@ -398,10 +401,7 @@ async function fetchMaterialsFromApi(){
     const res = await fetch(url, {cache:'no-store'});
     if (!res.ok) throw 0;
     const data = await res.json();
-    return (data.files||[]).map(f=>({
-      id:f.id, type:'pdf', title:f.title, topic:'Chưa phân loại',
-      updated:f.updated, source:'Drive', url:f.url
-    }));
+    return (data.files||[]).map(f=>({ id:f.id, type:'pdf', title:f.title, topic:'Chưa phân loại', updated:f.updated, source:'Drive', url:f.url }));
   }catch{ return null; }
 }
 const MOCK = [
@@ -415,7 +415,6 @@ let MATERIALS = [];
 
 (async function init(){
   try{ MATERIALS = await fetchMaterialsFromApi() || MOCK; }catch{ MATERIALS = MOCK; }
-
   const TOPICS = [...new Set(MATERIALS.map(x=>x.topic))].sort((a,b)=>a.localeCompare(b,'vi'));
   const YEARS  = [...new Set(MATERIALS.map(x=>new Date(x.updated).getFullYear()))].sort((a,b)=>b-a);
   topicSel.innerHTML = '<option value="">Tất cả chuyên đề</option>' + TOPICS.map(t=>`<option>${escapeHtml(t)}</option>`).join('');
@@ -486,37 +485,60 @@ function renderCard(it){
   </article>`;
 }
 
-/* Modal viewer */
-const viewer = $('#viewer'), viewerTitle = $('#viewerTitle'), viewerBody = $('#viewerBody');
-$('#closeViewer').onclick = ()=> viewer.style.display='none';
-window.addEventListener('click', e => { if(e.target===viewer) viewer.style.display='none'; });
+/* ===== BỔ SUNG B: Desktop – dựng dropdown & caret cho 2 mục dài ===== */
+(function(){
+  const norm = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 
-document.addEventListener('click', e=>{
-  const btn = e.target.closest('[data-open]'); if(!btn) return;
-  const it = MATERIALS.find(x=>x.id===btn.dataset.open); if(!it) return;
-  viewerTitle.textContent = it.title;
-  viewerBody.innerHTML = renderViewer(it);
-  viewer.style.display='block';
-  viewer.focus();
-  const onEsc = (ev)=>{ if(ev.key==='Escape'){ viewer.style.display='none'; document.removeEventListener('keydown', onEsc); } };
-  document.addEventListener('keydown', onEsc);
-});
+  function findAnchor(txt){
+    const want = norm(txt);
+    const as = document.querySelectorAll('.nav__links a');
+    for (const a of as){ if (norm(a.textContent).includes(want)) return a; }
+    return null;
+  }
+  function wrapItem(a){
+    if (!a) return null;
+    let li = a.closest('.nav__item');
+    if (!li){
+      li = document.createElement('div');
+      li.className = 'nav__item';
+      a.parentNode.insertBefore(li, a);
+      li.appendChild(a);
+    }
+    return li;
+  }
+  function ensureDropdown(title, items){
+    const a = findAnchor(title); if(!a) return;
+    const li = wrapItem(a);
+    li.classList.add('has-dropdown');   // nav.css sẽ áp dụng style dropdown
+    a.removeAttribute('href');          // không điều hướng ở tiêu đề
+    a.style.cursor = 'default';
 
-function renderViewer(it){
-  if (it.type==='video'){
-    const src = isSafeHttpUrl(it.url) ? it.url : '';
-    return src ? `<div class="frame"><iframe src="${src}" allow="accelerometer; autoplay; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe></div>`
-               : `<div class="empty">Video không khả dụng.</div>`;
+    let dd = li.querySelector('.dropdown');
+    if (!dd){ dd = document.createElement('div'); dd.className='dropdown'; li.appendChild(dd); }
+    dd.innerHTML = items.map(it=>`<a href="${it.href}">${it.text}</a>`).join('');
   }
-  if (it.type==='audio'){
-    const src = isSafeHttpUrl(it.url) ? it.url : '';
-    return src ? `<audio controls style="width:100%"><source src="${src}">Trình duyệt không hỗ trợ audio.</audio>`
-               : `<div class="empty">Audio không khả dụng.</div>`;
-  }
-  const src = it.url && it.url.includes('/preview') && isSafeHttpUrl(it.url) ? it.url : '';
-  return src ? `<div class="frame"><iframe src="${src}" referrerpolicy="no-referrer"></iframe></div>`
-             : `<div class="empty">Tài liệu không khả dụng.</div>`;
+
+  ensureDropdown('làm bài kiểm tra', [
+    {href:'exam.html',     text:'Kiểm tra nhận thức'},
+    {href:'practice.html', text:'Ôn trắc nghiệm'},
+    {href:'quiz.html',     text:'Thi thử'}
+  ]);
+  ensureDropdown('kết quả kiểm tra', [
+    {href:'my-results.html',  text:'Kết quả của tôi'},
+    {href:'leaderboard.html', text:'Bảng xếp hạng'}
+  ]);
+})();
+</script>
+<script>
+const modal = document.getElementById('viewer');
+const closeBtn = document.getElementById('closeViewer');
+
+if (modal && closeBtn) {
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
 }
 </script>
+
 </body>
 </html>
