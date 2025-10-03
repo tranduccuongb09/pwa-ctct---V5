@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kiểm tra nhận thức – CTĐ, CTCT</title>
+
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../css/nav.css">
+
+  <!-- BẮT BUỘC đăng nhập: thành viên mới được làm bài kiểm tra -->
+  <script src="../js/auth-guard.js" data-require-role="member" defer></script>
+
+  <style>
+    :root{ --brand:#A41919; --brand-600:#8B1616; --bg:#f5f6f8; --card:#fff; --text:#111827; --border:#e5e7eb; --muted:#6b7280 }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .topbar{display:flex;gap:12px;align-items:center;background:var(--brand);color:#fff;padding:14px 16px}
+    .topbar a{color:#fff;text-decoration:none}
+    .topbar b{letter-spacing:.3px}
+    .container{max-width:1100px;margin:16px auto;padding:0 12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:18px;margin:12px auto}
+    .row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    @media (max-width:800px){.row{grid-template-columns:1fr}}
+    .input,.select{width:100%;padding:12px;border:1px solid var(--border);border-radius:12px}
+    .btn{padding:12px 18px;border-radius:12px;border:none;font-weight:800;cursor:pointer}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-600)}
+    .muted{color:var(--muted)}
+    .quiz{display:grid;gap:12px}
+    .qhead{display:flex;justify-content:space-between;align-items:center}
+    .bar{height:8px;background:#f3f4f6;border-radius:999px;overflow:hidden}
+    .bar>span{display:block;height:100%;background:var(--brand);width:0%}
+    .option{display:block;padding:10px;border:1px solid var(--border);border-radius:12px;margin:8px 0}
+    .navs{display:flex;gap:10px;flex-wrap:wrap}
+    .btn-ghost{background:#fff;border:1px solid var(--border)}
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js'));
+    }
+  </script>
+</head>
+<body class="page-quiz">
+  <div class="topbar">
+    <a href="../index.html">← Trang chủ</a>
+    <b>KIỂM TRA NHẬN THỨC (CHÍNH THỨC)</b>
+  </div>
+
+  <main class="container">
+    <!-- Thẻ START -->
+    <section id="startCard" class="card">
+      <h3 style="margin-top:0">Thông tin thí sinh</h3>
+      <div class="row" style="margin:10px 0 14px">
+        <input id="fullname" class="input" placeholder="Họ và tên" autocomplete="name"/>
+        <input id="unit" class="input" placeholder="Đơn vị"/>
+        <input id="position" class="input" placeholder="Chức vụ"/>
+      </div>
+      <div class="row" style="margin:10px 0 14px">
+        <label>Đối tượng
+          <select id="examTopic" class="select">
+            <option value="DQTV">DQTV</option>
+            <option value="LLTT">LLTT</option>
+          </select>
+        </label>
+        <div class="muted" style="align-self:center">Thời lượng: 30 phút • Số câu: 50 • Mã đề: <b id="examCode">----</b></div>
+        <div style="text-align:right">
+          <button id="resumeBtn" class="btn btn-ghost" hidden>Tiếp tục bài đang làm</button>
+          <button id="startBtn"  class="btn btn-primary">Bắt đầu làm bài</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hộp LÀM BÀI -->
+    <section id="quizBox" class="card" hidden>
+      <div class="quiz">
+        <div class="qhead">
+          <div><b id="qTitle">Câu 1</b></div>
+          <div>Thời gian: <b id="time">00:00</b></div>
+        </div>
+        <div class="bar"><span id="progressFill"></span></div>
+        <div class="muted" style="margin-top:6px">Tiến độ: <span id="progress">0/50</span></div>
+
+        <h3 id="qText" style="margin:10px 0 6px"></h3>
+        <div id="options"></div>
+
+        <div class="navs">
+          <button id="prevBtn" class="btn btn-ghost">← Trước</button>
+          <button id="nextBtn" class="btn btn-ghost">Tiếp →</button>
+          <button id="reviewBtn" class="btn btn-ghost">Câu chưa trả lời</button>
+          <button id="submitBtn" class="btn btn-primary" style="margin-left:auto">Nộp bài</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- KẾT QUẢ -->
+    <section id="resultCard" class="card" hidden>
+      <h3 id="resultText" style="margin-top:0">Kết quả</h3>
+      <div class="muted" id="classification"></div>
+      <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+        <a class="btn btn-ghost" href="./review.html">Xem lại & giải thích</a>
+        <a class="btn btn-ghost" href="./materials.html">Tài liệu học tập</a>
+        <a class="btn btn-primary" href="../index.html">Về Trang chủ</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- cấu hình + helpers -->
+  <script src="../js/config.js"></script>
+  <script>window.CTCT_USE_TRY_API = false; /* ép app.js dùng SHEET_API (chính thức) */</script>
+  <script src="../js/net.js"></script>
+  <script src="../js/analytics.js"></script>
+  <script src="../js/navbar.js" defer></script>
+  <script src="../js/app.js" defer></script>
+</body>
+</html>

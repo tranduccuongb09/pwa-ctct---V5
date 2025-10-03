@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Đăng nhập / Đăng ký – CTĐ, CTCT</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="../../public/manifest.webmanifest">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => { try { navigator.serviceWorker.register('../../public/sw.js'); } catch(_){} });
+    }
+  </script>
+
+  <!-- Style chung + nav -->
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/nav.css">
+  <style>
+    :root{ --brand:#A41919; --brand-600:#8B1616; --ring:#e5e7eb; --bg:#f6f7fb; --muted:#6b7280 }
+    body{ background:#fff; color:#111827 }
+    .wrap{ max-width:980px; margin:24px auto; padding:0 16px }
+    .auth-card{
+      background:#fff; border:1px solid var(--ring); border-radius:16px;
+      box-shadow:0 8px 28px rgba(0,0,0,.08); overflow:hidden;
+    }
+    .auth-head{
+      background:linear-gradient(135deg,var(--brand),var(--brand-600));
+      color:#fff; padding:18px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .auth-head h1{ margin:0; font-size:20px; letter-spacing:.3px }
+    .tabs{ display:flex; gap:6px; background:#fafafa; border-bottom:1px solid var(--ring) }
+    .tab{
+      flex:1; text-align:center; padding:12px; font-weight:800; cursor:pointer; user-select:none;
+      border-right:1px solid var(--ring);
+    }
+    .tab:last-child{ border-right:0 }
+    .tab.active{ background:#fff; color:var(--brand); box-shadow:inset 0 -3px 0 var(--brand) }
+    .pane{ padding:18px }
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px }
+    @media (max-width:720px){ .grid{ grid-template-columns:1fr } }
+    .input{
+      width:100%; padding:12px 14px; border:1px solid var(--ring); border-radius:12px; background:#fff; font-size:16px;
+    }
+    .hint{ color:var(--muted); font-size:13px }
+    .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px }
+    .btn{ padding:12px 16px; border-radius:12px; border:1px solid var(--ring); background:#fff; font-weight:800; cursor:pointer }
+    .btn-primary{ background:var(--brand); border-color:var(--brand); color:#fff }
+    .btn-primary:hover{ filter:brightness(.98) }
+    .badge{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:#f3f4f6; font-weight:700 }
+    .muted{ color:var(--muted) }
+    .foot{ display:flex; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--ring); background:#fafafa }
+  </style>
+</head>
+<body>
+  <nav class="topbar" style="background:var(--brand);color:#fff">
+    <a href="index.html" class="back" style="color:#fff;text-decoration:none">← Trang chủ</a>
+    <h2>ĐĂNG NHẬP / ĐĂNG KÝ</h2>
+  </nav>
+
+  <main class="wrap">
+    <section class="auth-card">
+      <div class="auth-head">
+        <h1>GIÁO DỤC CHÍNH TRỊ SỐ – PTKV3</h1>
+        <span class="badge">🔒 Bảo vệ truy cập thi & kết quả</span>
+      </div>
+
+      <div class="tabs">
+        <div id="tabLogin" class="tab active">Đăng nhập</div>
+        <div id="tabRegister" class="tab">Đăng ký</div>
+      </div>
+
+      <!-- PANE: LOGIN -->
+      <div id="paneLogin" class="pane">
+        <div class="grid">
+          <label>Họ và tên
+            <input id="l_name" class="input" autocomplete="name" placeholder="VD: Nguyễn Văn A">
+          </label>
+          <label>Đơn vị
+            <input id="l_unit" class="input" placeholder="VD: Tiểu đoàn…">
+          </label>
+          <label>Chức vụ (tuỳ chọn)
+            <input id="l_position" class="input" placeholder="VD: Trung đội trưởng">
+          </label>
+          <label>Vai trò (phân quyền)
+            <select id="l_role" class="input">
+              <option value="member">Thành viên</option>
+              <option value="unit_viewer">Xem kết quả đơn vị</option>
+              <option value="ptkv_viewer">Xem cấp PTKV</option>
+              <option value="province_admin">Tỉnh (Chỉ huy trưởng/Chính uỷ)</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint">Đăng nhập nhanh chỉ lưu hồ sơ trên thiết bị để mở quyền truy cập thi & xem kết quả theo vai trò do quản trị cấp phát.</p>
+        <div class="actions">
+          <a class="btn" href="index.html">Huỷ</a>
+          <button id="btnLogin" class="btn btn-primary">Đăng nhập</button>
+        </div>
+      </div>
+
+      <!-- PANE: REGISTER -->
+      <div id="paneRegister" class="pane" hidden>
+        <div class="grid">
+          <label>Họ và tên
+            <input id="r_name" class="input" autocomplete="name">
+          </label>
+          <label>Đơn vị
+            <input id="r_unit" class="input">
+          </label>
+          <label>Chức vụ
+            <input id="r_position" class="input">
+          </label>
+          <label>Email (để liên hệ phê duyệt)
+            <input id="r_email" class="input" type="email" placeholder="ten@donvi.vn">
+          </label>
+          <label>Mã đơn vị (nếu có)
+            <input id="r_unitCode" class="input" placeholder="VD: PTKV3-TD1">
+          </label>
+          <label>Vai trò mong muốn
+            <select id="r_role" class="input">
+              <option value="member">Thành viên (mặc định)</option>
+              <option value="unit_viewer">Xem kết quả đơn vị</option>
+            </select>
+          </label>
+        </div>
+        <p class="hint">Yêu cầu đăng ký sẽ được lưu kèm hồ sơ cục bộ. Quản trị có thể đối chiếu & nâng quyền sau.</p>
+        <div class="actions">
+          <a class="btn" href="index.html">Huỷ</a>
+          <button id="btnRegister" class="btn btn-primary">Đăng ký</button>
+        </div>
+      </div>
+
+      <div class="foot">
+        <span class="muted">Thương hiệu • màu chủ đạo #A41919 đồng bộ toàn site</span>
+        <a class="btn" href="materials.html">Tài liệu học tập</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- JS chung -->
+  <script src="../js/config.js" defer></script>
+  <script src="../js/net.js" defer></script>
+  <script src="../js/analytics.js" defer></script>
+  <script src="../js/navbar.js" defer></script>
+
+  <!-- Logic auth nội trang -->
+  <script>
+    const LS_KEY = 'ctct_profile';
+    const J = { parse:(s,f=null)=>{try{return JSON.parse(s)}catch{ return f }}, str:o=>JSON.stringify(o||{}) };
+
+    const $ = (id)=>document.getElementById(id);
+    const tabLogin = $('tabLogin'), tabRegister = $('tabRegister');
+    const paneLogin = $('paneLogin'), paneRegister = $('paneRegister');
+
+    tabLogin.addEventListener('click', ()=>{ tabLogin.classList.add('active'); tabRegister.classList.remove('active'); paneLogin.hidden=false; paneRegister.hidden=true; });
+    tabRegister.addEventListener('click', ()=>{ tabRegister.classList.add('active'); tabLogin.classList.remove('active'); paneLogin.hidden=true; paneRegister.hidden=false; });
+
+    function redirectAfter(){
+      const next = new URLSearchParams(location.search).get('next');
+      location.href = next ? next : 'index.html';
+    }
+
+    function saveProfile(p){
+      localStorage.setItem(LS_KEY, J.str(p));
+      try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}
+    }
+
+    // Đăng nhập
+    $('btnLogin').addEventListener('click', ()=>{
+      const name=($('l_name').value||'').trim();
+      const unit=($('l_unit').value||'').trim();
+      if(!name || !unit){ alert('Vui lòng nhập Họ tên và Đơn vị.'); return; }
+      const position = ($('l_position').value||'').trim();
+      const role = ($('l_role').value||'member');
+      saveProfile({ name, unit, position, role, unitCode:'', registered:true, ts: Date.now() });
+      window.toast && toast('Đăng nhập thành công!');
+      redirectAfter();
+    });
+
+    // Đăng ký
+    $('btnRegister').addEventListener('click', ()=>{
+      const name=($('r_name').value||'').trim();
+      const unit=($('r_unit').value||'').trim();
+      if(!name || !unit){ alert('Vui lòng nhập Họ tên và Đơn vị.'); return; }
+      const position=($('r_position').value||'').trim();
+      const email=($('r_email').value||'').trim();
+      const unitCode=($('r_unitCode').value||'').trim();
+      const role=($('r_role').value||'member');
+
+      // Lưu local + gửi log lên Apps Script (nếu muốn)
+      const profile = { name, unit, position, email, unitCode, role, registered:true, ts: Date.now() };
+      saveProfile(profile);
+
+      // ghi log đăng ký (tuỳ chọn)
+      try{
+        const { SHEET_API } = window.CTCT_CONFIG || {};
+        if (SHEET_API) {
+          fetchJSON(SHEET_API+'?action=log', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ action:'log', event:'register', me:profile, ts:new Date().toISOString(), ua:navigator.userAgent })
+          });
+        }
+      }catch(_){}
+
+      window.toast && toast('Đăng ký thành công!');
+      redirectAfter();
+    });
+  </script>
+</body>
+</html>

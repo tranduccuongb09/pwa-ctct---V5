@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PTKV3 – Trung tâm Giáo dục Chính trị số</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- CSS chung -->
+  <link rel="stylesheet" href="style.css?v=20250918">
+  <link rel="stylesheet" href="nav.css?v=20250930">
+
+  <!-- Font CHỈ dùng cho trang chủ -->
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
+
+  <!-- Trang chủ – tinh chỉnh nhỏ, KHÔNG ảnh hưởng desktop -->
+  <style>
+    body.home, body.home *:not(code):not(kbd){
+      font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
+    }
+    body.home .nav, body.home .nav *{ font-family:inherit!important; }
+
+    @media (max-width:768px){
+      body.home{
+        background: url("assets/bg-mobile.png") center/cover no-repeat fixed;
+        background-attachment: scroll;
+        position: relative;
+      }
+      body.home::before{
+        content:"";
+        position:fixed; inset:0;
+        pointer-events:none;
+        background: linear-gradient(180deg, rgba(164,25,25,.45), rgba(164,25,25,.45));
+        z-index:-1;
+      }
+    }
+
+    .hero{ padding:100px 20px 80px; text-align:center; color:#fff; }
+    .hero p{ font-size:18px; margin:0 auto 32px; opacity:.96; max-width:760px; }
+
+    .hero h1{ margin:0 0 18px; line-height:1.15; }
+    .hero .h1-main{ display:inline-block; font-weight:800; }
+    .hero .h1-sub{ display:inline-block; font-weight:800; }
+
+    @media (min-width:769px){
+      .hero h1{ font-size:clamp(36px,6vw,84px); }
+    }
+
+    @media (max-width:768px){
+      .hero{
+        min-height: calc(100svh - 72px);
+        display:grid; place-content:center; gap:14px;
+        text-align:left;
+      }
+      .hero .h1-main{
+        text-transform:uppercase;
+        font-size: clamp(26px, 7.2vw, 32px);
+        white-space:nowrap;
+        letter-spacing:.3px;
+      }
+      .hero .h1-sub{ display:none; }
+      .hero p{ font-size:16px; line-height:1.45; max-width:480px; }
+      .hero__actions{ justify-content:flex-start; }
+    }
+
+    .hero__actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .btn-ghost{
+      padding:12px 20px; border:2px solid #fff; border-radius:10px;
+      font-weight:600; color:#fff; background:transparent; transition:all .2s;
+    }
+    .btn-ghost:hover{ background:#FFD966; color:#111; border-color:#FFD966; }
+
+    @media (max-width:768px){ .hide-sm{ display:none!important; } }
+
+    /* ---- Tin tức host ---- */
+    .news-host{max-width:1100px;margin:18px auto;padding:0 16px}
+    .news-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}
+    .news-empty{color:#6b7280}
+  </style>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      });
+    }
+  </script>
+</head>
+
+<body class="home">
+  <!-- NAVBAR -->
+  <header class="nav nav-dark">
+    <div class="nav__inner">
+      <a class="brand" href="index.html">BỘ CHQS TỈNH BẮC NINH</a>
+
+      <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav__links">
+        <a href="index.html" class="is-active">Trang chủ</a>
+        <a href="materials.html">Tài liệu học tập</a>
+
+        <div class="nav__item has-dropdown">
+          <a href="exam.html">Làm bài kiểm tra ▾</a>
+          <div class="dropdown">
+            <a href="exam.html">Kiểm tra nhận thức</a>
+            <a href="practice.html">Ôn trắc nghiệm</a>
+            <a href="quiz.html">Thi thử</a>
+          </div>
+        </div>
+
+        <div class="nav__item has-dropdown">
+          <a href="results.html">Kết quả kiểm tra ▾</a>
+          <div class="dropdown">
+            <a href="my-results.html">Kết quả của tôi</a>
+            <a href="leaderboard.html">Bảng xếp hạng</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Search (desktop) -->
+      <form id="globalSearch" class="nav__search hide-sm" role="search" aria-label="Tìm kiếm">
+        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu chủ đề…" autocomplete="off">
+        <button class="search__btn" type="submit">Tìm kiếm</button>
+      </form>
+
+      <!-- ✅ Thay cụm nút để khớp navbar.js -->
+      <div class="nav__actions hide-sm">
+        <button id="btnLogin"  class="btn btn-auth" type="button">Đăng nhập</button>
+        <button id="btnLogout" class="btn btn-auth" type="button" hidden>Đăng xuất</button>
+        <span id="navProfile" class="brand" hidden></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER -->
+  <aside id="mDrawer" class="m-drawer" aria-hidden="true">
+    <div class="m-head">
+      <span class="m-home" aria-label="Trang chủ" title="Trang chủ">🏠</span>
+      <span class="m-brand">BỘ CHQS TỈNH BẮC NINH</span>
+    </div>
+
+    <nav class="m-menu" role="navigation">
+      <a class="m-item" href="index.html">Trang chủ</a>
+      <a class="m-item" href="materials.html">Tài liệu học tập</a>
+
+      <button class="m-item m-drop" data-target="#m-exam">Làm bài kiểm tra <span class="caret">▾</span></button>
+      <div id="m-exam" class="m-sub">
+        <a href="exam.html">Kiểm tra nhận thức</a>
+        <a href="practice.html">Ôn trắc nghiệm</a>
+        <a href="quiz.html">Thi thử</a>
+      </div>
+
+      <button class="m-item m-drop" data-target="#m-result">Kết quả kiểm tra <span class="caret">▾</span></button>
+      <div id="m-result" class="m-sub">
+        <a href="my-results.html">Kết quả của tôi</a>
+        <a href="leaderboard.html">Bảng xếp hạng</a>
+      </div>
+
+      <a class="m-item" href="#" id="m-ai">Trợ lý AI</a>
+
+      <div class="m-auth">
+        <button type="button" class="m-btn" id="m-login">Đăng nhập</button>
+        <button type="button" class="m-btn m-ghost" id="m-register">Đăng ký</button>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- HERO -->
+  <main>
+    <section class="hero">
+      <h1>
+        <span class="h1-main">GIÁO DỤC CHÍNH TRỊ SỐ</span>
+        <br><span class="h1-sub">BAN CHỈ HUY PTKV3</span>
+      </h1>
+      <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra & phân tích chất lượng.</p>
+      <div class="hero__actions">
+        <a href="materials.html" class="btn-ghost">Bắt đầu học tập</a>
+        <button id="ai-toggle" type="button" class="btn-ghost hide-sm">Trợ lý AI</button>
+      </div>
+    </section>
+
+    <!-- ⭐ Tin chính trị (ticker + list ngắn) -->
+    <div class="news-host" aria-label="Tin chính trị mới">
+      <div class="news-card">
+        <h3 style="margin:0 0 10px;color:#111827">Tin chính trị – cập nhật từ nguồn chính thống</h3>
+        <div id="newsStrip" class="news-empty">Đang tải bản tin…</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- AI tray -->
+  <div id="ai-tray" class="ai-tray" hidden>
+    <div class="ai-tray__panel">
+      <header class="ai-tray__head">
+        <strong>Trợ lý AI</strong>
+        <div class="ai-head-actions">
+          <button id="ai-minify" class="ai-head-btn" type="button" title="Thu nhỏ" aria-label="Thu nhỏ">–</button>
+          <button id="ai-close"  class="ai-head-btn" type="button" title="Đóng" aria-label="Đóng">✕</button>
+        </div>
+      </header>
+      <div id="ai-messages" class="ai-tray__messages" aria-live="polite"></div>
+      <div id="ai-previews" class="ai-previews" hidden></div>
+      <form id="ai-form" class="ai-tray__form">
+        <input id="ai-input" type="text" placeholder="Nhập câu hỏi…" autocomplete="off"/>
+        <button type="submit">Gửi</button>
+      </form>
+    </div>
+  </div>
+  <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
+
+  <!-- JS: cấu hình + helper + navbar + search + news + AI -->
+  <script src="config.js" defer></script>
+  <script src="net.js" defer></script>
+  <script src="analytics.js" defer></script>
+  <script src="navbar.js?v=20250930" defer></script>
+  <script src="search.js" defer></script>
+  <script src="news.js" defer></script>
+  <script>
+    // Fallback khi news.js không có mountNewsStrip
+    document.addEventListener('DOMContentLoaded', async () => {
+      const host = document.getElementById('newsStrip');
+      try{
+        if (typeof window.mountNewsStrip === 'function') {
+          window.mountNewsStrip('newsStrip');
+          return;
+        }
+        const { SHEET_API } = window.CTCT_CONFIG || {};
+        if (!SHEET_API){ host.textContent='Thiếu SHEET_API trong config.js'; return; }
+        const url = `${SHEET_API}?action=news&limitPer=5&total=18`;
+        const res = await fetch(url, {cache:'no-store'});
+        const data = await res.json();
+        const items = Array.isArray(data.items) ? data.items.slice(0,6) : [];
+        if (!items.length){ host.textContent='Chưa có tin mới.'; return; }
+        host.innerHTML = items.map(it=>`
+          <div style="display:flex;gap:8px;align-items:center;margin:6px 0">
+            <span>📰</span>
+            <a href="${it.url||it.link}" target="_blank" rel="noopener" style="font-weight:700;color:#111827;text-decoration:none">${it.title}</a>
+            <span style="color:#6b7280;font-size:12px">${new Date(it.date||it.dateISO||'').toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})} • ${it.source||''}</span>
+          </div>
+        `).join('');
+      }catch(e){
+        host.textContent = 'Không tải được bản tin.';
+      }
+    });
+  </script>
+  <script src="ai.js" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
