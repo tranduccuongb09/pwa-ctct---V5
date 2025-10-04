@@ -1,0 +1,94 @@
+/* review-polish.css — bóng bẩy + chuyên nghiệp */
+:root{
+  --brand:#A41919; --brand-600:#8B1616;
+  --ink:#111827; --muted:#6b7280; --ring:#e5e7eb; --bg:#f7f8fb; --ok:#16a34a; --ng:#dc2626;
+  --radius:14px; --shadow:0 8px 24px rgba(17, 24, 39, .06);
+}
+
+/* Tổng thể */
+body{ background:var(--bg); color:var(--ink); }
+
+/* ===== Toolbar ===== */
+.toolbar{
+  background:#fff;
+  border:1px solid var(--ring);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+  display:flex; flex-wrap:wrap; gap:10px;
+  align-items:center;
+}
+.toolbar .field{
+  display:inline-flex; align-items:center; gap:10px;
+  background:#fff;
+  border:1px solid var(--ring);
+  border-radius:12px;
+  padding:10px 12px;
+  min-height:25px;
+}
+.toolbar input[type="text"], .toolbar input[type="search"], 
+.toolbar select{
+  border:0; outline:0; background:transparent; color:inherit;
+  font:inherit; min-width:220px;
+}
+.toolbar .btn, .btn{
+  height:40px; padding:0 12px; border-radius:8px; border:1px solid var(--ring);
+  background:#fff; color:var(--ink); font-weight:800;
+  display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+  box-shadow:var(--shadow); transition:transform .08s ease, box-shadow .18s ease, filter .18s;
+}
+.toolbar .btn.primary, .btn.primary{ background:var(--brand); border-color:var(--brand); color:#fff; }
+.btn:hover{ filter:brightness(.98); transform:translateY(-1px); }
+
+/* Checkbox mặt nạ gọn */
+.chk{
+  display:inline-flex; align-items:center; gap:10px;
+  background:#fff; border:1px solid var(--ring);
+  border-radius:12px; padding:10px 12px;
+  user-select:none;
+}
+.chk input{ width:18px; height:18px; }
+
+/* ===== Card chứa danh sách & footer actions ===== */
+.panel{
+  background:#fff;
+  border:1px solid var(--ring);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.panel + .panel{ margin-top:12px; }
+
+.panel .footer{
+  display:flex; flex-wrap:wrap; gap:14px; padding:14px;
+  border-top:1px dashed var(--ring);
+}
+.footer .btn{ min-width:180px; }
+
+/* ===== Câu hỏi ===== */
+.qa{ padding:14px 16px; border-top:1px solid var(--ring); }
+.qa:first-child{ border-top:0; }
+.qa .qhead{ display:flex; align-items:baseline; gap:8px; margin:0 0 6px; }
+.qa .qindex{ font-weight:900; color:#374151; }
+.qa .qtext{ margin:0 0 8px; line-height:1.65; text-align:justify; }
+.qa .result{ margin:0; font-weight:700; }
+.qa .result.ok{ color:var(--ok); }
+.qa .result.ng{ color:var(--ng); }
+.qa .exp{ margin-top:8px; color:var(--muted); }
+
+/* Highlight tìm kiếm */
+mark.hl{ background:#fff3bf; padding:0 .15em; border-radius:4px; }
+
+/* Sticky toolbar (desktop) */
+@media (min-width:1024px){
+  .toolbar.sticky{ position:sticky; top:64px; z-index:10; }
+}
+
+/* In/PDF */
+@media print{
+  body{ background:#fff; }
+  .toolbar, .footer{ display:none!important; }
+  .qa{ page-break-inside:avoid; }
+}
+/* review-polish.css — thêm ở cuối file */
+[hidden] { display: none !important; }

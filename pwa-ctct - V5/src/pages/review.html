@@ -1,149 +1,180 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Xem lại & giải thích</title>
-  <link rel="manifest" href="manifest.webmanifest">
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Xem lại &amp; Giải thích — Kiểm tra nhận thức</title>
 
-  <!-- Font Roboto đồng bộ toàn site (có thể bỏ nếu đã nạp trong style.css) -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="../css/review-polish.css">
 
   <style>
-    :root{
-      --brand:#A41919; --brand-600:#8B1616;
-      --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
-      --ok:#16a34a; --ng:#dc2626;
-    }
-    *{box-sizing:border-box}
-    html,body{
-      margin:0; background:var(--bg); color:var(--text);
-      font-family:'Roboto', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    /* Top bar */
-    .topbar{
-      position:sticky; top:0; z-index:50;
-      display:flex; align-items:center; gap:12px;
-      background:var(--brand); color:#fff; padding:14px 16px;
-    }
-    .topbar a{ color:#fff; text-decoration:none }
-    .topbar a:hover{ text-decoration:underline }
-    .topbar strong{ font-weight:900 }
-
-    /* Layout */
-    .container{ max-width:980px; margin:16px auto; padding:0 12px }
-    .card{
-      background:var(--card); border:1px solid var(--border);
-      border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,.06);
-      padding:18px; margin:12px auto;
-    }
-
-    /* Header kết quả */
-    .summary{
-      display:flex; flex-wrap:wrap; gap:10px 16px;
-      padding-bottom:10px; border-bottom:1px dashed var(--border);
-      margin-bottom:6px;
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border:1px solid var(--border); border-radius:999px;
-      background:#fff; font-weight:700;
-    }
-
-    /* Mỗi câu hỏi */
-    .qa{ padding:14px 0; border-top:1px solid var(--border) }
-    .qa:first-of-type{ border-top:none }
-    .qa h4{ margin:0 0 6px; font-size:16px; font-weight:700 }
-    .qtext{ margin:0 0 10px; line-height:1.6; text-align:justify }
-    .result{ margin:0 0 6px }
-    .muted{ color:var(--muted) }
-    .ok{ color:var(--ok); font-weight:700 }
-    .ng{ color:var(--ng); font-weight:700 }
-
-    /* Nút điều hướng cuối trang */
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px }
-    .btn{
-      padding:10px 16px; border-radius:10px; border:1px solid var(--border);
-      background:#fff; color:#111; cursor:pointer; text-decoration:none; font-weight:700;
-    }
-    .btn:hover{ box-shadow:0 2px 8px rgba(0,0,0,.08) }
-    .btn-primary{ background:var(--brand); color:#fff; border:none }
-    .btn-primary:hover{ background:var(--brand-600) }
+    .topbar{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .topbar a{color:#fff;text-decoration:none;font-weight:700}
+    .topbar a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:16px auto;padding:0 12px}
+    .pillbar{display:flex;flex-wrap:wrap;gap:.6rem;margin:12px 0}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem .7rem;border-radius:999px;background:#f3f4f6;font-weight:700}
   </style>
 
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        try{ navigator.serviceWorker.register('./sw.js'); }catch(e){}
-      });
+      addEventListener('load', () => { try{ navigator.serviceWorker.register('./sw.js'); }catch(e){} });
     }
   </script>
 </head>
 <body>
   <div class="topbar">
     <a href="index.html">← Trang chủ</a>
-    <strong>XEM LẠI & GIẢI THÍCH</strong>
+    <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — KIỂM TRA NHẬN THỨC</strong>
   </div>
 
-  <main class="container">
-    <section class="card" id="box">Đang tải…</section>
-    <section class="card">
-      <div class="actions">
-        <a class="btn" href="quiz.html">Làm lại</a>
-        <a class="btn" href="leaderboard.html">Xem bảng xếp hạng</a>
-        <a class="btn btn-primary" href="materials.html">Về tài liệu học tập</a>
+  <main class="wrap">
+    <!-- Toolbar -->
+    <div class="toolbar sticky" id="tool">
+      <label class="chk"><input id="onlyWrong" type="checkbox"> Chỉ hiện câu sai</label>
+
+      <div class="field">
+        🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…">
       </div>
-    </section>
+
+      <div class="field">
+        <select id="expMode" title="Hiển thị giải thích">
+          <option value="auto">Giải thích — Tự động</option>
+          <option value="show">Luôn hiện</option>
+          <option value="hide">Ẩn</option>
+        </select>
+      </div>
+
+      <button id="printBtn" class="btn">🖨️ In/PDF</button>
+    </div>
+
+    <!-- Thông tin -->
+    <div class="panel" id="metaPanel">
+      <div class="pillbar" id="metaPills"></div>
+    </div>
+
+    <!-- Danh sách câu hỏi -->
+    <div class="panel">
+      <div id="reviewList"></div>
+      <div class="footer">
+        <a class="btn" href="exam.html">↻ Làm lại kiểm tra</a>
+        <a class="btn" href="leaderboard.html">📊 Bảng xếp hạng</a>
+        <a class="btn primary" href="materials.html">📚 Về tài liệu học tập</a>
+      </div>
+    </div>
   </main>
 
   <script>
-    (function(){
-      const box = document.getElementById('box');
-      let data = null;
-      try{
-        data = JSON.parse(localStorage.getItem('ctct_last_result_for_review') || 'null');
-      }catch(_){ data = null; }
+  (function(){
+    const LS_KEY = 'ctct_last_result_for_review';  // giữ nguyên theo bản cũ
+    const pack = safeParse(localStorage.getItem(LS_KEY));
+    const pills = document.getElementById('metaPills');
+    const list  = document.getElementById('reviewList');
 
-      if(!data){
-        box.textContent = 'Chưa có lần nộp gần đây.';
-        return;
-      }
+    if (!pack || !Array.isArray(pack.details)) {
+      document.querySelector('#metaPanel').innerHTML =
+        '<div style="padding:16px">Không có dữ liệu để xem lại. Vui lòng hoàn thành bài kiểm tra trước.</div>';
+      return;
+    }
 
-      const head = `
-        <div class="summary">
-          <span class="chip">👤 <b>${escapeHtml(data.name||'')}</b></span>
-          <span class="chip">🏢 ${escapeHtml(data.unit||'')}</span>
-          <span class="chip">🎖 ${escapeHtml(data.position||'')}</span>
-          <span class="chip">🧾 Mã đề: <b>${escapeHtml(data.examCode||'----')}</b></span>
-          <span class="chip">🧮 Điểm: <b>${Number(data.score||0)}/${Number(data.total||0)}</b></span>
-        </div>
-      `;
+    // ===== meta
+    const items = [
+      pack.name ? `👤 ${pack.name}` : '',
+      pack.unit ? `🏢 ${pack.unit}` : '',
+      pack.position ? `🎖 ${pack.position}` : '',
+      pack.examCode ? `🧾 Mã đề: ${pack.examCode}` : '',
+      `📈 Điểm: ${Number(pack.score||0)}/${Number(pack.total||0)}`
+    ].filter(Boolean);
+    pills.innerHTML = items.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('');
 
-      const list = (Array.isArray(data.details)?data.details:[]).map(d=>{
-        const ok = (d.chosen||'') === (d.correct||'');
-        const explain = (d.explanation||'').trim();
-        return `
-          <div class="qa">
-            <h4>Câu ${Number(d.index)||''}</h4>
-            <p class="qtext">${escapeHtml(d.question||'')}</p>
-            <p class="result ${ok?'ok':'ng'}">
-              ${ok?'✔ Đúng':'✘ Sai'} — Bạn chọn: <b>${escapeHtml(d.chosen||'-')}</b> • Đúng: <b>${escapeHtml(d.correct||'-')}</b>
-            </p>
-            ${explain ? `<p class="muted"><i>Giải thích:</i> ${escapeHtml(explain)}</p>` : ''}
-          </div>
-        `;
-      }).join('');
+    // ===== list
+    list.innerHTML = (pack.details||[]).map(d=>{
+      const chosen=(d.chosen||'').trim(), correct=(d.correct||'').trim();
+      const answered=!!chosen, ok=answered && chosen===correct;
+      const cls = answered ? (ok?'ok':'ng') : 'skip';
+      const status = !answered
+        ? `— <b>Không trả lời</b> • Đúng: <b>${escapeHtml(correct||'-')}</b>`
+        : ok
+          ? `✔ Đúng — Bạn chọn: <b>${escapeHtml(chosen)}</b> • Đúng: <b>${escapeHtml(correct)}</b>`
+          : `✘ Sai — Bạn chọn: <b>${escapeHtml(chosen||'—')}</b> • Đúng: <b>${escapeHtml(correct)}</b>`;
+      const exp = (d.explanation||'').trim();
+      return `
+        <div class="qa ${ok?'ok':answered?'ng':'skip'}" data-qindex="${Number(d.index)||''}" data-ok="${ok?'1':'0'}" data-answered="${answered?'1':'0'}">
+          <div class="qhead"><span class="qindex">Câu ${Number(d.index)||''}.</span></div>
+          <p class="qtext">${escapeHtml(d.question||'')}</p>
+          <p class="result ${ok?'ok':'ng'}">${status}</p>
+          ${exp ? `<div class="exp"><b>Giải thích:</b> ${escapeHtml(exp)}</div>` : ''}
+        </div>`;
+    }).join('');
 
-      box.innerHTML = head + list;
+    // ===== UX helpers
+    document.getElementById('printBtn')?.addEventListener('click', ()=>window.print());
 
-      function escapeHtml(s){
-        return String(s||'').replace(/[&<>"']/g, m => ({
-          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'
-        }[m]));
-      }
-    })();
+    const sb = document.getElementById('searchBox');
+    const onlyWrong = document.getElementById('onlyWrong');
+    const expSel = document.getElementById('expMode');
+
+    function applyFilters(){
+      const term = (sb?.value||'').trim().toLowerCase();
+      const showWrongOnly = !!(onlyWrong && onlyWrong.checked);
+
+      // remove old highlights
+      list.querySelectorAll('mark.hl').forEach(m=>{ const t=document.createTextNode(m.textContent); m.replaceWith(t); });
+
+      const rx = term ? new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi') : null;
+
+      list.querySelectorAll('.qa').forEach(q=>{
+        const ok = q.dataset.ok === '1';
+        const text = (q.querySelector('.qtext')?.textContent||'').toLowerCase();
+
+        let hit = true;
+        if (term) hit = text.includes(term);
+        if (showWrongOnly && ok) hit = false;
+
+        q.style.display = hit ? '' : 'none';
+
+        if (hit && rx){
+          const p = q.querySelector('.qtext');
+          p.innerHTML = p.textContent.replace(rx, m=>`<mark class="hl">${m}</mark>`);
+        }
+      });
+
+      applyExpMode();
+    }
+
+    function applyExpMode(){
+      const mode = expSel ? expSel.value : 'auto';
+      list.querySelectorAll('.qa').forEach(q=>{
+        const exp = q.querySelector('.exp'); if(!exp) return;
+        if (mode==='show') exp.hidden=false;
+        else if (mode==='hide') exp.hidden=true;
+        else exp.hidden = (q.dataset.ok === '1'); // auto: chỉ hiện khi sai
+      });
+    }
+
+    sb && sb.addEventListener('input', debounce(applyFilters, 220));
+    onlyWrong && onlyWrong.addEventListener('change', applyFilters);
+    expSel && expSel.addEventListener('change', applyExpMode);
+
+    // Jump
+    const ji=document.getElementById('jumpInput'), jb=document.getElementById('jumpBtn');
+    function jump(){
+      const n=parseInt(ji.value||'0',10); if(!n) return;
+      const el=list.querySelector(`[data-qindex="${n}"]`);
+      if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),700); }
+    }
+    jb && jb.addEventListener('click', jump);
+    ji && ji.addEventListener('keydown', e=>{ if(e.key==='Enter') jump(); });
+
+    // initial
+    applyFilters();
+
+    // utils
+    function debounce(fn,ms){ let t; return function(){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,arguments),ms); }; }
+    function safeParse(s){ try{return JSON.parse(s||'null')}catch(_){return null} }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+  })();
   </script>
 </body>
 </html>

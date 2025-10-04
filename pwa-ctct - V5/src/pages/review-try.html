@@ -1,176 +1,158 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Xem lại & giải thích | Thi thử</title>
-  <link rel="stylesheet" href="style.css"><!-- sửa đường dẫn đúng với dự án -->
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Xem lại &amp; Giải thích — Thi thử</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="../css/review-polish.css">
+
   <style>
-    :root{
-      --brand:#991b1b;
-      --bg:#f7f8fa;
-      --card:#fff;
-      --ring:#e6e7ea;
-      --muted:#6b7280;
-      --ok:#065f46;
-      --bad:#991b1b;
-      --skip:#475569;
-      --radius:14px;
-      --shadow:0 1px 2px rgba(0,0,0,.05);
-      --font: clamp(15px, 1.6vw, 17px); /* tăng cỡ chữ nhưng KHÔNG đổi font-family */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-    /* KHÔNG đặt font-family ở đây để kế thừa Roboto từ CSS chung */
-    font-size: clamp(15px, 1.6vw, 17px);
-    line-height: 1.65;
-    font-weight: 500;
-    color:#111827;
-    }
-    .container{max-width:1024px;margin:0 auto;padding:0 16px}
-    header{
-      background:var(--brand); color:#fff;
-      position:sticky; top:0; z-index:10;
-      box-shadow:0 1px 0 rgba(0,0,0,.08);
-    }
-    .topbar{display:flex; align-items:center; gap:10px; height:56px}
-    .back{
-      display:inline-flex; align-items:center; gap:8px;
-      color:#fff; text-decoration:none; font-weight:700;
-      padding:8px 10px; border-radius:10px;
-    }
-    .back:hover{background:rgba(255,255,255,.12)}
-    main{padding:18px 0 24px}
-    .card{
-      background:var(--card); border:1px solid var(--ring);
-      border-radius:var(--radius); box-shadow:var(--shadow);
-    }
-    .section{padding:16px}
-    .review-pills{display:flex;flex-wrap:wrap;gap:.6rem}
-    .pill{
-      display:inline-flex; align-items:center; gap:.5rem;
-      padding:.38rem .7rem; border-radius:999px;
-      background:#f3f4f6; font-weight:700;
-    }
-    .qwrap{margin-top:12px}
-    .qitem{padding:14px 16px;border-top:1px solid var(--ring)}
-    .qitem:first-child{border-top:0}
-    .q{font-weight:800; font-size:1.05rem; margin:0 0 6px}
-    .ans{margin:2px 0 0}
-    .exp{color:var(--muted); margin-top:8px}
-    .ok .ans{color:var(--ok)}
-    .bad .ans{color:var(--bad)}
-    .skip .ans{color:var(--skip)}
-    .actions{
-      margin-top:16px;
-      display:grid; grid-template-columns: repeat(4, 1fr);
-      gap:10px;
-    }
-    @media (max-width:720px){
-      .actions{grid-template-columns: 1fr 1fr}
-    }
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      height:44px; padding:0 14px; border-radius:12px;
-      border:1px solid var(--ring); background:#fff;
-      text-decoration:none; color:#111827; font-weight:800;
-      box-shadow:var(--shadow);
-    }
-    .btn.primary{background:var(--brand); border-color:var(--brand); color:#fff}
-    .btn:hover{filter:brightness(.98)}
+    .topbar{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .topbar a{color:#fff;text-decoration:none;font-weight:700}
+    .topbar a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:16px auto;padding:0 12px}
+    .pillbar{display:flex;flex-wrap:wrap;gap:.6rem;margin:12px 0}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem .7rem;border-radius:999px;background:#f3f4f6;font-weight:700}
   </style>
 </head>
 <body>
-  <header>
-    <div class="container topbar">
-      <a id="homeLink" class="back" href="index.html" title="Về Trang chủ">← Trang chủ</a>
-      <div style="font-weight:800">XEM LẠI &amp; GIẢI THÍCH</div>
-    </div>
-  </header>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — THI THỬ</strong>
+  </div>
 
-  <main class="container">
-    <div class="card section">
-      <div id="reviewMeta" class="review-pills"></div>
+  <main class="wrap">
+    <div class="toolbar sticky">
+      <label class="chk"><input id="onlyWrong" type="checkbox"> Chỉ hiện câu sai</label>
+
+      <div class="field">🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…"></div>
+
+      <div class="field">
+        <select id="expMode">
+          <option value="auto">Giải thích — Tự động</option>
+          <option value="show">Luôn hiện</option>
+          <option value="hide">Ẩn</option>
+        </select>
+      </div>
+
+    <button id="printBtn" class="btn">🖨️ In/PDF</button>
     </div>
 
-    <div class="card qwrap">
+    <div class="panel">
+      <div class="pillbar" id="metaPills"></div>
+    </div>
+
+    <div class="panel">
       <div id="reviewList"></div>
-      <div class="section">
-        <div class="actions">
-          <a id="redoBtn" class="btn" href="try.html">↻ Làm lại</a>
-          <!-- tìm nút -->
-            <a id="resultsBtn" class="btn" href="try-results.html">📊 Kết quả của tôi</a>
-          <a id="materialsBtn" class="btn" href="materials.html">📚 Tài liệu học tập</a>
-          <a id="homeBtn" class="btn primary" href="index.html">🏠 Về Trang chủ</a>
-        </div>
+      <div class="footer">
+        <a class="btn" href="quiz.html">↻ Làm lại thi thử</a>
+        <a class="btn" href="try-results.html">📊 Kết quả của tôi</a>
+        <a class="btn primary" href="materials.html">📚 Về tài liệu học tập</a>
       </div>
     </div>
   </main>
 
   <script>
-    (function(){
-      const HOME_HREF = 'index.html';
-      const MATERIALS_FALLBACK = 'materials.html';
+  (function(){
+    const LS_KEY='ctct_try_last_result';
+    const pack=safeParse(localStorage.getItem(LS_KEY));
+    const pills=document.getElementById('metaPills');
+    const list=document.getElementById('reviewList');
 
-      document.getElementById('homeLink').setAttribute('href', HOME_HREF);
-      document.getElementById('homeBtn').setAttribute('href', HOME_HREF);
+    if(!pack || !Array.isArray(pack.details)){
+      list.innerHTML='<div style="padding:16px">Không có dữ liệu để xem lại. Hãy hoàn thành một bài thi thử.</div>';
+      return;
+    }
 
-      const LS_KEY = 'ctct_try_last_result';
-      const pack = JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    const items=[
+      pack.name?`👤 ${pack.name}`:'',
+      pack.unit?`🏢 ${pack.unit}`:'',
+      pack.position?`🎖 ${pack.position}`:'',
+      (pack.topicLabel||pack.topic)?`🎯 ${(pack.topicLabel||pack.topic)}`:'',
+      pack.examCode?`🧾 Mã đề: ${pack.examCode}`:'',
+      `📈 Điểm: ${Number(pack.score||0)}/${Number(pack.total||0)}`
+    ].filter(Boolean);
+    pills.innerHTML=items.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('');
 
-      const pills = document.getElementById('reviewMeta');
-      const list  = document.getElementById('reviewList');
+    list.innerHTML=(pack.details||[]).map(d=>{
+      const chosen=(d.chosen||'').trim(), correct=(d.correct||'').trim();
+      const answered=!!chosen, ok=answered && chosen===correct;
+      const status=!answered
+        ? `— <b>Không trả lời</b> • Đúng: <b>${escapeHtml(correct||'-')}</b>`
+        : ok
+          ? `✔ Đúng — Bạn chọn: <b>${escapeHtml(chosen)}</b> • Đúng: <b>${escapeHtml(correct)}</b>`
+          : `✘ Sai — Bạn chọn: <b>${escapeHtml(chosen||'—')}</b> • Đúng: <b>${escapeHtml(correct)}</b>`;
+      const exp=(d.explanation||'').trim();
+      return `
+        <div class="qa ${ok?'ok':answered?'ng':'skip'}" data-qindex="${Number(d.index)||''}" data-ok="${ok?'1':'0'}" data-answered="${answered?'1':'0'}">
+          <div class="qhead"><span class="qindex">Câu ${Number(d.index)||''}.</span></div>
+          <p class="qtext">${escapeHtml(d.question||'')}</p>
+          <p class="result ${ok?'ok':'ng'}">${status}</p>
+          ${exp?`<div class="exp"><b>Giải thích:</b> ${escapeHtml(exp)}</div>`:''}
+        </div>`;
+    }).join('');
 
-      if (!pack || !Array.isArray(pack.details)) {
-        document.querySelector('main').innerHTML =
-          '<div class="card section"><b>Không có dữ liệu để xem lại.</b><br/>Bạn hãy hoàn thành một bài thi thử, sau đó bấm “Xem lại &amp; giải thích”.</div>';
-        return;
+    wireUx(list);
+
+    function wireUx(list){
+      document.getElementById('printBtn')?.addEventListener('click',()=>window.print());
+      const sb=document.getElementById('searchBox'), onlyWrong=document.getElementById('onlyWrong'), expSel=document.getElementById('expMode');
+
+      function applyFilters(){
+        const term=(sb?.value||'').trim().toLowerCase();
+        const showWrongOnly=!!(onlyWrong && onlyWrong.checked);
+
+        list.querySelectorAll('mark.hl').forEach(m=>{ const t=document.createTextNode(m.textContent); m.replaceWith(t); });
+        const rx=term?new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'):null;
+
+        list.querySelectorAll('.qa').forEach(q=>{
+          const ok=q.dataset.ok==='1';
+          const text=(q.querySelector('.qtext')?.textContent||'').toLowerCase();
+          let hit=true;
+          if(term) hit=text.includes(term);
+          if(showWrongOnly && ok) hit=false;
+          q.style.display=hit?'':'none';
+          if(hit && rx){
+            const p=q.querySelector('.qtext');
+            p.innerHTML=p.textContent.replace(rx,m=>`<mark class="hl">${m}</mark>`);
+          }
+        });
+
+        applyExpMode();
       }
 
-      const name  = pack.name || '-';
-      const unit  = pack.unit || '';
-      const pos   = pack.position || '';
-      const topic = pack.topicLabel || pack.topic || '';
-      const code  = pack.examCode || '';
-      const score = Number(pack.score||0);
-      const total = Number(pack.total||0);
-
-      const pillItems = [
-        `👤 ${name}`,
-        unit ? `🏢 ${unit}` : '',
-        pos  ? `🎖️ ${pos}` : '',
-        topic? `🎯 ${topic}` : '',
-        code ? `🧾 Mã đề: ${code}` : '',
-        `📈 Điểm: ${score}/${total}`
-      ].filter(Boolean);
-      pills.innerHTML = pillItems.map(t=>`<span class="pill">${t}</span>`).join('');
-
-      list.innerHTML = pack.details.map(d=>{
-        const chosen  = (d.chosen||'').trim();
-        const correct = (d.correct||'').trim();
-        const answered= !!chosen;
-        const ok      = answered && chosen===correct;
-
-        let cls = 'skip', line = `— <b>Không trả lời</b> • Đúng: <b>${correct}</b>`;
-        if (answered) {
-          if (ok) { cls='ok';  line = `✔️ <b>Đúng</b> — Bạn chọn: <b>${chosen}</b> • Đúng: <b>${correct}</b>`; }
-          else    { cls='bad'; line = `✖️ <b>Sai</b> — Bạn chọn: <b>${chosen}</b> • Đúng: <b>${correct}</b>`; }
-        }
-
-        const exp = d.explanation ? `<div class="exp"><b>Giải thích:</b> ${d.explanation}</div>` : '';
-        return `<div class="qitem ${cls}">
-                  <div class="q">Câu ${d.index}. ${d.question||''}</div>
-                  <div class="ans">${line}</div>
-                  ${exp}
-                </div>`;
-      }).join('');
-
-      const materialsBtn = document.getElementById('materialsBtn');
-      if (materialsBtn && (!materialsBtn.getAttribute('href') || materialsBtn.getAttribute('href')==='#')) {
-        materialsBtn.setAttribute('href', MATERIALS_FALLBACK);
+      function applyExpMode(){
+        const mode = expSel ? expSel.value : 'auto';
+        list.querySelectorAll('.qa').forEach(q=>{
+          const exp = q.querySelector('.exp'); if(!exp) return;
+          if (mode==='show') exp.hidden=false;
+          else if (mode==='hide') exp.hidden=true;
+          else exp.hidden = (q.dataset.ok==='1');
+        });
       }
-    })();
+
+      sb && sb.addEventListener('input', debounce(applyFilters,220));
+      onlyWrong && onlyWrong.addEventListener('change', applyFilters);
+      expSel && expSel.addEventListener('change', applyExpMode);
+
+      const ji=document.getElementById('jumpInput'), jb=document.getElementById('jumpBtn');
+      function jump(){
+        const n=parseInt(ji.value||'0',10); if(!n) return;
+        const el=list.querySelector(`[data-qindex="${n}"]`);
+        if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),700); }
+      }
+      jb && jb.addEventListener('click', jump);
+      ji && ji.addEventListener('keydown', e=>{ if(e.key==='Enter') jump(); });
+
+      applyFilters();
+    }
+
+    function debounce(fn,ms){ let t; return function(){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,arguments),ms); }; }
+    function safeParse(s){ try{return JSON.parse(s||'null')}catch(_){return null} }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+  })();
   </script>
 </body>
 </html>

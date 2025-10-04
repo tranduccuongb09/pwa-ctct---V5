@@ -1,44 +1,158 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>XEM LẠI & GIẢI THÍCH (Ôn tập)</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Xem lại &amp; Giải thích — Ôn trắc nghiệm</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="../css/review-polish.css">
+
   <style>
-    :root{--bg:#f6f7fb;--text:#111827;--muted:#6b7280;--border:#e5e7eb}
-    html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    .wrap{max-width:1100px;margin:20px auto;padding:0 12px}
-    .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
-    .correct{color:#16a34a;font-weight:600} .wrong{color:#dc2626;font-weight:600}
-    .muted{color:var(--muted)}
-    .topnav{margin:10px 0 16px}
-    .topnav a{text-decoration:none}
+    .topbar{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .topbar a{color:#fff;text-decoration:none;font-weight:700}
+    .topbar a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:16px auto;padding:0 12px}
+    .pillbar{display:flex;flex-wrap:wrap;gap:.6rem;margin:12px 0}
+    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem .7rem;border-radius:999px;background:#f3f4f6;font-weight:700}
   </style>
 </head>
 <body>
+  <div class="topbar">
+    <a href="index.html">← Trang chủ</a>
+    <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — ÔN TRẮC NGHIỆM</strong>
+  </div>
+
   <main class="wrap">
-    <div class="topnav"><a href="practice.html">← Quay lại Ôn trắc nghiệm</a></div>
-    <div id="reviewBox"></div>
+    <div class="toolbar sticky">
+      <label class="chk"><input id="onlyWrong" type="checkbox"> Chỉ hiện câu sai</label>
+
+      <div class="field">🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…"></div>
+
+      <div class="field">
+        <select id="expMode">
+          <option value="auto">Giải thích — Tự động</option>
+          <option value="show">Luôn hiện</option>
+          <option value="hide">Ẩn</option>
+        </select>
+      </div>
+
+      <button id="printBtn" class="btn">🖨️ In/PDF</button>
+    </div>
+
+    <div class="panel">
+      <div class="pillbar" id="metaPills"></div>
+    </div>
+
+    <div class="panel">
+      <div id="reviewList"></div>
+      <div class="footer">
+        <a class="btn" href="practice.html">↻ Quay lại Ôn trắc nghiệm</a>
+        <a class="btn" href="leaderboard.html">📊 Bảng xếp hạng</a>
+        <a class="btn primary" href="materials.html">📚 Về tài liệu học tập</a>
+      </div>
+    </div>
   </main>
 
   <script>
-    const data = JSON.parse(localStorage.getItem('ctct_try_last_result')||'{}');
-    const box = document.getElementById('reviewBox');
-    if (!data.details || !Array.isArray(data.details) || data.details.length===0){
-      box.innerHTML = '<div class="card">Không có dữ liệu xem lại.</div>';
-    } else {
-      box.innerHTML = data.details.map((d,i)=>{
-        const ok = d.chosen === d.correct;
-        return `<div class="card">
-          <div style="margin-bottom:6px"><b>Câu ${i+1}</b>: ${d.question||''}</div>
-          <div>${ok ?
-            `<span class="correct">✔ Đúng — Bạn chọn: ${d.chosen} • Đúng: ${d.correct}</span>` :
-            `<span class="wrong">✘ Sai — Bạn chọn: ${d.chosen||'—'} • Đúng: ${d.correct}</span>`}
-          </div>
-          ${d.explanation?`<div class="muted" style="margin-top:6px">Giải thích: ${d.explanation}</div>`:''}
-        </div>`;
-      }).join('');
+  (function(){
+    const LS_KEY='ctct_try_last_result'; // giữ nguyên như bản anh gửi
+    const pack=safeParse(localStorage.getItem(LS_KEY));
+    const pills=document.getElementById('metaPills');
+    const list=document.getElementById('reviewList');
+
+    if(!pack || !Array.isArray(pack.details)){
+      list.innerHTML='<div style="padding:16px">Không có dữ liệu để xem lại. Hãy hoàn thành một lượt ôn trắc nghiệm.</div>';
+      return;
     }
+
+    const items=[
+      pack.name?`👤 ${pack.name}`:'',
+      pack.unit?`🏢 ${pack.unit}`:'',
+      pack.position?`🎖 ${pack.position}`:'',
+      `📈 Tổng câu: ${Number(pack.total||pack.details.length||0)}`
+    ].filter(Boolean);
+    pills.innerHTML=items.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('');
+
+    list.innerHTML=(pack.details||[]).map((d,i)=>{
+      const chosen=(d.chosen||'').trim(), correct=(d.correct||'').trim();
+      const answered=!!chosen, ok=answered && chosen===correct;
+      const status=!answered
+        ? `— <b>Không trả lời</b> • Đúng: <b>${escapeHtml(correct||'-')}</b>`
+        : ok
+          ? `✔ Đúng — Bạn chọn: <b>${escapeHtml(chosen)}</b> • Đúng: <b>${escapeHtml(correct)}</b>`
+          : `✘ Sai — Bạn chọn: <b>${escapeHtml(chosen||'—')}</b> • Đúng: <b>${escapeHtml(correct)}</b>`;
+      const exp=(d.explanation||'').trim();
+      const idx = Number(d.index || i+1);
+      return `
+        <div class="qa ${ok?'ok':answered?'ng':'skip'}" data-qindex="${idx}" data-ok="${ok?'1':'0'}" data-answered="${answered?'1':'0'}">
+          <div class="qhead"><span class="qindex">Câu ${idx}.</span></div>
+          <p class="qtext">${escapeHtml(d.question||'')}</p>
+          <p class="result ${ok?'ok':'ng'}">${status}</p>
+          ${exp?`<div class="exp"><b>Giải thích:</b> ${escapeHtml(exp)}</div>`:''}
+        </div>`;
+    }).join('');
+
+    wireUx(list);
+
+    function wireUx(list){
+      document.getElementById('printBtn')?.addEventListener('click',()=>window.print());
+      const sb=document.getElementById('searchBox'), onlyWrong=document.getElementById('onlyWrong'), expSel=document.getElementById('expMode');
+
+      function applyFilters(){
+        const term=(sb?.value||'').trim().toLowerCase();
+        const showWrongOnly=!!(onlyWrong && onlyWrong.checked);
+
+        list.querySelectorAll('mark.hl').forEach(m=>{ const t=document.createTextNode(m.textContent); m.replaceWith(t); });
+        const rx=term?new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'):null;
+
+        list.querySelectorAll('.qa').forEach(q=>{
+          const ok=q.dataset.ok==='1';
+          const text=(q.querySelector('.qtext')?.textContent||'').toLowerCase();
+          let hit=true;
+          if(term) hit=text.includes(term);
+          if(showWrongOnly && ok) hit=false;
+          q.style.display=hit?'':'none';
+          if(hit && rx){
+            const p=q.querySelector('.qtext');
+            p.innerHTML=p.textContent.replace(rx,m=>`<mark class="hl">${m}</mark>`);
+          }
+        });
+
+        applyExpMode();
+      }
+
+      function applyExpMode(){
+        const mode = expSel ? expSel.value : 'auto';
+        list.querySelectorAll('.qa').forEach(q=>{
+          const exp = q.querySelector('.exp'); if(!exp) return;
+          if (mode==='show') exp.hidden=false;
+          else if (mode==='hide') exp.hidden=true;
+          else exp.hidden = (q.dataset.ok==='1');
+        });
+      }
+
+      sb && sb.addEventListener('input', debounce(applyFilters,220));
+      onlyWrong && onlyWrong.addEventListener('change', applyFilters);
+      expSel && expSel.addEventListener('change', applyExpMode);
+
+      const ji=document.getElementById('jumpInput'), jb=document.getElementById('jumpBtn');
+      function jump(){
+        const n=parseInt(ji.value||'0',10); if(!n) return;
+        const el=list.querySelector(`[data-qindex="${n}"]`);
+        if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),700); }
+      }
+      jb && jb.addEventListener('click', jump);
+      ji && ji.addEventListener('keydown', e=>{ if(e.key==='Enter') jump(); });
+
+      applyFilters();
+    }
+
+    function debounce(fn,ms){ let t; return function(){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,arguments),ms); }; }
+    function safeParse(s){ try{return JSON.parse(s||'null')}catch(_){return null} }
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
+  })();
   </script>
+  <script src="../js/review-core.js?v=20251004"></script>
 </body>
 </html>
