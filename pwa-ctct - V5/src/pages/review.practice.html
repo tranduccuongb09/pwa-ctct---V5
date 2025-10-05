@@ -1,159 +1,141 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>XEM LẠI & GIẢI THÍCH — Ôn trắc nghiệm</title>
-
-  <link rel="manifest" href="manifest.webmanifest">
-  <!-- Giữ file polish của anh -->
-  <link rel="stylesheet" href="../css/review-polish.css">
-
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Xem lại & Giải thích — Ôn trắc nghiệm (UI one-file)</title>
+  <!-- Global styles -->
+  <link rel="stylesheet" href="../css/style.css">
+  <!-- UI chung đã gộp -->
+  <link rel="stylesheet" href="../css/review-polish.css" />
+  <!-- DÙNG CSS GỐC CỦA ANH + BỔ SUNG NHẸ -->
   <style>
-    /* Bổ sung rất nhỏ cho cụm chỉ số & footer – khớp ảnh mẫu */
-    .metrics{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-      background:#fff;border:1px solid var(--border,#e5e7eb);border-radius:12px;padding:10px 12px}
-    .chip{display:inline-flex;align-items:center;gap:8px;border-radius:999px;
-      padding:6px 10px;font-weight:800;background:#f8fafc;border:1px solid #e5e7eb}
-    .chip b{font-weight:900}
-    .chip.total{background:#eef2ff}
-    .chip.ok{background:#ecfdf5}
-    .chip.bad{background:#fef2f2}
-    .chip.skip{background:#fff7ed}
-    .metrics__right{margin-left:auto;color:#475569}
-    .qa-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px 16px}
-    .qa-card+.qa-card{margin-top:12px}
-    .qa-card .exp{margin-top:8px;color:#475569;background:#f8fafc;border:1px dashed #e5e7eb;
-      border-radius:10px;padding:10px}
-    .qa-card.ok .result{color:#065f46;font-weight:700}
-    .qa-card.ng .result{color:#991b1b;font-weight:700}
-    .footer-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-    .btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:12px;
-      border:1px solid #e5e7eb;background:#fff;font-weight:800;text-decoration:none;color:#111827}
-    .btn.primary{background:#A41919;color:#fff;border-color:#A41919}
-    .btn:hover{filter:brightness(.98)}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:10px}
-    .field{display:inline-flex;align-items:center;gap:8px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px 10px}
-    .field input[type="search"]{border:0;outline:0;min-width:260px}
-    .btn-print{display:inline-flex;align-items:center;gap:6px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px 12px}
+    :root{
+      --brand:#A41919; --text:#111827; --bg:#f6f7fb; --card:#fff; --border:#e5e7eb;
+      --ok:#0f766e; --bad:#b91c1c; --muted:#6b7280; --pill:#f3f4f6;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0; color:var(--text); background:var(--bg); font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    a{text-decoration:none; color:inherit}
+    .container{max-width:1000px; margin:0 auto}
+
+    /* Header */
+    .hdr{position:sticky; top:0; z-index:40; background:var(--brand); color:#fff}
+    .hdr__inner{display:flex; align-items:center; gap:12px; padding:12px 16px}
+    .btn-back{background:rgba(255,255,255,.1); border:none; color:#fff; padding:8px 12px; border-radius:12px; font-size:13px}
+    .btn-back:hover{background:rgba(255,255,255,.15)}
+    .hdr h1{font-size:16px; font-weight:600; margin:0}
+
+    /* Toolbar */
+    .bar{position:sticky; top:48px; z-index:30; background:rgba(255,255,255,.9); backdrop-filter:saturate(120%) blur(6px); border-bottom:1px solid var(--border)}
+    .bar__inner{display:flex; gap:8px; align-items:center; padding:12px 16px}
+    .chip{display:flex; align-items:center; gap:8px; border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:12px; white-space:nowrap}
+    .search{display:flex; align-items:center; gap:8px; border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:12px; min-width:160px; flex:1 1 42%; max-width:380px}
+    .search input{border:0; outline:0; width:100%; font-size:14px}
+    .btn{border:1px solid var(--border); background:#fff; padding:8px 10px; border-radius:12px; font-size:13px; display:inline-flex; align-items:center; gap:8px; cursor:pointer}
+    .btn:hover{background:#f9fafb}
+    .btn .label{display:none}
+    @media (min-width:640px){ .btn .label{display:inline} }
+
+    /* Stats */
+    .pills{display:flex; flex-wrap:wrap; align-items:center; gap:8px; border:1px solid var(--border); background:#fff; padding:8px 12px; border-radius:12px; margin:12px 16px}
+    .pill{display:inline-flex; align-items:center; gap:6px; background:var(--pill); padding:6px 10px; border-radius:999px; font-size:13px}
+    .pill.ok{background:#ecfdf5}
+    .pill.bad{background:#fee2e2}
+    .pills .spacer{margin-left:auto; font-size:12px; color:#6b7280}
+
+    /* List */
+    .list{border:1px solid var(--border); background:#fff; border-radius:16px; overflow:hidden; margin:0 16px 24px}
+    .row{padding:16px}
+    @media (min-width:768px){ .row{padding:24px} }
+    .row+.row{border-top:1px solid var(--border)}
+    .q{font-weight:600; margin:0 0 8px}
+    .judge{margin:8px 0; font-size:13px}
+    .judge.ok{color:var(--ok)}
+    .judge.bad{color:var(--bad)}
+    .judge.skip{color:#6b7280}
+    .exp{border:1px solid var(--border); background:#f8fafc; border-radius:12px; padding:12px; font-size:13px}
+
+    /* Footer actions – THÊM: căn giữa & to, đều */
+    .nav-actions{
+      display:flex; flex-wrap:wrap; gap:14px; justify-content:center;
+      margin:20px 16px 32px
+    }
+    .nav-actions .btn{
+      border-radius:16px; padding:12px 18px; font-size:14px; min-width:180px
+    }
+    .btn--ghost{background:#fff; border:1px solid var(--border); color:var(--text)}
+    .btn--ghost:hover{background:#f9fafb}
+    .btn--primary{background:var(--brand); color:#fff; border:1px solid var(--brand)}
+    .btn--primary:hover{filter:brightness(0.95)}
+    @media (max-width:480px){
+      .nav-actions{ gap:10px; margin:16px 12px 28px }
+      .nav-actions .btn{ min-width:unset; flex:1 1 auto }
+    }
+
+    /* Floating to top */
+    .to-top{position:fixed; right:16px; bottom:16px; border:1px solid #d1d5db; background:#fff; border-radius:999px; padding:8px 12px; font-size:13px; box-shadow:0 6px 16px rgba(0,0,0,.08); display:none}
+
+    /* Print */
+    @media print{
+      .hdr,.bar,.to-top,.nav-actions{display:none !important}
+      body{background:#fff}
+      .list{margin:0; border:0}
+      .row{page-break-inside:avoid}
+    }
   </style>
 </head>
-<body>
-  <!-- Topbar giữ màu thương hiệu -->
-  <div class="topbar">
-    <a href="index.html">← Trang chủ</a>
-    <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — ÔN TRẮC NGHIỆM</strong>
+<body data-page="practice">
+  <header class="hdr">
+    <div class="container hdr__inner">
+      <button class="btn-back" onclick="history.back()">← Trang chủ</button>
+      <h1 class="hdr__title">XEM LẠI & GIẢI THÍCH — ÔN TRẮC NGHIỆM</h1>
+    </div>
+  </header>
+
+  <div class="bar">
+    <div class="container bar__inner">
+      <label class="chip"><input type="checkbox" id="onlyWrong" /> Chỉ hiện câu sai</label>
+      <div class="search">
+        <span aria-hidden>🔎</span>
+        <input id="searchBox" placeholder="Nhập từ khoá..." />
+      </div>
+      <button class="btn" id="printBtn" title="In hoặc xuất PDF">🖨️ <span class="label">In/PDF</span></button>
+    </div>
   </div>
 
-  <main class="wrap">
-    <!-- Toolbar: chỉ hiện sai + search + in/pdf -->
-    <div class="toolbar sticky">
-      <label class="field" style="gap:10px"><input id="onlyWrong" type="checkbox"> <b>Chỉ hiện câu sai</b></label>
-      <label class="field" style="flex:1 1 230px">
-        🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…">
-      </label>
-      <button id="printBtn" class="btn-print">🖨️ In/PDF</button>
+  <section class="container">
+    <div class="pills" id="statsPills">
+      <span class="pill">📊 Tổng câu: <b id="stTotal">0</b></span>
+      <span class="pill ok">✔ Đúng: <b id="stOk">0</b></span>
+      <span class="pill bad">✖ Sai: <b id="stBad">0</b></span>
+      <span class="pill">⏳ Chưa TL: <b id="stSkip">0</b></span>
+      <span class="spacer">Hiển thị: <b id="stShown">0</b> mục</span>
     </div>
+  </section>
 
-    <!-- Cụm chỉ số động + “Hiển thị: n mục” -->
-    <div class="metrics" id="metricsBar" aria-live="polite">
-      <span class="chip total">📋 Tổng câu: <b id="statTotal">0</b></span>
-      <span class="chip ok">✅ Đúng: <b id="statOk">0</b></span>
-      <span class="chip bad">❌ Sai: <b id="statBad">0</b></span>
-      <span class="chip skip">⏳ Chưa TL: <b id="statSkip">0</b></span>
-      <span class="metrics__right">Hiển thị: <b id="statVisible">0</b> mục</span>
-    </div>
-
-    <!-- Danh sách câu hỏi (sẽ được chuẩn hoá + gắn class bằng normalize + core) -->
-    <section id="reviewList" style="margin-top:12px"></section>
-
-    <section style="margin-top:12px">
-      <div class="footer-actions">
-        <a class="btn" href="practice.html">↻ Quay lại Ôn trắc nghiệm</a>
-        <a class="btn" href="leaderboard.html">📊 Bảng xếp hạng</a>
-        <a class="btn primary" href="materials.html">📚 Về tài liệu học tập</a>
-      </div>
-    </section>
+  <main class="container">
+    <div class="list" id="reviewList"><!-- Sẽ render/normalize bởi core --></div>
   </main>
 
-  <!-- Lấy dữ liệu cũ từ localStorage, render như bản anh đang dùng -->
+  <!-- NÚT ĐIỀU HƯỚNG CUỐI TRANG (mới thêm) -->
+  <nav class="container nav-actions">
+    <button class="btn btn--ghost"   id="navAgain">⟲ Làm lại</button>
+    <button class="btn btn--ghost"   id="navDocs">📚 Tài liệu học tập</button>
+    <button class="btn btn--primary" id="navHome">🏠 Về Trang chủ</button>
+  </nav>
+
+  <button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ Lên đầu</button>
+
+  <!-- NẠP CORE HỢP NHẤT (đã bao gồm normalize + controls + routes) -->
+  <script src="../js/review-core.js"></script>
+
+  <!-- (Không cần thêm JS khác: core tự boot theo data-page=practice.
+       Nếu anh muốn ép dùng key cũ, có thể bật 2 dòng dưới)
   <script>
-    (function(){
-      const LS_KEY='ctct_try_last_result';
-      const pack=safeParse(localStorage.getItem(LS_KEY));
-      const list=document.getElementById('reviewList');
-
-      if(!pack || !Array.isArray(pack.details)){
-        list.innerHTML='<div class="qa-card">Không có dữ liệu để xem lại. Hãy hoàn thành một lượt ôn trắc nghiệm.</div>';
-        return;
-      }
-
-      list.innerHTML=(pack.details||[]).map((d,i)=>{
-        const chosen=(d.chosen||'').trim(), correct=(d.correct||'').trim();
-        const answered=!!chosen, ok=answered && chosen===correct;
-        const status=!answered
-          ? `— <b>Không trả lời</b> • Đúng: <b>${escapeHtml(correct||'-')}</b>`
-          : ok
-            ? `✔ Đúng — Bạn chọn: <b>${escapeHtml(chosen)}</b> • Đúng: <b>${escapeHtml(correct)}</b>`
-            : `✘ Sai — Bạn chọn: <b>${escapeHtml(chosen||'—')}</b> • Đúng: <b>${escapeHtml(correct)}</b>`;
-        const exp=(d.explanation||'').trim();
-        const idx = Number(d.index || i+1);
-        return `
-        <article class="qa-card ${ok?'ok':answered?'ng bad':'skip'} qitem" data-qindex="${idx}" data-ok="${ok?'1':'0'}" data-answered="${answered?'1':'0'}">
-          <header class="qhead" style="font-weight:800;margin-bottom:6px">Câu ${idx}.</header>
-          <p class="qtext">${escapeHtml(d.question||'')}</p>
-          <p class="result">${status}</p>
-          ${exp?`<div class="exp"><b>Giải thích:</b> ${escapeHtml(exp)}</div>`:''}
-        </article>`;
-      }).join('');
-
-      function safeParse(s){ try{return JSON.parse(s||'null')}catch(_){return null} }
-      function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
-    })();
+    CTCT_REVIEW.renderReview('reviewList', 'ctct_review_pack_practice');
+    CTCT_REVIEW.bindControls({ listSelector: '#reviewList' });
   </script>
-
-  <!-- Core của anh (đã chạy ổn) -->
-  <script src="../js/review-normalize.js?v=20251006"></script>
-  <script src="../js/review-core.js?v=20251006"></script>
-
-  <!-- Kết nối control + cập nhật CHỈ SỐ động -->
-  <script>
-    (function(){
-      const $ = (sel)=>document.querySelector(sel);
-      const api = (window.CTCT_REVIEW && CTCT_REVIEW.bindControls)
-        ? CTCT_REVIEW.bindControls()
-        : { apply: ()=>{} };
-
-      $('#printBtn')?.addEventListener('click', ()=>window.print());
-
-      function countNow(){
-        const items = Array.from(document.querySelectorAll('.qa, .qitem'));
-        const total = items.length;
-        const ok    = items.filter(el => el.classList.contains('ok') || el.dataset.ok==='1').length;
-        const bad   = items.filter(el => el.classList.contains('bad')|| el.classList.contains('ng') || el.dataset.ok==='0').length;
-        const skip  = items.filter(el => el.classList.contains('skip') || /không trả lời/i.test(el.textContent)).length;
-        const visible = items.filter(el => !(el.hidden || el.style.display==='none')).length;
-
-        $('#statTotal').textContent   = total;
-        $('#statOk').textContent      = ok;
-        $('#statBad').textContent     = bad;
-        $('#statSkip').textContent    = skip;
-        $('#statVisible').textContent = visible;
-      }
-
-      // Gọi đếm ngay sau khi core apply
-      const origApply = api.apply || function(){};
-      api.apply = function(){ origApply(); countNow(); };
-
-      // Lần đầu:
-      window.addEventListener('load', ()=>{ origApply(); countNow(); });
-
-      // Phòng trường hợp người dùng gõ search – cứ ẩn/hiện là cập nhật lại
-      $('#onlyWrong')?.addEventListener('change', countNow);
-      $('#searchBox')?.addEventListener('input', debounce(countNow,200));
-
-      function debounce(fn,ms){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(null,a),ms); }; }
-    })();
-  </script>
+  -->
 </body>
 </html>

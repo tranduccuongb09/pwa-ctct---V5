@@ -3,101 +3,77 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Xem lại &amp; Giải thích — Kiểm tra nhận thức</title>
+  <title>Xem lại & Giải thích — Kiểm tra nhận thức</title>
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="../css/review-polish.css">
+  <!-- PWA manifest (nếu có) -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <!-- Global styles -->
+  <link rel="stylesheet" href="../css/style.css">
 
-  <style>
-    .brand-top{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20}
-    .brand-top a{color:#fff;text-decoration:none;font-weight:700}
-    .brand-top a:hover{text-decoration:underline}
-    .wrap{max-width:1100px;margin:16px auto;padding:0 12px}
-    .stats{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-weight:800}
-    .chip.ok{background:#ecfdf5;border-color:#bbf7d0}
-    .chip.bad{background:#fef2f2;border-color:#fecaca}
-    .chip.skip{background:#f1f5f9;border-color:#e2e8f0}
-    .muted-small{color:#6b7280;font-size:13px}
-  </style>
+  <!-- UI chung đã gộp -->
+  <link rel="stylesheet" href="../css/review-polish.css" />
+
 </head>
-<body>
-  <header class="brand-top">
-    <a href="index.html">← Trang chủ</a>
-    <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — KIỂM TRA NHẬN THỨC</strong>
+<body data-page="ktnt">
+  <!-- Header chuẩn -->
+  <header class="hdr">
+    <div class="container hdr__inner">
+      <button class="hdr__back" onclick="history.back()">← Trang trước</button>
+      <h1 class="hdr__title">XEM LẠI & GIẢI THÍCH — KIỂM TRA NHẬN THỨC</h1>
+    </div>
   </header>
 
-  <main class="wrap">
-    <!-- Toolbar -->
-    <div class="toolbar sticky">
-      <label class="chk"><input id="onlyWrong" type="checkbox"> Chỉ hiện câu sai</label>
-      <div class="field">🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…"></div>
-      <div class="field">
-        <select id="explainMode">
-          <option value="auto">Giải thích — Tự động</option>
-          <option value="always">Luôn hiện</option>
-          <option value="hide">Ẩn</option>
-        </select>
+  <!-- Toolbar: 3 control trên 1 hàng -->
+  <div class="bar">
+    <div class="container bar__inner">
+      <label class="chip"><input id="onlyWrong" type="checkbox" /> Chỉ hiện câu sai</label>
+      <div class="search">
+        <span aria-hidden="true">🔎</span>
+        <input id="searchBox" type="search" placeholder="Nhập từ khoá..." />
       </div>
-      <button id="printBtn" class="btn">🖨️ In/PDF</button>
+      <button id="printBtn" class="btn" title="In hoặc xuất PDF">🖨️ <span class="label">In/PDF</span></button>
     </div>
+  </div>
 
-    <!-- Stats -->
-    <div class="panel" id="statsPanel">
-      <div class="stats">
-        <span class="chip"><span id="stTotal">Tổng câu: 0</span></span>
-        <span class="chip ok">✔ <span id="stOk">Đúng: 0</span></span>
-        <span class="chip bad">✘ <span id="stBad">Sai: 0</span></span>
-        <span class="chip skip">⏳ <span id="stSkip">Chưa TL: 0</span></span>
-        <span class="muted-small">Hiển thị: <b id="stVisible">0</b> mục</span>
-      </div>
+  <!-- Stats pills -->
+  <section class="container">
+    <div class="pills">
+      <span class="pill">📊 Tổng câu: <b id="stTotal">0</b></span>
+      <span class="pill ok">✔ Đúng: <b id="stOk">0</b></span>
+      <span class="pill bad">✖ Sai: <b id="stBad">0</b></span>
+      <span class="pill">⏳ Chưa TL: <b id="stSkip">0</b></span>
+      <span class="spacer">Hiển thị: <b id="stShown">0</b> mục</span>
     </div>
+  </section>
 
-    <!-- Meta pills (từ pack) -->
-    <div class="panel">
-      <div class="pillbar" id="reviewMeta"></div>
-    </div>
+  <!-- Meta pills (từ pack) -->
+  <section class="container">
+    <div class="pills" id="reviewMeta"></div>
+  </section>
 
-    <!-- List câu hỏi -->
-    <div class="panel">
-      <div id="reviewList"></div>
-    </div>
+  <!-- Danh sách câu hỏi -->
+  <main class="container">
+    <div class="list" id="reviewList"><!-- Sẽ được render/normalize bởi review-core.js --></div>
   </main>
 
-  <!-- JS: normalize + core -->
-  <script src="../js/review-normalize.js?v=ui-badges"></script>
-  <script src="../js/review-core.js?v=ui-badges"></script>
+  <!-- Nút điều hướng cuối trang -->
+  <nav class="container nav-actions">
+    <button class="btn btn--ghost"   id="navAgain">⟲ Làm lại</button>
+    <button class="btn btn--ghost"   id="navDocs">📚 Tài liệu học tập</button>
+    <button class="btn btn--primary" id="navHome">🏠 Về Trang chủ</button>
+  </nav>
 
+  <!-- Nút lên đầu trang -->
+  <button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ Lên đầu</button>
+
+  <!-- Core đã gộp: render + normalize + controls + nav -->
+  <script src="../js/review-core.js"></script>
+
+  <!-- (Tùy chọn) Nếu muốn ép dùng key cũ cho trang này, bật 2 dòng dưới:
   <script>
-    (function(){
-      // Nạp dữ liệu kiểm tra nhận thức
-      CTCT_REVIEW.renderReview('reviewList','ctct_last_result_for_review');
-
-      // Bind control
-      const auto = CTCT_REVIEW.bindControls();
-
-      // Tính & hiển thị thống kê
-      function computeStats(){
-        const all = Array.from(document.querySelectorAll('.qa, .qitem'));
-        const vis = all.filter(el=>!el.hidden);
-        const ok  = all.filter(el=>el.classList.contains('ok'));
-        const bad = all.filter(el=>el.classList.contains('ng')||el.classList.contains('bad')||el.dataset.ok==='0');
-        const skip= all.filter(el=>el.classList.contains('skip') || /không trả lời/i.test(el.textContent));
-
-        document.getElementById('stTotal').textContent   = 'Tổng câu: ' + all.length;
-        document.getElementById('stOk').textContent      = 'Đúng: ' + ok.length;
-        document.getElementById('stBad').textContent     = 'Sai: ' + bad.length;
-        document.getElementById('stSkip').textContent    = 'Chưa TL: ' + skip.length;
-        document.getElementById('stVisible').textContent = vis.length;
-      }
-
-      // Gọi lúc đầu và sau mỗi lần apply()
-      computeStats();
-      if (auto && typeof auto.apply==='function'){
-        const orig = auto.apply;
-        auto.apply = function(){ orig(); computeStats(); };
-      }
-    })();
+    CTCT_REVIEW.renderReview('reviewList', 'ctct_last_result_for_review');
+    CTCT_REVIEW.bindControls({ listSelector: '#reviewList' });
   </script>
+  -->
 </body>
 </html>

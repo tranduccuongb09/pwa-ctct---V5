@@ -1,87 +1,658 @@
+/* ===========================================
+   review-polish.css — UI trang Xem lại & Giải thích
+   (Header • Toolbar • Stats • List • Explain • Nav • Print)
+   =========================================== */
+
+/* ----- Biến màu chung ----- */
 :root{
-  --brand:#A41919; --brand-600:#8B1616;
-  --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --ring:#e5e7eb;
-  --ok:#16a34a; --bad:#dc2626; --skip:#ca8a04;
-  --radius:14px; --shadow:0 2px 10px rgba(0,0,0,.06);
+  --brand:#A41919;
+  --text:#0F172A;
+  --bg:#F6F7FB;
+  --card:#FFFFFF;
+  --border:#E5E7EB;
+  --muted:#475569;
+
+  --ok-green:#2daf0c;     /* Đúng (emerald-600) */
+  --ok-green-100:#DCFCE7; /* Nền nhạt cho pill Đúng */
+  --bad:#B42318;          /* Sai */
+  --warn:#D97706;         /* Chưa trả lời (cam) */
+
+  --pill:#F3F4F6;
 }
 
-*{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+/* ----- Reset cơ bản / container ----- */
+*{ box-sizing:border-box }
+html,body{ color:var(--text) }
+.container{ max-width:1000px; margin:0 auto }
 
-.topbar{
-  position:sticky; top:0; z-index:50;
+/* ===== Header ===== */
+.hdr{
+  position:sticky; top:0; z-index:40;
+  background:var(--brand); color:#fff;
+}
+.hdr__inner{
   display:flex; align-items:center; gap:12px;
-  background:var(--brand); color:#fff; padding:12px 16px;
+  padding:14px 18px;
 }
-.topbar a{ color:#fff; text-decoration:none; font-weight:800 }
-.topbar a:hover{ text-decoration:underline }
-
-.wrap{ max-width:1100px; margin:16px auto; padding:0 12px }
-
-/* Toolbar */
-.toolbar{
-  background:var(--card); border:1px solid var(--ring);
-  border-radius:var(--radius); box-shadow:var(--shadow);
-  padding:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+.hdr__back{
+  background:rgba(255,255,255,.12);
+  border:0; color:#fff;
+  padding:10px 14px;
+  border-radius:14px; font-size:15px; font-weight:600;
+  cursor:pointer;
 }
-.chk{ display:inline-flex; align-items:center; gap:8px; font-weight:700 }
-.field{ display:inline-flex; align-items:center; gap:8px; background:#fff;
-  border:1px solid var(--ring); border-radius:15px; padding:8px 10px; min-width:200px }
-.field input{ border:none; outline:none; width:100%; font:inherit; }
-.btn{ height:38px; padding:0 12px; border-radius:12px; border:1px solid var(--ring);
-  background:#fff; font-weight:800; cursor:pointer }
-.btn:hover{ filter:brightness(.98) }
+.hdr__back:hover{ background:rgba(255,255,255,.18) }
+.hdr__title{ font-size:18px; font-weight:700; margin:0; letter-spacing:.2px }
 
-/* Stats bar */
-.stats{
-  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-  background:#fff; border:1px solid var(--ring); border-radius:12px;
-  padding:10px 12px; margin-top:10px; box-shadow:var(--shadow);
+/* ===== Toolbar ===== */
+.bar{
+  position:sticky; top:56px; z-index:30;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(120%) blur(6px);
+  border-bottom:1px solid var(--border);
 }
+.bar__inner{ display:flex; gap:10px; align-items:center; padding:14px 18px }
+
 .chip{
-  display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
-  border-radius:999px; background:#f3f4f6; font-weight:800; border:1px solid var(--ring)
+  display:flex; align-items:center; gap:8px;
+  border:1px solid var(--border); background:#fff;
+  padding:10px 14px; border-radius:14px;
+  white-space:nowrap; font-size:15px; font-weight:600;
 }
-.chip.ok{ color:var(--ok); border-color:rgba(22,163,74,.35); background:#ecfdf5 }
-.chip.bad{ color:var(--bad); border-color:rgba(220,38,38,.35); background:#fef2f2 }
-.chip.skip{ color:var(--skip); border-color:rgba(202,138,4,.35); background:#fffbeb }
-.chip.meta{ color:#374151; background:#fff }
-.stats__right{ margin-left:auto; color:var(--muted); font-weight:700 }
-
-/* QA card */
-.qa{
-  background:#fff; border:1px solid var(--ring); border-radius:12px;
-  box-shadow:var(--shadow); padding:14px; margin:12px 0;
+.search{
+  display:flex; align-items:center; gap:10px;
+  border:1px solid var(--border); background:#fff;
+  padding:10px 14px; border-radius:14px;
+  min-width:220px; flex:1 1 42%; max-width:560px;
 }
-.qa .qindex{ font-weight:900; margin-right:6px }
-.qa .qtext{ margin:.25rem 0 .5rem; line-height:1.65 }
-.qa .result{ font-weight:700; margin:0 0 .6rem; }
-.qa.ok .result{ color:var(--ok) }
-.qa.ng .result{ color:var(--bad) }
-.qa.skip .result{ color:var(--skip) }
+@media (min-width:768px){ .search{ max-width:560px } }
+.search input{
+  border:0; outline:0; width:100%;
+  font-size:15px; color:var(--text);
+}
+.search input::placeholder{ color:var(--muted); opacity:.95 }
 
-/* Explanation block */
+.btn{
+  border:1px solid var(--border); background:#fff;
+  padding:10px 14px; border-radius:14px;
+  font-size:15px; font-weight:600;
+  display:inline-flex; align-items:center; gap:8px;
+  min-height:44px; cursor:pointer;
+}
+.btn:hover{ background:#F9FAFB }
+
+/* Focus ring đồng nhất */
+.search:focus-within,
+.chip:has(input:focus),
+.btn:focus-visible{
+  outline:2px solid rgba(164,25,25,.25);
+  outline-offset:2px;
+}
+
+/* ===== Pills thống kê ===== */
+.pills{
+  display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+  border:1px solid var(--border); background:#fff;
+  padding:10px 14px; border-radius:14px; margin:12px 16px 14px;
+}
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--pill); padding:8px 12px; border-radius:999px;
+  font-size:14.5px; font-weight:600;
+}
+.pill.ok{ background:var(--ok-green-100); color:#064E3B }
+.pill.bad{ background:#FEE2E2; color:#7F1D1D }
+.pills .spacer{ margin-left:auto; font-size:13.5px; color:var(--muted) }
+
+/* ===== Danh sách câu hỏi ===== */
+.list{
+  border:1px solid var(--border); background:#fff; border-radius:18px; overflow:hidden;
+  margin:0 16px 24px;
+  box-shadow:0 8px 20px rgba(17,24,39,.05);
+}
+.row{ padding:22px }
+@media (min-width:768px){ .row{ padding:26px } }
+.row + .row{ border-top:1px solid var(--border) }
+
+.q{ font-weight:700; font-size:17px; margin:0 0 10px }
+
+/* Dòng kết quả */
+.judge{ margin:10px 0 12px; font-size:15px; font-weight:600 }
+.judge.ok  { color:var(--ok-green) }
+.judge.bad { color:var(--bad) }
+.judge.skip{ color:var(--warn) }
+
+/* Đáp án trong dòng kết quả */
+.ans{ font-weight:800; letter-spacing:.2px }
+/* Màu theo trạng thái dòng (ghi đè mạnh để đồng bộ cả câu) */
+.judge.ok  .ans{ color:var(--ok-green) !important }
+.judge.bad .ans{ color:var(--bad)      !important }
+.judge.skip .ans{ color:var(--warn)     !important }
+
+/* Hộp Giải thích */
 .exp{
-  background:#f8fafc; border:1px dashed var(--ring); border-radius:10px;
-  padding:10px 12px; color:#374151
+  border:1px solid var(--border); background:#F8FAFC;
+  border-radius:14px; padding:14px 16px; font-size:15px;
+  position:relative;
 }
-.hl{ background: #fff59d; padding:0 .12em; }
-
-/* Pulse when jump */
-.qa.pulse{ animation:pulse .7s linear 1 }
-@keyframes pulse{
-  0%{ box-shadow:0 0 0 0 rgba(164,25,25,.45) }
-  100%{ box-shadow:0 0 0 14px rgba(164,25,25,0) }
+.exp b{ font-weight:700 }
+.exp::before{
+  content:"💡";
+  position:absolute; left:12px; top:-6px; font-size:18px;
 }
 
-/* Print */
+/* ===== Nút điều hướng cuối trang — căn giữa, nút nổi ===== */
+.container.nav-actions{
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap:16px;
+  max-width:860px;
+  margin:24px auto 48px;   /* căn giữa */
+}
+.container.nav-actions .btn{
+  height:56px;
+  border-radius:16px;
+  font-size:16px; font-weight:700;
+  display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  box-shadow:0 10px 24px rgba(17,24,39,.08), 0 1px 2px rgba(17,24,39,.04);
+  transform:translateY(0);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.container.nav-actions .btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 32px rgba(17,24,39,.12), 0 4px 8px rgba(17,24,39,.06);
+}
+.container.nav-actions .btn--ghost{
+  background:#fff; border:1px solid var(--border); color:var(--text)
+}
+.container.nav-actions .btn--primary{
+  background:var(--brand); color:#fff; border:1px solid var(--brand)
+}
+.container.nav-actions .btn > i,
+.container.nav-actions .btn > span.emoji{ font-size:18px; line-height:1 }
+
+@media (max-width:900px){
+  .container.nav-actions{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width:680px;
+  }
+}
+@media (max-width:560px){
+  .container.nav-actions{
+    grid-template-columns:1fr;
+    max-width:520px; gap:12px;
+    margin:20px auto 36px;
+  }
+  .container.nav-actions .btn{ height:54px }
+}
+
+/* ===== Nút lên đầu ===== */
+.to-top{
+  position:fixed; right:16px; bottom:16px;
+  border:1px solid #D1D5DB; background:#fff; border-radius:999px;
+  padding:10px 14px; font-size:14px;
+  box-shadow:0 6px 16px rgba(0,0,0,.08); display:none
+}
+
+/* ===== Mobile spacing ===== */
+@media (max-width:420px){
+  .hdr__inner{ padding:10px 12px }
+  .bar__inner{ padding:10px 12px; gap:8px }
+  .pills{ margin:10px 12px }
+  .list{ margin:0 12px 20px }
+  .nav-actions{ margin:10px 12px 24px }
+}
+
+/* ===== In ấn/PDF ===== */
 @media print{
-  .topbar, .toolbar, .btn, .stats__right{ display:none !important }
-  .wrap{ max-width:100%; margin:0; padding:0 }
-  .qa{ break-inside:avoid-page }
+  .hdr,.bar,.to-top,.nav-actions{ display:none !important }
+  body{ background:#fff }
+  .list{ margin:0; border:0; box-shadow:none }
+  .row{ page-break-inside:avoid }
 }
 
-@media (max-width: 600px){
-  .toolbar{ flex-direction: column; align-items: stretch; gap: 8px; }
-  .field{ min-width: 100%; }
+/* ===== RESET THEME cho các trang REVIEW (đè style.css) ===== */
+body[data-page="ktnt"],
+body[data-page="practice"],
+body[data-page="try"]{
+  background: var(--bg) !important;   /* nền xám nhạt chuẩn review */
+  color: var(--text) !important;      /* chữ tối chuẩn review */
 }
+
+/* Giữ header của review theo brand */
+body[data-page] .hdr{
+  background: var(--brand) !important;
+  color:#fff !important;
+}
+
+/* Form & card về tông sáng (phòng khi inherit trắng/đỏ từ global) */
+body[data-page] .list,
+body[data-page] .pills,
+body[data-page] .chip,
+body[data-page] .search,
+body[data-page] .btn{
+  background:#fff;
+  color: var(--text);
+}
+
+/* Ẩn dropdown “Giải thích — Tự động” nếu template cũ còn ở đó */
+body[data-page] #explainMode,
+body[data-page] #expMode{
+  display:none !important;
+}
+
+/* ================================
+   WHITE PAGE MODE — Review pages
+   Làm nổi các nút & box trên nền trắng
+   ================================ */
+
+/* 1) Ép nền trang review trắng + chữ tối */
+body[data-page="ktnt"],
+body[data-page="practice"],
+body[data-page="try"]{
+  background:#fff !important;
+  color:var(--text) !important;
+}
+
+/* 2) Shadow token dùng chung */
+:root{
+  --shadow-sm: 0 4px 10px rgba(17,24,39,.06), 0 1px 2px rgba(17,24,39,.03);
+  --shadow-md: 0 10px 24px rgba(17,24,39,.10), 0 2px 6px rgba(17,24,39,.05);
+}
+
+/* 3) Cards câu hỏi: viền rõ + bóng nhẹ để tách khỏi nền trắng */
+.list{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius:18px;
+}
+
+/* 4) Pills thống kê: nổi hơn, đọc rõ trên nền trắng */
+.pills{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius:14px;
+}
+
+/* 5) Ô tìm kiếm & chip: tăng độ nổi và viền */
+.search,
+.chip{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius:14px;
+}
+
+/* 6) Nút bấm: nổi khối, hover nhô nhẹ — hợp nền trắng */
+.btn{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  border-radius:14px;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  background:#F9FAFB;
+}
+
+/* 7) CTA chính (màu đỏ) nổi mạnh hơn một nấc */
+.btn--primary{
+  background: var(--brand);
+  color:#fff;
+  border:1px solid var(--brand);
+  box-shadow: var(--shadow-md);
+}
+.btn--primary:hover{
+  filter: brightness(.98);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(164,25,25,.25), 0 3px 8px rgba(0,0,0,.06);
+}
+
+/* 8) Hộp Giải thích: nền xanh nhạt + viền rõ + gờ nhẹ */
+.exp{
+  background:#F8FAFC;
+  border:1px solid #E2E8F0;        /* hơi đậm để rõ trên nền trắng */
+  box-shadow: var(--shadow-sm);
+  border-radius:14px;
+  position:relative;
+}
+.exp::before{
+  /* icon đã có, chỉ chắc chắn nổi trên nền trắng */
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.04));
+}
+
+/* 9) Cụm nút cuối trang: căn giữa & nổi trên nền trắng */
+.container.nav-actions{
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap:16px;
+  max-width:860px;
+  margin:24px auto 48px;
+}
+.container.nav-actions .btn{
+  height:56px;
+  font-size:16px; font-weight:700;
+  border-radius:16px;
+  box-shadow: var(--shadow-md);
+}
+@media (max-width:900px){
+  .container.nav-actions{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width:560px){
+  .container.nav-actions{ grid-template-columns: 1fr; gap:12px; }
+  .container.nav-actions .btn{ height:54px; }
+}
+
+/* 10) Nút “Lên đầu”: rõ ràng trên nền trắng */
+.to-top{
+  background:#fff;
+  color:var(--text);
+  border:1px solid #D1D5DB;
+  box-shadow: var(--shadow-md);
+  border-radius:999px;
+}
+.to-top:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(17,24,39,.12), 0 3px 8px rgba(0,0,0,.06);
+}
+
+/* 11) Focus ring: dễ thấy trên nền trắng */
+.search:focus-within,
+.chip:has(input:focus),
+.btn:focus-visible{
+  outline: 2px solid rgba(164,25,25,.28);
+  outline-offset: 2px;
+}
+
+/* 12) Giữ màu trạng thái cho dòng kết quả & đáp án */
+.judge.ok,  .judge.ok  .ans{ color: var(--ok-green) !important; }
+.judge.bad, .judge.bad .ans{ color: var(--bad)      !important; }
+.judge.skip,.judge.skip.ans,
+.judge.skip .ans{ color: var(--warn) !important; }
+
+/* 13) In ấn: bỏ bóng/hover */
+@media print{
+  .pills, .search, .chip, .btn, .list, .exp{ box-shadow:none !important }
+}
+
+/* ================================
+   COLORED BORDERS FOR WHITE PAGES
+   ================================ */
+
+/* 0) Bảo đảm biến màu (nếu đã có thì giữ nguyên) */
+:root{
+  --ok-green: #19a307;   /* xanh đáp án đúng */
+  --bad:      #B42318;   /* đỏ sai */
+  --warn:     #D97706;   /* cam chưa trả lời */
+  --border:   #E5E7EB;
+}
+
+/* 1) Câu hỏi: vạch màu trái theo trạng thái */
+.row.qitem{
+  border-left: 4px solid var(--border);
+}
+.row.qitem.ok   { border-left-color: var(--ok-green); }
+.row.qitem.bad,
+.row.qitem.ng   { border-left-color: var(--bad); }
+.row.qitem.skip { border-left-color: var(--warn); }
+
+/* 2) Hộp Giải thích: viền trái theo trạng thái (nổi hơn) */
+.exp{
+  border: 1px solid #E2E8F0;       /* viền rõ trên nền trắng */
+  border-left-width: 4px;
+  border-left-color: rgba(164,25,25,.5); /* mặc định theo brand */
+  background: #F8FAFC;
+}
+.qitem.ok  .exp{ border-left-color: var(--ok-green); }
+.qitem.bad .exp,
+.qitem.ng  .exp{ border-left-color: var(--bad); }
+.qitem.skip .exp{ border-left-color: var(--warn); }
+
+/* 3) Pills thống kê: thêm viền màu đồng điệu */
+.pill{ border:1px solid var(--border); }
+.pill.ok  { border-color:#86EFAC; background:#E8FBE8; color:#065F46; } /* xanh nhạt */
+.pill.bad { border-color:#FCA5A5; background:#FEE2E2; color:#7F1D1D; } /* đỏ nhạt */
+.pill.skip{ border-color:#FCD34D; background:#FEF3C7; color:#92400E; } /* cam nhạt */
+
+/* 4) Ô tìm kiếm, chip & nút: viền tinh tế, nổi khối */
+.search, .chip, .btn{
+  border-color:#D0D7E2;
+  box-shadow: 0 4px 10px rgba(17,24,39,.06), 0 1px 2px rgba(17,24,39,.03);
+}
+.btn--primary{
+  border-color:#8C1414; /* đậm hơn brand một nấc */
+}
+
+/* 5) Dòng kết quả: màu chữ theo trạng thái (đồng bộ với viền) */
+.judge.ok,
+.judge.ok .ans   { color: var(--ok-green) !important; }
+.judge.bad,
+.judge.bad .ans  { color: var(--bad)      !important; }
+.judge.skip,
+.judge.skip .ans { color: var(--warn)     !important; }
+
+/* ================================
+   ELEVATION + COLORED BORDERS (2-side)
+   Làm nổi nút/box và viền màu hai bên theo trạng thái
+   ================================ */
+
+/* 0) Token đổ bóng dùng chung (nổi mạnh hơn) */
+:root{
+  --elev-1: 0 4px 12px rgba(17,24,39,.08), 0 1px 2px rgba(17,24,39,.04);
+  --elev-2: 0 12px 28px rgba(17,24,39,.14), 0 4px 10px rgba(17,24,39,.06);
+}
+
+/* 1) Làm nổi tất cả box trên nền trắng */
+.pills,
+.search,
+.chip,
+.btn,
+.list,
+.exp{
+  background:#fff;
+  border:1px solid var(--border);
+  box-shadow: var(--elev-1);
+}
+
+/* 2) Nút bấm — nổi hơn + hover nhô nhẹ */
+.btn{
+  border-radius:14px;
+  transition:transform .15s ease, box-shadow .15s ease, background .15s ease, filter .15s ease;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:var(--elev-2); background:#F9FAFB }
+.btn:active{ transform:translateY(0);   box-shadow:var(--elev-1)       }
+.btn--primary{
+  background:var(--brand); color:#fff; border-color:var(--brand);
+  box-shadow:var(--elev-2);
+}
+.btn--primary:hover{ filter:brightness(.98) }
+
+/* 3) Câu hỏi: viền màu TRÁI đậm + PHẢI nhạt theo trạng thái */
+.row.qitem{
+  position:relative; overflow:hidden;
+  border-radius:18px;
+  border:1px solid var(--border);        /* đường bao nền trắng */
+  box-shadow: var(--elev-1);
+  background:#fff;
+  border-left:6px solid var(--border);   /* vạch trái */
+}
+
+/* map màu theo trạng thái (định nghĩa biến mềm/đậm) */
+.qitem.ok   { --state:#19a307; --state-soft: rgba(25,163,7,.18); }
+.qitem.bad,
+.qitem.ng   { --state:#B42318; --state-soft: rgba(180,35,24,.18); }
+.qitem.skip { --state:#D97706; --state-soft: rgba(217,119,6,.18); }
+
+/* áp màu: trái đậm */
+.row.qitem{ border-left-color: var(--state, var(--border)); }
+
+/* phải nhạt (stripe mềm 6px) */
+.row.qitem::after{
+  content:""; position:absolute; top:0; right:0; bottom:0; width:6px;
+  background: var(--state-soft, transparent);
+}
+
+/* 4) Hộp Giải thích: viền trái theo trạng thái + gờ nhẹ */
+.exp{
+  border-left-width:4px;
+  border-left-color: rgba(164,25,25,.45);  /* mặc định theo brand */
+  background:#F8FAFC;
+}
+.qitem.ok  .exp{ border-left-color: var(--state) }
+.qitem.bad .exp,
+.qitem.ng  .exp{ border-left-color: var(--state) }
+.qitem.skip .exp{ border-left-color: var(--state) }
+
+/* 5) Pills thống kê: viền màu đồng điệu, nổi hơn */
+.pill{ border:1px solid var(--border) }
+.pill.ok  { border-color:#86EFAC; background:#E8FBE8; color:#065F46 }
+.pill.bad { border-color:#FCA5A5; background:#FEE2E2; color:#7F1D1D }
+.pill.skip{ border-color:#FCD34D; background:#FEF3C7; color:#92400E }
+
+/* 6) Dòng kết quả + đáp án: màu theo trạng thái (đồng bộ với viền) */
+.judge.ok,  .judge.ok  .ans{ color: var(--ok-green) !important }
+.judge.bad, .judge.bad .ans{ color: var(--bad)      !important }
+.judge.skip,.judge.skip .ans{ color: var(--warn)     !important }
+
+/* 7) Cụm nút cuối trang: nổi & căn giữa (giữ setup grid 3 cột) */
+.container.nav-actions .btn{
+  height:56px; font-size:16px; font-weight:700; border-radius:16px;
+  box-shadow: var(--elev-2);
+}
+
+/* 8) Nút “Lên đầu”: nổi trên nền trắng */
+.to-top{
+  background:#fff; color:var(--text);
+  border:1px solid #D1D5DB; border-radius:999px;
+  box-shadow: var(--elev-2);
+}
+.to-top:hover{ transform:translateY(-1px) }
+
+/* 9) Focus ring rõ ràng */
+.search:focus-within,
+.chip:has(input:focus),
+.btn:focus-visible{
+  outline:2px solid rgba(164,25,25,.28);
+  outline-offset:2px;
+}
+
+/* ===============================
+   POLISH: Toolbar, Stats, Nav, ToTop
+   =============================== */
+
+/* 0) Review pages ép nền trắng, tắt mọi gradient từ global */
+body[data-page="ktnt"],
+body[data-page="practice"],
+body[data-page="try"]{
+  background:#fff !important;
+  background-image:none !important;
+  color:var(--text) !important;
+}
+
+/* Token bóng nổi dùng chung */
+:root{
+  --elev-1: 0 4px 12px rgba(17,24,39,.08), 0 1px 2px rgba(17,24,39,.04);
+  --elev-2: 0 12px 28px rgba(17,24,39,.14), 0 4px 10px rgba(17,24,39,.06);
+  --ring:   0 0 0 1px rgba(15,23,42,.05);
+}
+
+/* 1) TOOLBAR: cao đều, bóng nhẹ, các control canh thẳng */
+.bar{ border-bottom:1px solid var(--border) }
+.bar__inner{ gap:12px; padding:14px 18px }
+.chip,.search,.btn{
+  height:44px; min-height:44px;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow: var(--elev-1);
+}
+.search{ padding:0 14px; display:flex; align-items:center; gap:10px }
+.search input{ height:100% }
+.btn{ padding:0 14px; display:inline-flex; align-items:center; gap:10px }
+.btn:hover{ transform:translateY(-1px); box-shadow:var(--elev-2); background:#F9FAFB }
+.btn:active{ transform:translateY(0);   box-shadow:var(--elev-1) }
+
+/* 2) STATS/PILLS: khối nổi rõ + badge đồng đều + nhãn "Hiển thị" dạt phải */
+.pills{
+  border-radius:16px;
+  box-shadow: var(--elev-1), var(--ring);
+  padding:10px 14px;
+}
+.pill{
+  border:1px solid var(--border);
+  padding:8px 12px;
+  border-radius:999px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.03) inset;
+  font-weight:700;
+}
+.pill.ok  { background:#E8FBE8; border-color:#86EFAC; color:#065F46 }
+.pill.bad { background:#FEE2E2; border-color:#FCA5A5; color:#7F1D1D }
+.pill.skip{ background:#FEF3C7; border-color:#FCD34D; color:#92400E }
+.pills .spacer{ margin-left:auto; color:#64748B } /* “Hiển thị: …” sát phải */
+
+/* 3) CARD CÂU HỎI: hai vạch biên (trái đậm, phải mềm) + bo & bóng */
+.row.qitem{
+  position:relative; overflow:hidden;
+  background:#fff; border:1px solid var(--border);
+  border-radius:18px; box-shadow: var(--elev-1);
+  border-left:6px solid var(--border); /* vạch trái mặc định */
+}
+/* màu trạng thái */
+.qitem.ok   { --state:#19a307; --state-soft: rgba(25,163,7,.18) }
+.qitem.bad,.qitem.ng { --state:#B42318; --state-soft: rgba(180,35,24,.18) }
+.qitem.skip { --state:#D97706; --state-soft: rgba(217,119,6,.18) }
+.row.qitem{ border-left-color: var(--state,var(--border)) }
+.row.qitem::after{
+  content:""; position:absolute; top:0; right:0; bottom:0; width:6px;
+  background: var(--state-soft, transparent);
+}
+
+/* 4) Hộp Giải thích: nổi + viền trái theo trạng thái */
+.exp{
+  background:#F8FAFC; border:1px solid #E2E8F0;
+  border-left:4px solid rgba(164,25,25,.45);
+  border-radius:14px; box-shadow: var(--elev-1);
+}
+.qitem.ok  .exp{ border-left-color: var(--state) }
+.qitem.bad .exp,
+.qitem.ng  .exp{ border-left-color: var(--state) }
+.qitem.skip .exp{ border-left-color: var(--state) }
+
+/* 5) NAV ACTIONS: căn giữa tuyệt đối, nút nổi mạnh */
+.container.nav-actions{
+  display:grid !important;
+  grid-template-columns: repeat(3, minmax(200px, 1fr));
+  gap:16px; max-width:860px; margin:24px auto 48px;
+}
+.container.nav-actions .btn{
+  height:56px; font-size:16px; font-weight:800; border-radius:16px;
+  box-shadow: var(--elev-2);
+}
+.container.nav-actions .btn--ghost{ background:#fff; border-color:#D0D7E2 }
+.container.nav-actions .btn--primary{ background:var(--brand); color:#fff; border-color:var(--brand) }
+@media (max-width:900px){
+  .container.nav-actions{ grid-template-columns: repeat(2, minmax(0,1fr)) }
+}
+@media (max-width:560px){
+  .container.nav-actions{ grid-template-columns: 1fr; gap:12px }
+  .container.nav-actions .btn{ height:54px }
+}
+
+/* 6) TO-TOP: tăng bóng + khoảng cách, luôn nổi trên mọi box */
+.to-top{
+  right:24px; bottom:24px; z-index:60;
+  background:#fff; color:var(--text);
+  border:1px solid #D1D5DB; border-radius:999px;
+  padding:10px 16px; font-weight:700;
+  box-shadow: var(--elev-2);
+}
+.to-top:hover{ transform:translateY(-1px) }
+
+/* 7) Màu dòng kết quả & chữ đáp án theo trạng thái (đồng bộ viền) */
+.judge.ok,  .judge.ok  .ans{ color: var(--ok-green) !important }
+.judge.bad, .judge.bad .ans{ color: var(--bad)      !important }
+.judge.skip,.judge.skip .ans{ color: var(--warn)     !important }

@@ -1,16 +1,23 @@
-/* ===== Import Roboto ===== */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+/* ===== Fonts: Be Vietnam Pro (global) ===== */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap');
 
 /* ===== Toàn site: nền gradient đồng bộ ===== */
 html, body{
   margin:0; padding:0; min-height:100vh;
-  font-family: "Roboto", system-ui, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+  font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI",
+               Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   letter-spacing: .1px;
   background: linear-gradient(180deg, #8B1616 0%, #A41919 60%, #B93E1E 85%, #FFD966 100%);
   color:#fff;
+}
+
+/* ==== Biến màu dùng chung (bổ sung để đồng bộ với các trang review) ==== */
+:root{
+  --ok-green:#19a307;   /* Đúng */
+  --ok-green-100:#DCFCE7;
 }
 
 /* ===== Trang chủ: overlay ảnh + gradient ===== */
@@ -35,7 +42,6 @@ body.home{
   padding: 32px 16px;
   transform: translateY(-30px);
 }
-
 .hero__container{
   width: 100%;
   max-width: 1100px;
@@ -45,7 +51,7 @@ body.home{
 .hero__container h1{
   margin: 0 0 18px;
   font-size: clamp(48px, 8vw, 96px);
-  font-weight: 700; /* Roboto Bold */
+  font-weight: 700;
 }
 .hero__container p{
   margin: 0 auto 28px;
@@ -66,13 +72,14 @@ body.home{
   font-size: 18px;
   padding: 14px 32px;
   border-radius: 30px;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   display: inline-block;
   transition: transform .2s ease, background .25s ease, color .25s ease, box-shadow .25s ease;
   background: transparent;
   color: #fff;
   border: 2px solid transparent;
+  cursor: pointer;
 }
 .btn-ghost:hover{
   background: #fff;
@@ -96,10 +103,11 @@ body.home{
   font-size: 18px;
   padding: 14px 32px;
   border-radius: 30px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration: none;
   display: inline-block;
   transition: all .2s ease;
+  cursor: pointer;
 }
 .btn-primary{ background:#fff; color:#A41919; border:none; }
 .btn-primary:hover{ background:#FFD966; color:#111; }
@@ -114,7 +122,7 @@ body.home{
 /* ===== NAV QUIZ PAGE ===== */
 .page-quiz .nav__links a {
   color: #fff;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   transition: all .2s ease;
 }
@@ -138,7 +146,7 @@ body.home{
   background: #A41919;
   color: #fff;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 16px 36px;
   border-radius: 32px;
   transition: all .25s ease;
@@ -151,8 +159,6 @@ body.home{
 }
 
 /* ============ Trợ lý AI — Khay góc phải (FINAL) ============ */
-
-/* Nút mở/hiện lại khay (floating dock) – GÓC PHẢI DƯỚI */
 .ai-fab{
   position: fixed;
   right: 20px;
@@ -165,7 +171,7 @@ body.home{
   border: 1px solid rgba(0,0,0,.08);
   background: #ffd966;
   color: #111;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 8px 24px rgba(0,0,0,.18);
@@ -240,7 +246,7 @@ body.home{
 .ai-tray__form input::placeholder{ color:#777; }
 .ai-tray__form button{
   padding:10px 14px; border-radius:999px; border:0;
-  background:#ffd966; color:#111; font-weight:700; cursor:pointer;
+  background:#ffd966; color:#111; font-weight:800; cursor:pointer;
 }
 .ai-tray__form button:focus-visible{
   outline: 3px solid rgba(255,217,102,.9);
@@ -263,3 +269,7 @@ body.home{
 
 /* chi tiết bảng xem lại nếu dùng bảng text */
 .review-question { text-align: justify; }
+
+/* ===== Đồng bộ với trang Review: màu Đúng xanh lá ===== */
+.judge.ok{ color: var(--ok-green); }
+.pill.ok{ background: var(--ok-green-100); color:#064E3B; } /* text xanh đậm hơn trên nền nhạt */

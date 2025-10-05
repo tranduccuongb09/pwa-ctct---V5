@@ -7,6 +7,9 @@
 
   <!-- PWA -->
   <link rel="manifest" href="../../public/manifest.webmanifest">
+  <!-- Global styles -->
+  <link rel="stylesheet" href="../css/style.css">
+
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => { try { navigator.serviceWorker.register('../../public/sw.js'); } catch(_){} });
