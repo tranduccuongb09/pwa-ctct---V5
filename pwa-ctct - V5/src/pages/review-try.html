@@ -7,152 +7,87 @@
 
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="../css/review-polish.css">
-
   <style>
-    .topbar{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20;box-shadow:0 1px 0 rgba(0,0,0,.06)}
-    .topbar a{color:#fff;text-decoration:none;font-weight:700}
-    .topbar a:hover{text-decoration:underline}
+    .brand-top{background:#A41919;color:#fff;padding:12px 16px;position:sticky;top:0;z-index:20}
+    .brand-top a{color:#fff;text-decoration:none;font-weight:700}
+    .brand-top a:hover{text-decoration:underline}
     .wrap{max-width:1100px;margin:16px auto;padding:0 12px}
-    .pillbar{display:flex;flex-wrap:wrap;gap:.6rem;margin:12px 0}
-    .pill{display:inline-flex;align-items:center;gap:.5rem;padding:.38rem .7rem;border-radius:999px;background:#f3f4f6;font-weight:700}
+    .stats{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;font-weight:800}
+    .chip.ok{background:#ecfdf5;border-color:#bbf7d0}
+    .chip.bad{background:#fef2f2;border-color:#fecaca}
+    .chip.skip{background:#f1f5f9;border-color:#e2e8f0}
+    .muted-small{color:#6b7280;font-size:13px}
   </style>
 </head>
 <body>
-  <div class="topbar">
+  <header class="brand-top">
     <a href="index.html">← Trang chủ</a>
     <strong style="margin-left:10px">XEM LẠI &amp; GIẢI THÍCH — THI THỬ</strong>
-  </div>
+  </header>
 
   <main class="wrap">
     <div class="toolbar sticky">
       <label class="chk"><input id="onlyWrong" type="checkbox"> Chỉ hiện câu sai</label>
-
       <div class="field">🔎 <input id="searchBox" type="search" placeholder="Nhập từ khóa…"></div>
-
       <div class="field">
-        <select id="expMode">
+        <select id="explainMode">
           <option value="auto">Giải thích — Tự động</option>
-          <option value="show">Luôn hiện</option>
+          <option value="always">Luôn hiện</option>
           <option value="hide">Ẩn</option>
         </select>
       </div>
+      <button id="printBtn" class="btn">🖨️ In/PDF</button>
+    </div>
 
-    <button id="printBtn" class="btn">🖨️ In/PDF</button>
+    <div class="panel" id="statsPanel">
+      <div class="stats">
+        <span class="chip"><span id="stTotal">Tổng câu: 0</span></span>
+        <span class="chip ok">✔ <span id="stOk">Đúng: 0</span></span>
+        <span class="chip bad">✘ <span id="stBad">Sai: 0</span></span>
+        <span class="chip skip">⏳ <span id="stSkip">Chưa TL: 0</span></span>
+        <span class="muted-small">Hiển thị: <b id="stVisible">0</b> mục</span>
+      </div>
     </div>
 
     <div class="panel">
-      <div class="pillbar" id="metaPills"></div>
+      <div class="pillbar" id="reviewMeta"></div>
     </div>
 
     <div class="panel">
       <div id="reviewList"></div>
-      <div class="footer">
-        <a class="btn" href="quiz.html">↻ Làm lại thi thử</a>
-        <a class="btn" href="try-results.html">📊 Kết quả của tôi</a>
-        <a class="btn primary" href="materials.html">📚 Về tài liệu học tập</a>
-      </div>
     </div>
   </main>
 
+  <script src="../js/review-normalize.js?v=ui-badges"></script>
+  <script src="../js/review-core.js?v=ui-badges"></script>
   <script>
-  (function(){
-    const LS_KEY='ctct_try_last_result';
-    const pack=safeParse(localStorage.getItem(LS_KEY));
-    const pills=document.getElementById('metaPills');
-    const list=document.getElementById('reviewList');
+    (function(){
+      // Nạp dữ liệu thi thử
+      CTCT_REVIEW.renderReview('reviewList','ctct_try_last_result');
 
-    if(!pack || !Array.isArray(pack.details)){
-      list.innerHTML='<div style="padding:16px">Không có dữ liệu để xem lại. Hãy hoàn thành một bài thi thử.</div>';
-      return;
-    }
+      const auto = CTCT_REVIEW.bindControls();
 
-    const items=[
-      pack.name?`👤 ${pack.name}`:'',
-      pack.unit?`🏢 ${pack.unit}`:'',
-      pack.position?`🎖 ${pack.position}`:'',
-      (pack.topicLabel||pack.topic)?`🎯 ${(pack.topicLabel||pack.topic)}`:'',
-      pack.examCode?`🧾 Mã đề: ${pack.examCode}`:'',
-      `📈 Điểm: ${Number(pack.score||0)}/${Number(pack.total||0)}`
-    ].filter(Boolean);
-    pills.innerHTML=items.map(t=>`<span class="pill">${escapeHtml(t)}</span>`).join('');
+      function computeStats(){
+        const all = Array.from(document.querySelectorAll('.qa, .qitem'));
+        const vis = all.filter(el=>!el.hidden);
+        const ok  = all.filter(el=>el.classList.contains('ok'));
+        const bad = all.filter(el=>el.classList.contains('ng')||el.classList.contains('bad')||el.dataset.ok==='0');
+        const skip= all.filter(el=>el.classList.contains('skip') || /không trả lời/i.test(el.textContent));
 
-    list.innerHTML=(pack.details||[]).map(d=>{
-      const chosen=(d.chosen||'').trim(), correct=(d.correct||'').trim();
-      const answered=!!chosen, ok=answered && chosen===correct;
-      const status=!answered
-        ? `— <b>Không trả lời</b> • Đúng: <b>${escapeHtml(correct||'-')}</b>`
-        : ok
-          ? `✔ Đúng — Bạn chọn: <b>${escapeHtml(chosen)}</b> • Đúng: <b>${escapeHtml(correct)}</b>`
-          : `✘ Sai — Bạn chọn: <b>${escapeHtml(chosen||'—')}</b> • Đúng: <b>${escapeHtml(correct)}</b>`;
-      const exp=(d.explanation||'').trim();
-      return `
-        <div class="qa ${ok?'ok':answered?'ng':'skip'}" data-qindex="${Number(d.index)||''}" data-ok="${ok?'1':'0'}" data-answered="${answered?'1':'0'}">
-          <div class="qhead"><span class="qindex">Câu ${Number(d.index)||''}.</span></div>
-          <p class="qtext">${escapeHtml(d.question||'')}</p>
-          <p class="result ${ok?'ok':'ng'}">${status}</p>
-          ${exp?`<div class="exp"><b>Giải thích:</b> ${escapeHtml(exp)}</div>`:''}
-        </div>`;
-    }).join('');
-
-    wireUx(list);
-
-    function wireUx(list){
-      document.getElementById('printBtn')?.addEventListener('click',()=>window.print());
-      const sb=document.getElementById('searchBox'), onlyWrong=document.getElementById('onlyWrong'), expSel=document.getElementById('expMode');
-
-      function applyFilters(){
-        const term=(sb?.value||'').trim().toLowerCase();
-        const showWrongOnly=!!(onlyWrong && onlyWrong.checked);
-
-        list.querySelectorAll('mark.hl').forEach(m=>{ const t=document.createTextNode(m.textContent); m.replaceWith(t); });
-        const rx=term?new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'):null;
-
-        list.querySelectorAll('.qa').forEach(q=>{
-          const ok=q.dataset.ok==='1';
-          const text=(q.querySelector('.qtext')?.textContent||'').toLowerCase();
-          let hit=true;
-          if(term) hit=text.includes(term);
-          if(showWrongOnly && ok) hit=false;
-          q.style.display=hit?'':'none';
-          if(hit && rx){
-            const p=q.querySelector('.qtext');
-            p.innerHTML=p.textContent.replace(rx,m=>`<mark class="hl">${m}</mark>`);
-          }
-        });
-
-        applyExpMode();
+        stTotal.textContent   = 'Tổng câu: ' + all.length;
+        stOk.textContent      = 'Đúng: ' + ok.length;
+        stBad.textContent     = 'Sai: ' + bad.length;
+        stSkip.textContent    = 'Chưa TL: ' + skip.length;
+        stVisible.textContent = vis.length;
       }
 
-      function applyExpMode(){
-        const mode = expSel ? expSel.value : 'auto';
-        list.querySelectorAll('.qa').forEach(q=>{
-          const exp = q.querySelector('.exp'); if(!exp) return;
-          if (mode==='show') exp.hidden=false;
-          else if (mode==='hide') exp.hidden=true;
-          else exp.hidden = (q.dataset.ok==='1');
-        });
+      computeStats();
+      if (auto && typeof auto.apply==='function'){
+        const orig = auto.apply;
+        auto.apply = function(){ orig(); computeStats(); };
       }
-
-      sb && sb.addEventListener('input', debounce(applyFilters,220));
-      onlyWrong && onlyWrong.addEventListener('change', applyFilters);
-      expSel && expSel.addEventListener('change', applyExpMode);
-
-      const ji=document.getElementById('jumpInput'), jb=document.getElementById('jumpBtn');
-      function jump(){
-        const n=parseInt(ji.value||'0',10); if(!n) return;
-        const el=list.querySelector(`[data-qindex="${n}"]`);
-        if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.classList.add('pulse'); setTimeout(()=>el.classList.remove('pulse'),700); }
-      }
-      jb && jb.addEventListener('click', jump);
-      ji && ji.addEventListener('keydown', e=>{ if(e.key==='Enter') jump(); });
-
-      applyFilters();
-    }
-
-    function debounce(fn,ms){ let t; return function(){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,arguments),ms); }; }
-    function safeParse(s){ try{return JSON.parse(s||'null')}catch(_){return null} }
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[m])); }
-  })();
+    })();
   </script>
 </body>
 </html>
