@@ -26,7 +26,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,
 }
 .chk{ display:inline-flex; align-items:center; gap:8px; font-weight:700 }
 .field{ display:inline-flex; align-items:center; gap:8px; background:#fff;
-  border:1px solid var(--ring); border-radius:12px; padding:8px 10px; min-width:240px }
+  border:1px solid var(--ring); border-radius:15px; padding:8px 10px; min-width:200px }
 .field input{ border:none; outline:none; width:100%; font:inherit; }
 .btn{ height:38px; padding:0 12px; border-radius:12px; border:1px solid var(--ring);
   background:#fff; font-weight:800; cursor:pointer }
@@ -79,4 +79,9 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,
   .topbar, .toolbar, .btn, .stats__right{ display:none !important }
   .wrap{ max-width:100%; margin:0; padding:0 }
   .qa{ break-inside:avoid-page }
+}
+
+@media (max-width: 600px){
+  .toolbar{ flex-direction: column; align-items: stretch; gap: 8px; }
+  .field{ min-width: 100%; }
 }
