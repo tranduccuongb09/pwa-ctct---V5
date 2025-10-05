@@ -6,41 +6,59 @@
   <title>PTKV3 – Trung tâm Giáo dục Chính trị số</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="/manifest.webmanifest">
 
-  <!-- CSS chung -->
-  <!-- Global styles -->
-  <link rel="stylesheet" href="../css/style.css">
-  <link rel="stylesheet" href="nav.css?v=20250930">
+  <!-- CSS chung (từ src/pages/ → ../css/...) -->
+  <link rel="stylesheet" href="../css/style.css?v=20251005">
+  <link rel="stylesheet" href="../css/nav.css?v=20251005">
 
   <!-- Font CHỈ dùng cho trang chủ -->
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Trang chủ – tinh chỉnh nhỏ, KHÔNG ảnh hưởng desktop -->
+  <!-- Trang chủ – tinh chỉnh + nền tự thích ứng -->
   <style>
+    /* ====== Nền tự thích ứng: mặc định cho môi trường có server (Vite/Netlify/Live Server) ====== */
+    :root{
+      --bg-desktop: url("/assets/bg-desktop.png");
+      --bg-mobile:  url("/assets/bg-mobile.png");
+    }
+
+    /* Toàn trang chủ dùng Be Vietnam Pro */
     body.home, body.home *:not(code):not(kbd){
       font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
     }
     body.home .nav, body.home .nav *{ font-family:inherit!important; }
 
+    /* ===== HOME BACKGROUND (overlay có alpha + ảnh) ===== */
+    body.home{
+      background-image:
+        linear-gradient(
+          180deg,
+          rgba(139,22,22,0.78) 0%,
+          rgba(164,25,25,0.82) 60%,
+          rgba(185,62,30,0.70) 85%,
+          rgba(255,217,102,0.30) 100%
+        ),
+        var(--bg-desktop);
+      background-size: cover, cover;
+      background-position: center, center;
+      background-repeat: no-repeat, no-repeat;
+      background-attachment: fixed, fixed; /* desktop */
+      color:#fff;
+      min-height:100vh;
+    }
     @media (max-width:768px){
       body.home{
-        background: url("assets/bg-mobile.png") center/cover no-repeat fixed;
-        background-attachment: scroll;
-        position: relative;
-      }
-      body.home::before{
-        content:"";
-        position:fixed; inset:0;
-        pointer-events:none;
-        background: linear-gradient(180deg, rgba(164,25,25,.45), rgba(164,25,25,.45));
-        z-index:-1;
+        background-image:
+          linear-gradient(180deg, rgba(164,25,25,0.80), rgba(139,22,22,0.80)),
+          var(--bg-mobile);
+        background-attachment: scroll, scroll; /* mobile mượt hơn */
       }
     }
 
+    /* Hero */
     .hero{ padding:100px 20px 80px; text-align:center; color:#fff; }
     .hero p{ font-size:18px; margin:0 auto 32px; opacity:.96; max-width:760px; }
-
     .hero h1{ margin:0 0 18px; line-height:1.15; }
     .hero .h1-main{ display:inline-block; font-weight:800; }
     .hero .h1-sub{ display:inline-block; font-weight:800; }
@@ -48,53 +66,60 @@
     @media (min-width:769px){
       .hero h1{ font-size:clamp(36px,6vw,84px); }
     }
-
     @media (max-width:768px){
       .hero{
         min-height: calc(100svh - 72px);
-        display:grid; place-content:center; gap:14px;
-        text-align:left;
+        display:grid; place-content:center; gap:14px; text-align:left;
       }
       .hero .h1-main{
         text-transform:uppercase;
         font-size: clamp(26px, 7.2vw, 32px);
-        white-space:nowrap;
-        letter-spacing:.3px;
+        white-space:nowrap; letter-spacing:.3px;
       }
       .hero .h1-sub{ display:none; }
       .hero p{ font-size:16px; line-height:1.45; max-width:480px; }
       .hero__actions{ justify-content:flex-start; }
     }
 
+    /* Buttons */
     .hero__actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
     .btn-ghost{
       padding:12px 20px; border:2px solid #fff; border-radius:10px;
       font-weight:600; color:#fff; background:transparent; transition:all .2s;
     }
     .btn-ghost:hover{ background:#FFD966; color:#111; border-color:#FFD966; }
-
     @media (max-width:768px){ .hide-sm{ display:none!important; } }
 
-    /* ---- Tin tức host ---- */
+    /* News card */
     .news-host{max-width:1100px;margin:18px auto;padding:0 16px}
     .news-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}
     .news-empty{color:#6b7280}
   </style>
 
+  <!-- Fallback đường dẫn khi mở file trực tiếp (không có server) -->
+  <script>
+    // Nếu đang mở qua file:// thì đổi biến ảnh sang đường dẫn tương đối từ src/pages/
+    if (location.protocol === 'file:') {
+      document.documentElement.style.setProperty('--bg-desktop','url("../../public/assets/bg-desktop.png")');
+      document.documentElement.style.setProperty('--bg-mobile', 'url("../../public/assets/bg-mobile.png")');
+    }
+  </script>
+
+  <!-- Đăng ký SW ở gốc (vì sw.js nằm trong /public) -->
   <script>
     if ('serviceWorker' in navigator) {
       addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+        navigator.serviceWorker.register('/sw.js').catch(()=>{});
       });
     }
   </script>
 </head>
 
-<body class="home">
+<body class="home" data-page="home">
   <!-- NAVBAR -->
   <header class="nav nav-dark">
-    <div class="nav__inner">
-      <a class="brand" href="index.html">BỘ CHQS TỈNH BẮC NINH</a>
+    <div class="nav__inner container">
+      <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
 
       <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -124,11 +149,11 @@
 
       <!-- Search (desktop) -->
       <form id="globalSearch" class="nav__search hide-sm" role="search" aria-label="Tìm kiếm">
-        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu chủ đề…" autocomplete="off">
+        <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, chủ đề…" autocomplete="off">
         <button class="search__btn" type="submit">Tìm kiếm</button>
       </form>
 
-      <!-- ✅ Thay cụm nút để khớp navbar.js -->
+      <!-- Auth actions (giữ nguyên ID cho navbar.js) -->
       <div class="nav__actions hide-sm">
         <button id="btnLogin"  class="btn btn-auth" type="button">Đăng nhập</button>
         <button id="btnLogout" class="btn btn-auth" type="button" hidden>Đăng xuất</button>
@@ -141,7 +166,7 @@
   <aside id="mDrawer" class="m-drawer" aria-hidden="true">
     <div class="m-head">
       <span class="m-home" aria-label="Trang chủ" title="Trang chủ">🏠</span>
-      <span class="m-brand">BỘ CHQS TỈNH BẮC NINH</span>
+      <span class="m-brand">BAN CHỈ HUY PTKV3</span>
     </div>
 
     <nav class="m-menu" role="navigation">
@@ -172,7 +197,7 @@
 
   <!-- HERO -->
   <main>
-    <section class="hero">
+    <section class="hero container">
       <h1>
         <span class="h1-main">GIÁO DỤC CHÍNH TRỊ SỐ</span>
         <br><span class="h1-sub">BAN CHỈ HUY PTKV3</span>
@@ -184,7 +209,7 @@
       </div>
     </section>
 
-    <!-- ⭐ Tin chính trị (ticker + list ngắn) -->
+    <!-- Tin chính trị -->
     <div class="news-host" aria-label="Tin chính trị mới">
       <div class="news-card">
         <h3 style="margin:0 0 10px;color:#111827">Tin chính trị – cập nhật từ nguồn chính thống</h3>
@@ -214,20 +239,19 @@
   <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
 
   <!-- JS: cấu hình + helper + navbar + search + news + AI -->
-  <script src="config.js" defer></script>
-  <script src="net.js" defer></script>
-  <script src="analytics.js" defer></script>
-  <script src="navbar.js?v=20250930" defer></script>
-  <script src="search.js" defer></script>
-  <script src="news.js" defer></script>
+  <script src="../js/config.js" defer></script>
+  <script src="../js/net.js" defer></script>
+  <script src="../js/analytics.js" defer></script>
+  <script src="../js/navbar.js?v=20251005" defer></script>
+  <script src="../js/search.js" defer></script>
+  <script src="../js/news.js" defer></script>
   <script>
-    // Fallback khi news.js không có mountNewsStrip
+    // Fallback khi news.js chưa mountNewsStrip
     document.addEventListener('DOMContentLoaded', async () => {
       const host = document.getElementById('newsStrip');
       try{
         if (typeof window.mountNewsStrip === 'function') {
-          window.mountNewsStrip('newsStrip');
-          return;
+          window.mountNewsStrip('newsStrip'); return;
         }
         const { SHEET_API } = window.CTCT_CONFIG || {};
         if (!SHEET_API){ host.textContent='Thiếu SHEET_API trong config.js'; return; }
@@ -240,7 +264,10 @@
           <div style="display:flex;gap:8px;align-items:center;margin:6px 0">
             <span>📰</span>
             <a href="${it.url||it.link}" target="_blank" rel="noopener" style="font-weight:700;color:#111827;text-decoration:none">${it.title}</a>
-            <span style="color:#6b7280;font-size:12px">${new Date(it.date||it.dateISO||'').toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})} • ${it.source||''}</span>
+            <span style="color:#6b7280;font-size:12px">
+              ${new Date(it.date||it.dateISO||'').toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})}
+              • ${it.source||''}
+            </span>
           </div>
         `).join('');
       }catch(e){
@@ -248,7 +275,7 @@
       }
     });
   </script>
-  <script src="ai.js" defer></script>
-  <script src="app.js" defer></script>
+  <script src="../js/ai.js" defer></script>
+  <script src="../js/app.js" defer></script>
 </body>
 </html>

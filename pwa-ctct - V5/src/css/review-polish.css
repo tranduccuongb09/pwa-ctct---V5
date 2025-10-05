@@ -656,3 +656,23 @@ body[data-page="try"]{
 .judge.ok,  .judge.ok  .ans{ color: var(--ok-green) !important }
 .judge.bad, .judge.bad .ans{ color: var(--bad)      !important }
 .judge.skip,.judge.skip .ans{ color: var(--warn)     !important }
+
+/* ===== FIX: xoá gradient vàng ở chân trang các trang review ===== */
+
+/* Ép nền trắng cho html trên các trang review (vì style.css set gradient ở html,body) */
+html{
+  background:#fff !important;
+  background-image:none !important;
+  background-attachment:scroll !important;
+}
+
+/* Phòng khi có footer chung của site dùng màu vàng/gradient */
+footer, .site-footer, .page-footer, .app-footer{
+  background:#fff !important;
+  background-image:none !important;
+  box-shadow:none !important;
+  border-top:1px solid #EEF2F7; /* viền mảnh cho sạch sẽ */
+}
+
+/* Đảm bảo chiều cao phủ kín để không lộ nền html */
+html, body{ min-height:100%; }

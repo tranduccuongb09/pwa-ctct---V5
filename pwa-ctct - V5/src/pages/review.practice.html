@@ -85,10 +85,11 @@
     }
   </style>
 </head>
+
 <body data-page="practice">
   <header class="hdr">
     <div class="container hdr__inner">
-      <button class="btn-back" onclick="history.back()">← Trang chủ</button>
+      <a class="btn-back" href="index.html">← Trang chủ</a>
       <h1 class="hdr__title">XEM LẠI & GIẢI THÍCH — ÔN TRẮC NGHIỆM</h1>
     </div>
   </header>
@@ -119,11 +120,31 @@
   </main>
 
   <!-- NÚT ĐIỀU HƯỚNG CUỐI TRANG (mới thêm) -->
-  <nav class="container nav-actions">
-    <button class="btn btn--ghost"   id="navAgain">⟲ Làm lại</button>
-    <button class="btn btn--ghost"   id="navDocs">📚 Tài liệu học tập</button>
-    <button class="btn btn--primary" id="navHome">🏠 Về Trang chủ</button>
-  </nav>
+  
+<nav class="container nav-actions" id="navActions">
+  <a class="sr-only" href="practice.html">Làm lại</a>
+  <button class="btn btn--ghost"   data-href="practice.html"      type="button">⟳ Làm lại</button>
+
+  <a class="sr-only" href="materials.html">Tài liệu</a>
+  <button class="btn btn--ghost"   data-href="materials.html" type="button">📚 Tài liệu học tập</button>
+
+  <a class="sr-only" href="index.html">Trang chủ</a>
+  <button class="btn btn--primary" data-href="index.html"     type="button">🏠 Về Trang chủ</button>
+</nav>
+
+<style>
+  .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;}
+</style>
+
+<script>
+  const base = ''; // '../' nếu cần
+  document.getElementById('navActions')?.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button[data-href]');
+    if(!btn) return;
+    const url = btn.getAttribute('data-href');
+    if(url) window.location.href = base + url;
+  });
+</script>
 
   <button class="to-top" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆ Lên đầu</button>
 
