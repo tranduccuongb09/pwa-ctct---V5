@@ -1,41 +1,93 @@
-/* ===== CTĐ, CTCT – Navbar chuẩn (fixed) ===== */
+/* ===== CTĐ, CTCT – Navbar chuẩn (auth + user chip) ===== */
 (function () {
   'use strict';
 
-  // ---------- Hồ sơ đơn giản ----------
-  const LS_KEY = 'ctct_profile';
-  const J = { parse:(s,fb=null)=>{try{return JSON.parse(s);}catch{return fb;}}, str:o=>{try{return JSON.stringify(o);}catch{return'';}} };
-  const getProfile = () => J.parse(localStorage.getItem(LS_KEY), null);
+  // ---------- Hồ sơ + trạng thái đăng nhập ----------
+  const LS_PROFILE = 'ctct_profile';
+  const LS_TOKEN   = 'ctct_token'; // nếu hệ thống dùng token
+  const J = {
+    parse: (s, fb=null) => { try { return JSON.parse(s); } catch { return fb; } },
+    str:   (o)          => { try { return JSON.stringify(o); } catch { return ''; } }
+  };
+
+  const getProfile = () => J.parse(localStorage.getItem(LS_PROFILE), null);
   const setProfile = (p)=>{
     if(!p||typeof p!=='object') return false;
     const name=(p.name||'').trim(), unit=(p.unit||'').trim(), position=(p.position||'').trim();
     if(!name||!unit) return false;
-    localStorage.setItem(LS_KEY, J.str({name,unit,position}));
-    try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){}
+    localStorage.setItem(LS_PROFILE, J.str({name,unit,position}));
+    try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_PROFILE})); }catch(_){}
     return true;
   };
-  const clearProfile = ()=>{ localStorage.removeItem(LS_KEY); try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_KEY})); }catch(_){} };
+  const clearProfile = ()=>{
+    localStorage.removeItem(LS_PROFILE);
+    try{ window.dispatchEvent(new StorageEvent('storage',{key:LS_PROFILE})); }catch(_){}
+  };
+
+  const isAuthed = ()=>{
+    // Ưu tiên biến global (nếu backend đã set)
+    const u = window.CTCT_USER;
+    if (u && (u.isLoggedIn || u.id || u.token)) return true;
+    // Token (nếu dùng)
+    const t = localStorage.getItem(LS_TOKEN) || sessionStorage.getItem(LS_TOKEN);
+    if (t && t !== 'null' && t !== 'undefined') return true;
+    // Hồ sơ đơn giản (fallback)
+    const p = getProfile();
+    return !!(p && p.name);
+  };
+
+  // Expose (nếu nơi khác cần đọc)
   window.ctctProfile = getProfile;
 
   const linksWrap  = document.querySelector('.nav__links');
   const navActions = document.querySelector('.nav__actions');
-  const btnLogin   = document.getElementById('btnLogin');
-  const btnLogout  = document.getElementById('btnLogout');
-  const navProfile = document.getElementById('navProfile');
+  const btnLogin   = document.getElementById('btnLogin');    // "Đăng ký / Đăng nhập"
+  const btnLogout  = document.getElementById('btnLogout');   // "Đăng xuất"
+  const navProfile = document.getElementById('navProfile');  // chip text cũ (nếu dùng)
+  const userChip   = document.getElementById('userChip');    // chip avatar + tên (mới)
 
   function renderNav(){
     const authDisabled = !!(navActions && (navActions.hidden || navActions.hasAttribute('hidden')));
     if (authDisabled) return;
-    const me = getProfile(), ok = !!(me && me.name);
+
+    const authed = isAuthed();
+    const me = getProfile();
+
+    // Ẩn/hiện nút
+    if (btnLogin)  btnLogin.hidden  = authed;
+    if (btnLogout) btnLogout.hidden = !authed;
+
+    // Chip text cũ (nếu site cũ đang dùng)
     if (navProfile){
-      navProfile.hidden = !ok;
-      if (ok) navProfile.textContent = `${me.name}${me.unit?` • ${me.unit}`:''}`;
+      if (me && me.name){
+        navProfile.hidden = false;
+        navProfile.textContent = `${me.name}${me.unit?` • ${me.unit}`:''}`;
+      } else {
+        navProfile.hidden = true;
+        navProfile.textContent = '';
+      }
     }
-    if (btnLogin)  btnLogin.hidden  = ok;
-    if (btnLogout) btnLogout.hidden = !ok;
+
+    // User chip (avatar + tên rút gọn)
+    if (userChip){
+      if (authed && me && me.name){
+        const lastWord = (me.name || '').trim().split(/\s+/).slice(-1)[0] || '';
+        const initial  = lastWord.charAt(0).toUpperCase() || 'U';
+        userChip.innerHTML = `
+          <div class="chip-avatar" aria-hidden="true">${initial}</div>
+          <span class="chip-name" title="${me.name}${me.unit?` • ${me.unit}`:''}">
+            ${me.name}
+          </span>
+        `;
+        userChip.hidden = false;
+      } else {
+        userChip.hidden = true;
+        userChip.innerHTML = '';
+      }
+    }
   }
 
-  // Active link
+  // Active link (giữ nguyên hành vi)
   try{
     if (linksWrap){
       const here = location.pathname.split('/').pop() || 'index.html';
@@ -45,30 +97,37 @@
       });
     }
   }catch(_){}
-
-  // Login/Logout prompt
+  
+  // ---------- Login / Logout ----------
   function doLogin(){
-    const cur=getProfile()||{};
-    const name=(prompt('Họ và tên:',cur.name||'')||'').trim(); if(!name) return;
-    const unit=(prompt('Đơn vị:',cur.unit||'')||'').trim(); if(!unit) return;
-    const position=(prompt('Chức vụ (tùy chọn):',cur.position||'')||'').trim();
-    if (setProfile({name,unit,position})){
-      renderNav();
-      try{
-        const f=document.getElementById('fullname'), u=document.getElementById('unit'), p=document.getElementById('position');
-        if (f && !f.value) f.value=name; if (u && !u.value) u.value=unit; if (p && !p.value) p.value=position;
-      }catch(_){}
-      alert('Đăng nhập thành công!');
-    }
+    // Điều hướng thẳng tới trang đăng ký/đăng nhập (không prompt/alert)
+    location.href = 'login.html';
   }
-  function doLogout(){ if(!confirm('Đăng xuất tài khoản hiện tại?')) return; clearProfile(); renderNav(); }
+  function doLogout(){
+    // Xoá các dấu vết đăng nhập phổ biến + phát sự kiện cập nhật UI
+    try {
+      localStorage.removeItem(LS_TOKEN);
+      sessionStorage.removeItem(LS_TOKEN);
+      if (window.CTCT_USER) delete window.CTCT_USER;
+    } catch {}
+    clearProfile();
+    renderNav();
+    window.dispatchEvent(new Event('ctct:auth-changed'));
+  }
 
   btnLogin  && btnLogin.addEventListener('click', doLogin);
   btnLogout && btnLogout.addEventListener('click', doLogout);
-  window.addEventListener('storage', e=>{ if(e.key===LS_KEY) renderNav(); });
+
+  // Đồng bộ UI khi storage thay đổi (tab khác đăng nhập/đăng xuất)
+  window.addEventListener('storage', (e)=>{
+    if (e.key === LS_PROFILE || e.key === LS_TOKEN) renderNav();
+  });
+  // Cho phép nơi khác chủ động báo đã đổi trạng thái
+  window.addEventListener('ctct:auth-changed', renderNav);
+
   renderNav();
 
-  // Autofill form nếu có
+  // Autofill form nếu có (họ tên/đơn vị/chức vụ) – không bắt buộc
   try{
     const me=getProfile(); if(me){
       const f=document.getElementById('fullname'), u=document.getElementById('unit'), p=document.getElementById('position');
@@ -88,7 +147,7 @@
       const as = root.querySelectorAll('a');
       for (const a of as) {
         const t = norm(a.textContent || '');
-        if (t.includes(want)) return a; // nới lỏng khớp (kể cả có ký tự ▾)
+        if (t.includes(want)) return a; // khớp nới lỏng (kể cả có ký tự ▾)
       }
     }
     return null;
@@ -158,10 +217,10 @@
 
   function buildMenus(){
     // === LÀM BÀI KIỂM TRA ===
-    const aQuiz = findAnchorByText('Làm bài kiểm tra');
+    const aQuiz = findAnchorByText('lam bai kiem tra');
     if (aQuiz){
       const {panel, anchor} = ensureDropdownFor(aQuiz, 'lam-thi');
-      clearOther(panel, ['Kiểm tra nhận thức','Ôn trắc nghiệm','Thi thử']);
+      clearOther(panel, ['Kiem tra nhan thuc','On trac nghiem','Thi thu']);
       addItem(panel, 'exam.html',     'Kiểm tra nhận thức');
       addItem(panel, 'practice.html', 'Ôn trắc nghiệm');
       addItem(panel, 'quiz.html',     'Thi thử');
@@ -170,10 +229,10 @@
     }
 
     // === KẾT QUẢ KIỂM TRA ===
-    const aRes = findAnchorByText('Kết quả kiểm tra');
+    const aRes = findAnchorByText('ket qua kiem tra');
     if (aRes){
       const {panel, anchor} = ensureDropdownFor(aRes, 'ket-qua');
-      clearOther(panel, ['Kết quả của tôi','Bảng xếp hạng']);
+      clearOther(panel, ['Ket qua cua toi','Bang xep hang']);
       addItem(panel, 'my-results.html',  'Kết quả của tôi');
       addItem(panel, 'leaderboard.html', 'Bảng xếp hạng');
       disableNavigate(anchor);
@@ -198,7 +257,7 @@
 })();
 
 /* =========================================================
-   ➤ MOBILE DRAWER (Mockup B)
+   ➤ MOBILE DRAWER (chuẩn hóa)
    ========================================================= */
 (function(){
   const mq = window.matchMedia('(max-width: 768px)');
@@ -244,28 +303,67 @@
     a.addEventListener('click', ()=> open(false));
   });
 
-  // Trợ lý AI trong Drawer
-  const aiLink = document.getElementById('m-ai');
-  if (aiLink){
-    aiLink.addEventListener('click', (e)=>{
-      e.preventDefault();
-      open(false);
-      const t = document.getElementById('ai-toggle');
-      if (t) t.click();
-    });
-  }
+  // Auth trong Drawer
+  const mLogin  = document.getElementById('m-login');
+  const mLogout = document.getElementById('m-register'); // tái dụng id cũ làm "Đăng xuất"
 
-  // Auth nút trong Drawer (dùng prompt đơn giản như desktop)
-  const loginBtn = document.getElementById('m-login');
-  const registerBtn = document.getElementById('m-register');
-  [loginBtn, registerBtn].forEach(btn=>{
-    btn && btn.addEventListener('click', ()=>{
-      open(false);
-      alert('Mời dùng nút Đăng nhập/Đăng ký (giả lập).');
-      const evt = new Event('click');
-      // nếu anh có id #btnAuth riêng, có thể kích hoạt:
-      try{ document.getElementById('btnAuth').dispatchEvent(evt); }catch(_){}
-    });
+  mLogin  && mLogin.addEventListener('click', (e)=>{ e.preventDefault(); open(false); location.href='login.html'; });
+  mLogout && mLogout.addEventListener('click', (e)=>{
+    e.preventDefault();
+    open(false);
+    try {
+      localStorage.removeItem('ctct_token');
+      sessionStorage.removeItem('ctct_token');
+      if (window.CTCT_USER) delete window.CTCT_USER;
+      localStorage.removeItem('ctct_profile');
+      window.dispatchEvent(new Event('ctct:auth-changed'));
+    } catch {}
   });
 })();
 
+// Diệt "nút –" dù là inject muộn
+(function killWeirdDashForever(){
+  const root = document.querySelector('.nav__inner') || document.querySelector('.nav');
+  if (!root) return;
+
+  const sweep = () => {
+    [...root.querySelectorAll('button,span,div,a')].forEach(el=>{
+      // bỏ qua các phần tử hợp lệ
+      if (el.id === 'btnLogin' || el.id === 'btnLogout' || el.classList.contains('btn')) return;
+      if (el.closest('.m-drawer')) return; // không đụng drawer mobile
+
+      const t = (el.textContent || '').trim();
+      const onlyDash = (t === '–' || t === '—' || t === '-');
+      // nút/nhãn rất nhỏ, không có role, chỉ có dấu gạch -> remove
+      if (onlyDash) el.remove();
+    });
+  };
+
+  // quét ngay và theo dõi thay đổi sau này
+  sweep();
+  const mo = new MutationObserver(sweep);
+  mo.observe(root, { childList: true, subtree: true });
+})();
+
+// Xoá phần tử đứng ngay sau .nav__search nếu không phải nút auth/chip
+(function nukeWeirdSiblingAfterSearch(){
+  const s = document.querySelector('.nav__search');
+  if (!s) return;
+
+  const kill = () => {
+    const sib = s.nextElementSibling;
+    if (!sib) return;
+    const ok = sib.id === 'btnLogin' || sib.id === 'btnLogout' || sib.classList.contains('user-chip');
+    if (!ok) sib.remove();
+  };
+
+  // chạy ngay và lỡ có script khác chèn muộn thì vẫn quét lại
+  kill();
+  const mo = new MutationObserver(kill);
+  mo.observe(s.parentNode, { childList: true });
+})();
+
+document.getElementById('globalSearch')?.addEventListener('submit', (e)=>{
+  const q = e.currentTarget.querySelector('input[name="q"]')?.value?.trim();
+  if (!q) e.preventDefault();
+});

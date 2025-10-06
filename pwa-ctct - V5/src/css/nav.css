@@ -174,3 +174,45 @@ body.noscroll{ overflow:hidden; }
   .nav__toggle{ display:none; }
   .nav__links{ display:flex; }
 }
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 4px 10px;
+  gap: 8px;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.2s ease;
+}
+.user-chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+.chip-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #FFD966;
+  color: #8B1616;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+}
+.chip-name {
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Ẩn bất kỳ phần tử "kỳ lạ" đứng ngay sau cụm tìm kiếm */
+.nav__search + *:not(#btnLogin):not(#btnLogout):not(.user-chip) {
+  display: none !important;
+}
+
+/* Nếu có thêm 1 lớp wrapper trống giữa search và nút auth, ẩn luôn: */
+.nav__search + *:empty {
+  display: none !important;
+}

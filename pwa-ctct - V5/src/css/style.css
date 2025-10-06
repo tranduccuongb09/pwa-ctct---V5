@@ -273,3 +273,4 @@ body.home{
 /* ===== Đồng bộ với trang Review: màu Đúng xanh lá ===== */
 .judge.ok{ color: var(--ok-green); }
 .pill.ok{ background: var(--ok-green-100); color:#064E3B; } /* text xanh đậm hơn trên nền nhạt */
+

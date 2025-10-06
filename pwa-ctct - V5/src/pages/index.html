@@ -3,123 +3,167 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PTKV3 – Trung tâm Giáo dục Chính trị số</title>
+  <title>BAN CHỈ HUY PTKV3 – Trung tâm Giáo dục Chính trị số</title>
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.webmanifest">
 
-  <!-- CSS chung (từ src/pages/ → ../css/...) -->
-  <link rel="stylesheet" href="../css/style.css?v=20251005">
-  <link rel="stylesheet" href="../css/nav.css?v=20251005">
+  <!-- CSS lõi -->
+  <link rel="stylesheet" href="../css/style.css?v=20251006">
+  <link rel="stylesheet" href="../css/nav.css?v=20251006">
 
-  <!-- Font CHỈ dùng cho trang chủ -->
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
 
-  <!-- Trang chủ – tinh chỉnh + nền tự thích ứng -->
   <style>
-    /* ====== Nền tự thích ứng: mặc định cho môi trường có server (Vite/Netlify/Live Server) ====== */
     :root{
-      --bg-desktop: url("/assets/bg-desktop.png");
-      --bg-mobile:  url("/assets/bg-mobile.png");
+      --brand-gold:#FFD966;
+      --card-bg:rgba(255,255,255,.08);
+      --card-stroke:rgba(255,255,255,.18);
+      --blur:12px;
     }
 
-    /* Toàn trang chủ dùng Be Vietnam Pro */
+    /* ===== NỀN CỐ ĐỊNH ===== */
+    .bg-layer{
+      position:fixed; inset:0; z-index:-1; pointer-events:none;
+      background-image:
+        linear-gradient(180deg, rgba(139,22,22,.78) 0%, rgba(164,25,25,.82) 60%, rgba(185,62,30,.70) 85%, rgba(255,217,102,.30) 100%),
+        var(--bg-desktop, url("/assets/bg-desktop.png"));
+      background-size:cover,cover; background-position:center,center; background-repeat:no-repeat,no-repeat;
+    }
+    @media (max-width:768px){
+      .bg-layer{
+        background-image:
+          linear-gradient(180deg, rgba(164,25,25,.84), rgba(139,22,22,.84)),
+          var(--bg-mobile, url("/assets/bg-mobile.png"));
+      }
+    }
+
+    /* ===== Typo + Layout ===== */
     body.home, body.home *:not(code):not(kbd){
       font-family:"Be Vietnam Pro",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif!important;
     }
-    body.home .nav, body.home .nav *{ font-family:inherit!important; }
+    body{color:#fff}
+    .container{max-width:1180px;margin:0 auto;padding:0 20px}
 
-    /* ===== HOME BACKGROUND (overlay có alpha + ảnh) ===== */
-    body.home{
-      background-image:
-        linear-gradient(
-          180deg,
-          rgba(139,22,22,0.78) 0%,
-          rgba(164,25,25,0.82) 60%,
-          rgba(185,62,30,0.70) 85%,
-          rgba(255,217,102,0.30) 100%
-        ),
-        var(--bg-desktop);
-      background-size: cover, cover;
-      background-position: center, center;
-      background-repeat: no-repeat, no-repeat;
-      background-attachment: fixed, fixed; /* desktop */
-      color:#fff;
-      min-height:100vh;
-    }
-    @media (max-width:768px){
-      body.home{
-        background-image:
-          linear-gradient(180deg, rgba(164,25,25,0.80), rgba(139,22,22,0.80)),
-          var(--bg-mobile);
-        background-attachment: scroll, scroll; /* mobile mượt hơn */
-      }
-    }
+    /* ===== HERO ===== */
+    .hero{padding:110px 0 80px}
+    .hero__inner{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
+    .hero h1{margin:0 0 14px;font-weight:800;line-height:1.1;font-size:clamp(36px,6vw,68px)}
+    .hero p{opacity:.96;font-size:18px;max-width:680px}
+    .hero__actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
+    .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:12px 18px;font-weight:700}
+    .btn--primary{background:var(--brand-gold);color:#111;box-shadow:0 8px 30px rgba(0,0,0,.15)}
+    .btn--ghost{background:transparent;color:#fff;border:2px solid #fff}
+    .hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);backdrop-filter:blur(var(--blur));border:1px solid var(--card-stroke);font-weight:600;margin-bottom:14px}
+    .hero-media{position:relative}
+    .hero-card{position:relative;background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:18px;padding:18px;backdrop-filter:blur(var(--blur));box-shadow:0 10px 40px rgba(0,0,0,.25)}
+    .orbit{position:absolute;inset:auto -16px -16px auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side, rgba(255,217,102,.9), rgba(255,217,102,0) 70%);filter:blur(16px);opacity:.8}
 
-    /* Hero */
-    .hero{ padding:100px 20px 80px; text-align:center; color:#fff; }
-    .hero p{ font-size:18px; margin:0 auto 32px; opacity:.96; max-width:760px; }
-    .hero h1{ margin:0 0 18px; line-height:1.15; }
-    .hero .h1-main{ display:inline-block; font-weight:800; }
-    .hero .h1-sub{ display:inline-block; font-weight:800; }
+    /* ===== KPI (số liệu thật) ===== */
+    .strip{padding:18px 0 6px}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .kpi{background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:14px;padding:16px 14px;backdrop-filter:blur(var(--blur));text-align:center}
+    .kpi strong{display:block;font-size:28px}
+    .kpi span{opacity:.9}
 
-    @media (min-width:769px){
-      .hero h1{ font-size:clamp(36px,6vw,84px); }
-    }
-    @media (max-width:768px){
-      .hero{
-        min-height: calc(100svh - 72px);
-        display:grid; place-content:center; gap:14px; text-align:left;
-      }
-      .hero .h1-main{
-        text-transform:uppercase;
-        font-size: clamp(26px, 7.2vw, 32px);
-        white-space:nowrap; letter-spacing:.3px;
-      }
-      .hero .h1-sub{ display:none; }
-      .hero p{ font-size:16px; line-height:1.45; max-width:480px; }
-      .hero__actions{ justify-content:flex-start; }
-    }
+    /* ===== Lưới tính năng ===== */
+    .features{padding:28px 0 10px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:16px;padding:18px;backdrop-filter:blur(var(--blur));}
+    .card h3{margin:0 0 6px;font-size:18px}
+    .card p{margin:0;opacity:.92}
+    .ic{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px}
 
-    /* Buttons */
-    .hero__actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
-    .btn-ghost{
-      padding:12px 20px; border:2px solid #fff; border-radius:10px;
-      font-weight:600; color:#fff; background:transparent; transition:all .2s;
+    /* ===== Footer chuyên nghiệp ===== */
+    .pro-footer{position:relative; margin-top:34px}
+    .pro-footer .f-wave{display:block;width:100%;height:70px}
+    .pro-footer .f-panel{
+      margin-top:-1px; background:rgba(0,0,0,.12);
+      backdrop-filter:blur(10px);
+      border-top:1px solid rgba(255,255,255,.25);
+      border-bottom:1px solid rgba(255,255,255,.15);
     }
-    .btn-ghost:hover{ background:#FFD966; color:#111; border-color:#FFD966; }
-    @media (max-width:768px){ .hide-sm{ display:none!important; } }
+    .pro-footer .f-grid{display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:18px;padding:26px 20px}
+    .pro-footer h4{margin:0 0 10px;font-size:16px}
+    .pro-footer p, .pro-footer a{opacity:.92;color:#fff;text-decoration:none}
+    .pro-footer a:hover{opacity:1;text-decoration:underline}
+    .pro-footer .legal{border-top:1px solid rgba(255,255,255,.18);padding:12px 20px;opacity:.85;font-size:13px}
 
-    /* News card */
-    .news-host{max-width:1100px;margin:18px auto;padding:0 16px}
-    .news-card{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:14px}
-    .news-empty{color:#6b7280}
+    /* ===== NAV auth (đẹp – gọn) ===== */
+    .nav__search .search__input{
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.18);
+      color: #fff; padding: 10px 14px;
+    }
+    .nav__search .search__btn{
+      border-radius: 999px;
+      background: #FFD966; color:#111;
+      font-weight:700; padding:10px 14px;
+    }
+    .btn-auth{
+      border-radius:999px; background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff; padding:8px 14px; font-weight:700;
+      transition:.2s; backdrop-filter:blur(8px);
+    }
+    .btn-auth:hover{ background:rgba(255,255,255,.18); }
+    .btn-auth--primary{
+      background:linear-gradient(180deg,#FFE68A,#FFD04D);
+      color:#111; border:none; box-shadow:0 6px 20px rgba(0,0,0,.18);
+    }
+    .btn-auth--primary:hover{ filter:brightness(1.03); }
+
+    .m-auth .m-btn{ width:100%; border-radius:12px; padding:10px 12px;
+      border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06);
+      color:#fff; font-weight:700; }
+    .m-auth .m-btn--primary{ background:linear-gradient(180deg,#FFE68A,#FFD04D); color:#111; border:none; }
+
+    /* ===== Responsive ===== */
+    @media(max-width:940px){
+      .hero__inner{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr 1fr}
+      .kpis{grid-template-columns:1fr 1fr}
+      .pro-footer .f-grid{grid-template-columns:1fr 1fr}
+    }
+    @media(max-width:640px){
+      .grid{grid-template-columns:1fr}
+      .pro-footer .f-grid{grid-template-columns:1fr}
+    }
   </style>
 
-  <!-- Fallback đường dẫn khi mở file trực tiếp (không có server) -->
+  <!-- Dò đường dẫn ảnh nền (chạy ở mọi môi trường) -->
   <script>
-    // Nếu đang mở qua file:// thì đổi biến ảnh sang đường dẫn tương đối từ src/pages/
-    if (location.protocol === 'file:') {
-      document.documentElement.style.setProperty('--bg-desktop','url("../../public/assets/bg-desktop.png")');
-      document.documentElement.style.setProperty('--bg-mobile', 'url("../../public/assets/bg-mobile.png")');
-    }
+    (function(){
+      const bust = Date.now();
+      const desk = ["/assets/bg-desktop.png","../../public/assets/bg-desktop.png","../assets/bg-desktop.png","./assets/bg-desktop.png"];
+      const mob  = ["/assets/bg-mobile.png","../../public/assets/bg-mobile.png","../assets/bg-mobile.png","./assets/bg-mobile.png"];
+      function pick(paths, cb){ let i=0; const step=()=>{ if(i>=paths.length) return cb(null);
+        const u=paths[i++]+ "?v="+bust; const im=new Image(); im.onload=()=>cb(u); im.onerror=step; im.src=u; }; step(); }
+      window.addEventListener('DOMContentLoaded',()=>{
+        pick(desk,(u)=>{ if(u) document.documentElement.style.setProperty('--bg-desktop', `url("${u}")`); });
+        pick(mob, (u)=>{ if(u) document.documentElement.style.setProperty('--bg-mobile',  `url("${u}")`); });
+      });
+    })();
   </script>
 
-  <!-- Đăng ký SW ở gốc (vì sw.js nằm trong /public) -->
+  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(()=>{});
-      });
+      addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
     }
   </script>
 </head>
 
 <body class="home" data-page="home">
+  <!-- NỀN -->
+  <div class="bg-layer" aria-hidden="true"></div>
+
   <!-- NAVBAR -->
   <header class="nav nav-dark">
     <div class="nav__inner container">
-      <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+      <a class="brand" href="index.html">BỘ CHQS TỈNH BẮC NINH</a>
 
       <button class="nav__toggle" aria-label="Mở menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -128,7 +172,6 @@
       <nav class="nav__links">
         <a href="index.html" class="is-active">Trang chủ</a>
         <a href="materials.html">Tài liệu học tập</a>
-
         <div class="nav__item has-dropdown">
           <a href="exam.html">Làm bài kiểm tra ▾</a>
           <div class="dropdown">
@@ -137,7 +180,6 @@
             <a href="quiz.html">Thi thử</a>
           </div>
         </div>
-
         <div class="nav__item has-dropdown">
           <a href="results.html">Kết quả kiểm tra ▾</a>
           <div class="dropdown">
@@ -147,15 +189,16 @@
         </div>
       </nav>
 
-      <!-- Search (desktop) -->
+      <!-- Search -->
       <form id="globalSearch" class="nav__search hide-sm" role="search" aria-label="Tìm kiếm">
         <input class="search__input" type="search" name="q" placeholder="Tìm tài liệu, chủ đề…" autocomplete="off">
         <button class="search__btn" type="submit">Tìm kiếm</button>
       </form>
 
-      <!-- Auth actions (giữ nguyên ID cho navbar.js) -->
-      <div class="nav__actions hide-sm">
-        <button id="btnLogin"  class="btn btn-auth" type="button">Đăng nhập</button>
+      <!-- Auth actions (desktop) -->
+       <div id="userChip" class="user-chip" hidden></div>
+        <div class="nav__actions hide-sm">
+        <button id="btnLogin"  class="btn btn-auth btn-auth--primary" type="button">Đăng ký / Đăng nhập</button>
         <button id="btnLogout" class="btn btn-auth" type="button" hidden>Đăng xuất</button>
         <span id="navProfile" class="brand" hidden></span>
       </div>
@@ -166,7 +209,7 @@
   <aside id="mDrawer" class="m-drawer" aria-hidden="true">
     <div class="m-head">
       <span class="m-home" aria-label="Trang chủ" title="Trang chủ">🏠</span>
-      <span class="m-brand">BAN CHỈ HUY PTKV3</span>
+      <span class="m-brand">BỘ CHQS TỈNH BẮC NINH</span>
     </div>
 
     <nav class="m-menu" role="navigation">
@@ -188,47 +231,111 @@
 
       <a class="m-item" href="#" id="m-ai">Trợ lý AI</a>
 
+      <!-- Auth mobile -->
       <div class="m-auth">
-        <button type="button" class="m-btn" id="m-login">Đăng nhập</button>
-        <button type="button" class="m-btn m-ghost" id="m-register">Đăng ký</button>
+        <button type="button" class="m-btn m-btn--primary" id="m-login">Đăng ký / Đăng nhập</button>
+        <button type="button" class="m-btn m-ghost" id="m-register" hidden>Đăng xuất</button>
       </div>
     </nav>
   </aside>
 
   <!-- HERO -->
-  <main>
-    <section class="hero container">
-      <h1>
-        <span class="h1-main">GIÁO DỤC CHÍNH TRỊ SỐ</span>
-        <br><span class="h1-sub">BAN CHỈ HUY PTKV3</span>
-      </h1>
-      <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp · Kiểm tra & phân tích chất lượng.</p>
-      <div class="hero__actions">
-        <a href="materials.html" class="btn-ghost">Bắt đầu học tập</a>
-        <button id="ai-toggle" type="button" class="btn-ghost hide-sm">Trợ lý AI</button>
+  <section class="hero">
+    <div class="container hero__inner">
+      <div>
+        <div class="hero-badge">🎖️ Trung tâm Giáo dục Chính trị số</div>
+        <h1>BAN CHỈ HUY PTKV3</h1>
+        <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp tức thì · Bài kiểm tra & phân tích kết quả theo chuẩn.</p>
+        <div class="hero__actions">
+          <a href="materials.html" class="btn btn--primary">Bắt đầu học tập</a>
+          <button id="ai-toggle" type="button" class="btn btn--ghost hide-sm">Trợ lý AI</button>
+        </div>
       </div>
-    </section>
-
-    <!-- Tin chính trị -->
-    <div class="news-host" aria-label="Tin chính trị mới">
-      <div class="news-card">
-        <h3 style="margin:0 0 10px;color:#111827">Tin chính trị – cập nhật từ nguồn chính thống</h3>
-        <div id="newsStrip" class="news-empty">Đang tải bản tin…</div>
+      <div class="hero-media" aria-hidden="true">
+        <div class="hero-card">
+          <svg width="100%" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="518" height="138" rx="14" stroke="rgba(255,255,255,.35)" fill="rgba(255,255,255,.06)"/>
+            <g transform="translate(20,20)">
+              <rect width="110" height="20" rx="6" fill="rgba(255,255,255,.18)"/>
+              <rect x="0" y="34" width="320" height="12" rx="6" fill="rgba(255,255,255,.22)"/>
+              <rect x="0" y="54" width="280" height="12" rx="6" fill="rgba(255,255,255,.18)"/>
+            </g>
+            <g transform="translate(360,20)">
+              <circle cx="20" cy="20" r="20" fill="rgba(255,217,102,.85)"/>
+            </g>
+          </svg>
+          <div class="orbit"></div>
+        </div>
       </div>
     </div>
-  </main>
+  </section>
 
-  <!-- AI tray -->
+  <!-- KPI THỰC -->
+  <section class="strip">
+    <div class="container kpis">
+      <div class="kpi"><strong id="kpiSessions">0</strong><span>Lượt học/tháng</span></div>
+      <div class="kpi"><strong id="kpiCompletion">0%</strong><span>Tỷ lệ hoàn thành bài</span></div>
+      <div class="kpi"><strong id="kpiStartTime">0 phút</strong><span>Thời gian bắt đầu</span></div>
+      <div class="kpi"><strong id="kpiAi24">0</strong><span>Phiên hỏi đáp AI</span></div>
+    </div>
+  </section>
+
+  <!-- LƯỚI TÍNH NĂNG -->
+  <section class="features">
+    <div class="container grid">
+      <div class="card"><h3><span class="ic">📚</span>Tài liệu học tập</h3><p>Tài liệu chuẩn hóa, phân theo chủ đề. Tìm kiếm nhanh.</p></div>
+      <div class="card"><h3><span class="ic">🧠</span>Ôn tập & Thi thử</h3><p>Ngân hàng câu hỏi bám sát chuẩn. Luyện thi có thời gian.</p></div>
+      <div class="card"><h3><span class="ic">📊</span>Phân tích kết quả</h3><p>Thống kê điểm, nhận diện điểm yếu, gợi ý lộ trình.</p></div>
+      <div class="card"><h3><span class="ic">🤖</span>Trợ lý AI</h3><p>Hỏi – đáp tức thì, trích nguồn rõ ràng.</p></div>
+      <div class="card"><h3><span class="ic">🛡️</span>Bảo mật & Minh bạch</h3><p>Đăng nhập an toàn, lưu vết bài làm.</p></div>
+      <div class="card"><h3><span class="ic">📱</span>Thân thiện đa thiết bị</h3><p>Trải nghiệm thống nhất trên di động & desktop.</p></div>
+    </div>
+  </section>
+
+  <!-- FOOTER CHUYÊN NGHIỆP -->
+  <footer class="pro-footer">
+    <svg class="f-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,40 C240,10 480,10 720,40 C960,70 1200,70 1440,40 L1440,70 L0,70 Z"
+            fill="rgba(255,255,255,.14)"></path>
+    </svg>
+
+    <div class="f-panel">
+      <div class="container f-grid">
+        <div>
+          <h4>BAN CHỈ HUY PTKV3</h4>
+          <p>Trung tâm Giáo dục Chính trị số – học liệu chuẩn hóa, kiểm tra minh bạch.</p>
+        </div>
+        <div>
+          <h4>Liên kết</h4>
+          <p><a href="materials.html">Tài liệu học tập</a></p>
+          <p><a href="exam.html">Bài kiểm tra</a></p>
+          <p><a href="leaderboard.html">Bảng xếp hạng</a></p>
+        </div>
+        <div>
+          <h4>Hỗ trợ</h4>
+          <p><a href="practice.html">Ôn trắc nghiệm</a></p>
+          <p><a href="quiz.html">Thi thử</a></p>
+          <p><a href="#" id="m-ai">Trợ lý AI</a></p>
+        </div>
+      </div>
+
+      <div class="container legal">
+        © <span id="y"></span> BAN CHỈ HUY PTKV3 · BỘ CHQS TỈNH BẮC NINH
+      </div>
+    </div>
+  </footer>
+
+  <!-- AI tray (giữ nguyên hook) -->
   <div id="ai-tray" class="ai-tray" hidden>
     <div class="ai-tray__panel">
       <header class="ai-tray__head">
         <strong>Trợ lý AI</strong>
         <div class="ai-head-actions">
-          <button id="ai-minify" class="ai-head-btn" type="button" title="Thu nhỏ" aria-label="Thu nhỏ">–</button>
-          <button id="ai-close"  class="ai-head-btn" type="button" title="Đóng" aria-label="Đóng">✕</button>
+          <button id="ai-minify" class="ai-head-btn" title="Thu nhỏ">–</button>
+          <button id="ai-close"  class="ai-head-btn" title="Đóng">✕</button>
         </div>
       </header>
-      <div id="ai-messages" class="ai-tray__messages" aria-live="polite"></div>
+      <div id="ai-messages" class="ai-tray__messages"></div>
       <div id="ai-previews" class="ai-previews" hidden></div>
       <form id="ai-form" class="ai-tray__form">
         <input id="ai-input" type="text" placeholder="Nhập câu hỏi…" autocomplete="off"/>
@@ -238,44 +345,112 @@
   </div>
   <button id="ai-dock" class="ai-fab" hidden>Trợ lý AI</button>
 
-  <!-- JS: cấu hình + helper + navbar + search + news + AI -->
+  <!-- JS cũ -->
   <script src="../js/config.js" defer></script>
   <script src="../js/net.js" defer></script>
   <script src="../js/analytics.js" defer></script>
-  <script src="../js/navbar.js?v=20251005" defer></script>
+  <script src="../js/navbar.js" defer></script>
   <script src="../js/search.js" defer></script>
   <script src="../js/news.js" defer></script>
-  <script>
-    // Fallback khi news.js chưa mountNewsStrip
-    document.addEventListener('DOMContentLoaded', async () => {
-      const host = document.getElementById('newsStrip');
-      try{
-        if (typeof window.mountNewsStrip === 'function') {
-          window.mountNewsStrip('newsStrip'); return;
-        }
-        const { SHEET_API } = window.CTCT_CONFIG || {};
-        if (!SHEET_API){ host.textContent='Thiếu SHEET_API trong config.js'; return; }
-        const url = `${SHEET_API}?action=news&limitPer=5&total=18`;
-        const res = await fetch(url, {cache:'no-store'});
-        const data = await res.json();
-        const items = Array.isArray(data.items) ? data.items.slice(0,6) : [];
-        if (!items.length){ host.textContent='Chưa có tin mới.'; return; }
-        host.innerHTML = items.map(it=>`
-          <div style="display:flex;gap:8px;align-items:center;margin:6px 0">
-            <span>📰</span>
-            <a href="${it.url||it.link}" target="_blank" rel="noopener" style="font-weight:700;color:#111827;text-decoration:none">${it.title}</a>
-            <span style="color:#6b7280;font-size:12px">
-              ${new Date(it.date||it.dateISO||'').toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})}
-              • ${it.source||''}
-            </span>
-          </div>
-        `).join('');
-      }catch(e){
-        host.textContent = 'Không tải được bản tin.';
-      }
-    });
-  </script>
   <script src="../js/ai.js" defer></script>
   <script src="../js/app.js" defer></script>
+
+  <!-- KPI thực: analytics.js (window.PTKV3_STATS) + fallback localStorage -->
+  <script>
+    (function(){
+      function n(v){ try{ return Number(v)||0 }catch{return 0} }
+      function fmt(x){ try{ return Number(x).toLocaleString('vi-VN') }catch{return x} }
+      function pct(r){ return (Math.round((r||0)*1000)/10)+'%' }
+
+      const s = (window.PTKV3_STATS||{});
+      let sessions = n(s.sessions30d);
+      let attempts  = n(s.attempts30d);
+      let completed = n(s.completedAttempts30d);
+      let startMin  = n(s.avgStartMinutes);
+      let aiCount   = n(s.aiSessions30d);
+
+      try{
+        const THIRTY = 30*24*60*60*1000, now = Date.now();
+
+        if(!sessions){
+          const arr = JSON.parse(localStorage.getItem('ctct_learning_sessions')||'[]');
+          sessions = Array.isArray(arr) ? arr.filter(ts => now-n(ts) < THIRTY).length : 0;
+        }
+        if(!attempts || !completed){
+          const arr = JSON.parse(localStorage.getItem('ctct_results')||'[]');
+          const recent = Array.isArray(arr) ? arr.filter(r => now-n(r?.ts) < THIRTY) : [];
+          attempts  = attempts  || recent.length;
+          completed = completed || recent.filter(r => !!r?.finished).length;
+        }
+        if(!aiCount){
+          const arr = JSON.parse(localStorage.getItem('ctct_ai_sessions')||'[]');
+          aiCount = Array.isArray(arr) ? arr.filter(ts => now-n(ts) < THIRTY).length : 0;
+        }
+        if(!startMin){
+          startMin = n(localStorage.getItem('ctct_avg_start_minutes'));
+        }
+      }catch(e){}
+
+      document.getElementById('kpiSessions').textContent   = fmt(sessions);
+      document.getElementById('kpiCompletion').textContent = pct(attempts? completed/attempts : 0);
+      document.getElementById('kpiStartTime').textContent  = (startMin||0) + ' phút';
+      document.getElementById('kpiAi24').textContent       = fmt(aiCount);
+      document.getElementById('y').textContent = new Date().getFullYear();
+    })();
+  </script>
+
+  <!-- Ép UI Auth: chỉ 1 nút ĐK/ĐN hoặc Đăng xuất -->
+  <script>
+    (function () {
+      const btnLogin   = document.getElementById('btnLogin');
+      const btnLogout  = document.getElementById('btnLogout');
+      const mLogin     = document.getElementById('m-login');
+      const mLogout    = document.getElementById('m-register'); // dùng làm Đăng xuất (giữ hook)
+
+      const goLogin = () => { location.href = 'login.html'; };
+      btnLogin?.addEventListener('click', goLogin);
+      mLogin?.addEventListener('click', goLogin);
+
+      function isAuthed() {
+        try {
+          const u = window.CTCT_USER;
+          if (u && (u.isLoggedIn || u.id || u.token)) return true;
+          const t = localStorage.getItem('ctct_token') || sessionStorage.getItem('ctct_token');
+          return !!t && t !== 'null' && t !== 'undefined';
+        } catch { return false; }
+      }
+
+      function updateAuthUI() {
+        const authed = isAuthed();
+        if (authed) {
+          if (btnLogin)  btnLogin.style.display  = 'none';
+          if (btnLogout) btnLogout.style.display = 'inline-block';
+          if (mLogin)    mLogin.style.display    = 'none';
+          if (mLogout)   mLogout.style.display   = 'inline-block';
+        } else {
+          if (btnLogin)  btnLogin.style.display  = 'inline-block';
+          if (btnLogout) btnLogout.style.display = 'none';
+          if (mLogin)    mLogin.style.display    = 'inline-block';
+          if (mLogout)   mLogout.style.display   = 'none';
+        }
+      }
+
+      function doLogout() {
+        try {
+          localStorage.removeItem('ctct_token');
+          sessionStorage.removeItem('ctct_token');
+          if (window.CTCT_USER) delete window.CTCT_USER;
+        } catch {}
+        updateAuthUI();
+      }
+
+      btnLogout?.addEventListener('click', doLogout);
+      mLogout?.addEventListener('click', doLogout);
+
+      updateAuthUI();
+      window.addEventListener('storage', (e) => { if (e.key === 'ctct_token') updateAuthUI(); });
+      window.addEventListener('ctct:auth-changed', updateAuthUI);
+    })();
+  </script>
 </body>
 </html>
