@@ -47,18 +47,30 @@
     .container{max-width:1180px;margin:0 auto;padding:0 20px}
 
     /* ===== HERO ===== */
-    .hero{padding:110px 0 80px}
-    .hero__inner{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center}
-    .hero h1{margin:0 0 14px;font-weight:800;line-height:1.1;font-size:clamp(36px,6vw,68px)}
-    .hero p{opacity:.96;font-size:18px;max-width:680px}
-    .hero__actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}
-    .btn{appearance:none;border:none;cursor:pointer;border-radius:12px;padding:12px 18px;font-weight:700}
-    .btn--primary{background:var(--brand-gold);color:#111;box-shadow:0 8px 30px rgba(0,0,0,.15)}
-    .btn--ghost{background:transparent;color:#fff;border:2px solid #fff}
-    .hero-badge{display:inline-flex;align-items:center;gap:10px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.12);backdrop-filter:blur(var(--blur));border:1px solid var(--card-stroke);font-weight:600;margin-bottom:14px}
-    .hero-media{position:relative}
-    .hero-card{position:relative;background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:18px;padding:18px;backdrop-filter:blur(var(--blur));box-shadow:0 10px 40px rgba(0,0,0,.25)}
-    .orbit{position:absolute;inset:auto -16px -16px auto;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side, rgba(255,217,102,.9), rgba(255,217,102,0) 70%);filter:blur(16px);opacity:.8}
+    .hero {position: relative; color: #fff;}
+    .hero__inner {display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(18px, 4vw, 40px); align-items: center; padding: clamp(52px, 8vw, 110px) 0 72px;}
+    @media (max-width: 900px){.hero__inner { grid-template-columns: 1fr; padding-top: 72px; }}
+    .hero h1{ margin: 10px 0 12px; text-transform: uppercase; font-weight: 900; letter-spacing: .5px; line-height: 1.05; font-size: clamp(42px, 7.2vw, 96px);
+    background: linear-gradient(160deg,#FFF2B0 0%, #FFD966 25%, #FFB400 55%, #FFE07A 80%, #FFF6C9 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    /* giúp chữ nổi trên nền đỏ/ánh sáng */
+    text-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 22px rgba(255,217,102,.38);
+    -webkit-text-stroke: .6px rgba(130,20,20,.28);}
+    .hero__content h1 {white-space: nowrap; font-size: clamp(42px, 6vw, 84px); font-weight: 900; text-transform: uppercase; background: linear-gradient(90deg,#FFD966,#fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 3px 12px rgba(255,217,102,0.45);  margin: 10px 0 16px;}
+    .hero p{max-width: 820px; font-size: clamp(16px, 2.2vw, 20px); opacity: .98; margin-bottom: 28px;}
+    .hero__actions{ display:flex; gap:14px; flex-wrap:wrap; }
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px; padding: 14px 26px;border-radius: 14px; font-weight: 800;font-size: 18px; cursor:pointer; user-select:none; text-decoration:none; transition: transform .08s ease, box-shadow .25s ease, background .25s ease, color .25s ease, border-color .25s ease;}
+    .btn--primary{background:#FFD966; color:#7E120F; border:0; box-shadow: 0 8px 24px rgba(255,217,102,.35);}
+    .btn--primary:hover{background:#FFE680; transform: translateY(-1px); box-shadow: 0 10px 28px rgba(255,217,102,.48);}
+    .btn--ghost{background: transparent; color:#FFD966; border:2px solid #FFD966; box-shadow: 0 6px 20px rgba(255,217,102,.18);}
+    .btn--ghost:hover{ background:#FFD966; color:#7E120F; transform: translateY(-1px); }
+    .hero-badge{display:inline-flex;align-items:center;gap:8px; padding:8px 14px;border-radius:999px; font-weight:700; color:#FFD966; background:rgba(255,217,102,.14); border:1px solid rgba(255,217,102,.35); backdrop-filter: blur(2px); margin-bottom: 10px;}
+    
+    /* Khối media bên phải:*/
+
+    .hero-media { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; pointer-events: none;}
+    .hero-media .halo { width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,217,102,0.3) 0%, rgba(255,255,255,0) 70%); filter: blur(60px); animation: pulse 6s ease-in-out infinite;}
+    @keyframes pulse { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.15); opacity: 1; }}
 
     /* ===== KPI (số liệu thật) ===== */
     .strip{padding:18px 0 6px}
@@ -76,20 +88,17 @@
     .ic{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px}
 
     /* ===== Footer chuyên nghiệp ===== */
-    .pro-footer{position:relative; margin-top:34px}
-    .pro-footer .f-wave{display:block;width:100%;height:70px}
-    .pro-footer .f-panel{
-      margin-top:-1px; background:rgba(0,0,0,.12);
-      backdrop-filter:blur(10px);
-      border-top:1px solid rgba(255,255,255,.25);
-      border-bottom:1px solid rgba(255,255,255,.15);
-    }
-    .pro-footer .f-grid{display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:18px;padding:26px 20px}
-    .pro-footer h4{margin:0 0 10px;font-size:16px}
-    .pro-footer p, .pro-footer a{opacity:.92;color:#fff;text-decoration:none}
-    .pro-footer a:hover{opacity:1;text-decoration:underline}
-    .pro-footer .legal{border-top:1px solid rgba(255,255,255,.18);padding:12px 20px;opacity:.85;font-size:13px}
+    .pro-footer{margin-top: 24px; color:#f7f7f7;}
+    .pro-footer .f-wave{display:block; width:100%; height:70px;}
+    .pro-footer .f-panel{background: rgba(0,0,0,.16); border-top: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(4px); padding: 18px 0 8px;}
+    .pro-footer .f-grid{display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 22px; align-items:flex-start; padding: 8px 0 16px;}
+    @media (max-width:900px){.pro-footer .f-grid{ grid-template-columns:1fr; gap:10px; }}
 
+    .pro-footer h4{ margin:0 0 8px; font-size:16px; color:#FFD966; }
+    .pro-footer p{ margin:6px 0; color:#f1f1f1; opacity:.95; }
+    .pro-footer a{ color:#FFE680; text-decoration:none; }
+    .pro-footer a:hover{ text-decoration:underline; }
+    .pro-footer .legal{ border-top:1px dashed rgba(255,255,255,.18); margin-top:8px; padding-top:10px; font-size:14px; text-align:center; color:#EDE0A0;}
     /* ===== NAV auth (đẹp – gọn) ===== */
     .nav__search .search__input{
       border-radius: 999px;
@@ -251,21 +260,8 @@
           <button id="ai-toggle" type="button" class="btn btn--ghost hide-sm">Trợ lý AI</button>
         </div>
       </div>
-      <div class="hero-media" aria-hidden="true">
-        <div class="hero-card">
-          <svg width="100%" height="140" viewBox="0 0 520 140" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="1" y="1" width="518" height="138" rx="14" stroke="rgba(255,255,255,.35)" fill="rgba(255,255,255,.06)"/>
-            <g transform="translate(20,20)">
-              <rect width="110" height="20" rx="6" fill="rgba(255,255,255,.18)"/>
-              <rect x="0" y="34" width="320" height="12" rx="6" fill="rgba(255,255,255,.22)"/>
-              <rect x="0" y="54" width="280" height="12" rx="6" fill="rgba(255,255,255,.18)"/>
-            </g>
-            <g transform="translate(360,20)">
-              <circle cx="20" cy="20" r="20" fill="rgba(255,217,102,.85)"/>
-            </g>
-          </svg>
-          <div class="orbit"></div>
-        </div>
+      <div class="hero-media">
+        <div class="halo"></div>
       </div>
     </div>
   </section>
@@ -302,8 +298,9 @@
     <div class="f-panel">
       <div class="container f-grid">
         <div>
-          <h4>BAN CHỈ HUY PTKV3</h4>
-          <p>Trung tâm Giáo dục Chính trị số – học liệu chuẩn hóa, kiểm tra minh bạch.</p>
+          <h4>BỘ CHQS TỈNH BẮC NINH</h4>
+          <p>Trung tâm Giáo dục Chính trị số – © 2025</p>
+          <p>Phát triển bởi PTKV3 Digital Team</p>
         </div>
         <div>
           <h4>Liên kết</h4>
@@ -317,10 +314,6 @@
           <p><a href="quiz.html">Thi thử</a></p>
           <p><a href="#" id="m-ai">Trợ lý AI</a></p>
         </div>
-      </div>
-
-      <div class="container legal">
-        © <span id="y"></span> BAN CHỈ HUY PTKV3 · BỘ CHQS TỈNH BẮC NINH
       </div>
     </div>
   </footer>
@@ -452,5 +445,11 @@
       window.addEventListener('ctct:auth-changed', updateAuthUI);
     })();
   </script>
+  <script>
+  (function(){
+    const y = document.getElementById('y');
+    if (y) y.textContent = new Date().getFullYear();
+  })();
+</script>
 </body>
 </html>

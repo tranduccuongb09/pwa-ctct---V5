@@ -367,3 +367,15 @@ document.getElementById('globalSearch')?.addEventListener('submit', (e)=>{
   const q = e.currentTarget.querySelector('input[name="q"]')?.value?.trim();
   if (!q) e.preventDefault();
 });
+
+// Update năm dưới footer
+document.getElementById('y') && (document.getElementById('y').textContent = new Date().getFullYear());
+
+// Footer: mở khay AI khi bấm "Trợ lý AI"
+(function(){
+  const link = document.getElementById('m-ai');
+  const toggle = document.getElementById('ai-toggle');
+  if (link && toggle){
+    link.addEventListener('click', (e)=>{ e.preventDefault(); toggle.click(); });
+  }
+})();
