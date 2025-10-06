@@ -11,7 +11,7 @@
   <!-- CSS lõi -->
   <link rel="stylesheet" href="../css/style.css?v=20251006">
   <link rel="stylesheet" href="../css/nav.css?v=20251006">
-
+  <link rel="stylesheet" href="../css/home.css?v=20251006">
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet" />
 
@@ -48,15 +48,9 @@
 
     /* ===== HERO ===== */
     .hero {position: relative; color: #fff;}
-    .hero__inner {display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(18px, 4vw, 40px); align-items: center; padding: clamp(52px, 8vw, 110px) 0 72px;}
+    
     @media (max-width: 900px){.hero__inner { grid-template-columns: 1fr; padding-top: 72px; }}
-    .hero h1{ margin: 10px 0 12px; text-transform: uppercase; font-weight: 900; letter-spacing: .5px; line-height: 1.05; font-size: clamp(42px, 7.2vw, 96px);
-    background: linear-gradient(160deg,#FFF2B0 0%, #FFD966 25%, #FFB400 55%, #FFE07A 80%, #FFF6C9 100%);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-    /* giúp chữ nổi trên nền đỏ/ánh sáng */
-    text-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 22px rgba(255,217,102,.38);
-    -webkit-text-stroke: .6px rgba(130,20,20,.28);}
-    .hero__content h1 {white-space: nowrap; font-size: clamp(42px, 6vw, 84px); font-weight: 900; text-transform: uppercase; background: linear-gradient(90deg,#FFD966,#fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 3px 12px rgba(255,217,102,0.45);  margin: 10px 0 16px;}
+
     .hero p{max-width: 820px; font-size: clamp(16px, 2.2vw, 20px); opacity: .98; margin-bottom: 28px;}
     .hero__actions{ display:flex; gap:14px; flex-wrap:wrap; }
     .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px; padding: 14px 26px;border-radius: 14px; font-weight: 800;font-size: 18px; cursor:pointer; user-select:none; text-decoration:none; transition: transform .08s ease, box-shadow .25s ease, background .25s ease, color .25s ease, border-color .25s ease;}
@@ -66,13 +60,7 @@
     .btn--ghost:hover{ background:#FFD966; color:#7E120F; transform: translateY(-1px); }
     .hero-badge{display:inline-flex;align-items:center;gap:8px; padding:8px 14px;border-radius:999px; font-weight:700; color:#FFD966; background:rgba(255,217,102,.14); border:1px solid rgba(255,217,102,.35); backdrop-filter: blur(2px); margin-bottom: 10px;}
     
-    /* Khối media bên phải:*/
-
-    .hero-media { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; pointer-events: none;}
-    .hero-media .halo { width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,217,102,0.3) 0%, rgba(255,255,255,0) 70%); filter: blur(60px); animation: pulse 6s ease-in-out infinite;}
-    @keyframes pulse { 0%,100% { transform: scale(1); opacity: .85; } 50% { transform: scale(1.15); opacity: 1; }}
-
-    /* ===== KPI (số liệu thật) ===== */
+      /* ===== KPI (số liệu thật) ===== */
     .strip{padding:18px 0 6px}
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
     .kpi{background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:14px;padding:16px 14px;backdrop-filter:blur(var(--blur));text-align:center}
@@ -140,6 +128,8 @@
       .grid{grid-template-columns:1fr}
       .pro-footer .f-grid{grid-template-columns:1fr}
     }
+    .hero-media{ display: none !important; }
+
   </style>
 
   <!-- Dò đường dẫn ảnh nền (chạy ở mọi môi trường) -->
@@ -253,16 +243,14 @@
     <div class="container hero__inner">
       <div>
         <div class="hero-badge">🎖️ Trung tâm Giáo dục Chính trị số</div>
-        <h1>BAN CHỈ HUY PTKV3</h1>
+        <h1 class="soft-gold glow">BAN CHỈ HUY PTKV3</h1>
         <p>Kho tài liệu đa phương tiện · Trợ lý AI hỏi đáp tức thì · Bài kiểm tra & phân tích kết quả theo chuẩn.</p>
         <div class="hero__actions">
           <a href="materials.html" class="btn btn--primary">Bắt đầu học tập</a>
           <button id="ai-toggle" type="button" class="btn btn--ghost hide-sm">Trợ lý AI</button>
         </div>
       </div>
-      <div class="hero-media">
-        <div class="halo"></div>
-      </div>
+      
     </div>
   </section>
 

@@ -1,83 +1,314 @@
-/* ===== HERO theo mẫu ===== */
-.landing, .hero { margin:0; }
-.hero{
-  position:relative; min-height:calc(100vh - 64px);
-  display:grid; place-items:center; overflow:hidden;
-}
-.hero__bg{
-  position:absolute; inset:0;
-  background-image:var(--bg, url('assets/hero.jpg'));
-  background-size:cover; background-position:center;
-  filter:brightness(.56); transform:scale(1.02);
-}
-.hero__content{
-  position:relative; z-index:1; text-align:center;
-  color:#fff; max-width:920px; padding:0 16px;
-}
-.hero__content h1{
-  margin:0 0 16px; font-weight:900; letter-spacing:.6px;
-  font-size:clamp(34px, 7vw, 74px);
-}
-.hero__content p{
-  margin:0 auto 26px; max-width:720px;
-  font-size:clamp(14px, 2.4vw, 18px); opacity:.95; line-height:1.6;
-}
-.hero__actions{ display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+/* ============================================================
+   HOME.CSS – PTKV3 (Final Polished Version – 2025-10-06)
+   Mục tiêu: Vàng kim 3D + glint mảnh cho H1, không ảnh hưởng phần khác
+   ============================================================ */
 
-.btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  padding:10px 16px; border-radius:999px; font-weight:900; text-decoration:none; cursor:pointer;
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, color .12s ease;
-}
-.btn-lg{ padding:14px 22px; font-size:18px; }
-.btn-primary{ background:var(--brand); color:#fff; box-shadow:0 10px 24px rgba(164,25,25,.25); }
-.btn-primary:hover{ transform:translateY(-1px); }
-.btn-ghost{ background:transparent; color:#fff; border:2px solid rgba(255,255,255,.8); }
-.btn-ghost:hover{ background:rgba(255,255,255,.1); }
+/* ===== HERO khung cơ bản ===== */
+.landing, .hero { margin: 0; }
 
-/* Mobile */
-@media (max-width:768px){
-  .hero__bg{ background-image: url("assets/bg-mobile.png"); }
+.home .hero {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  padding: 96px 20px 88px;
+  overflow: visible; /* tránh cắt dấu tiếng Việt */
 }
 
-/* ======= HERO – BAN CHỈ HUY PTKV3 ======= */
-.hero{ text-align:center; padding:100px 20px 80px; color:#fff; }
-.hero .tagline{
-  display:inline-block; background:rgba(255,217,102,0.15); color:#FFD966;
-  padding:6px 14px; border-radius:999px; font-weight:600; margin-bottom:14px;
-  font-size:18px;
+.home .hero > .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.hero h1{
-  font-size:clamp(40px,6vw,84px); font-weight:900; text-transform:uppercase;
-  background:linear-gradient(90deg,#FFD966,#fff);
-  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-  text-shadow:0 2px 10px rgba(255,217,102,0.35); margin:10px 0 16px;
-}
-.hero p{ font-size:20px; opacity:.95; margin-bottom:36px; }
 
-.hero__actions{ display:flex; justify-content:center; gap:16px; flex-wrap:wrap; }
-.btn-primary{
-  background:#FFD966; color:#A41919; border:none; border-radius:12px;
-  padding:14px 28px; font-weight:700; font-size:18px;
-  box-shadow:0 4px 14px rgba(255,217,102,0.3); transition:all .25s;
+/* ===== Badge nhỏ phía trên tiêu đề ===== */
+.home .hero .hero-badge,
+.home .hero .tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #FFD966;
+  background: rgba(255,217,102,.14);
+  border: 1px solid rgba(255,217,102,.35);
+  backdrop-filter: blur(2px);
+  margin-bottom: 12px;
 }
-.btn-primary:hover{ background:#ffec99; box-shadow:0 6px 20px rgba(255,217,102,0.5); }
-.btn-outline{
-  border:2px solid #FFD966; color:#FFD966; padding:12px 26px;
-  font-weight:700; border-radius:12px; background:transparent; transition:all .25s;
-}
-.btn-outline:hover{ background:#FFD966; color:#A41919; }
 
-/* ===== Override cho hero PTKV3 (ưu tiên vàng ánh kim) ===== */
-.hero h1{
-  background: linear-gradient(160deg,#FFF2B0 0%, #FFD966 25%, #FFB400 55%, #FFE07A 80%, #FFF6C9 100%) !important;
+/* ============================================================
+   Tiêu đề chính – BAN CHỈ HUY PTKV3 (Vàng kim 3D + glint mảnh)
+   ============================================================ */
+.home .hero h1{
+  display:inline-block;
+  margin:10px 0 16px;
+  padding-top:8px;                       /* tránh cắt dấu hỏi/ắc-xăng */
+  font-weight:900;
+  letter-spacing:.6px;
+  line-height:1.14;
+  font-size:clamp(42px,7.2vw,96px);
+  white-space:nowrap;                    /* desktop không xuống dòng */
+  overflow:visible;
+  text-overflow:clip;
+
+  /* Chống răng cưa & cân sáng chữ */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 1) Dùng nền gradient làm “màu chữ” */
   -webkit-background-clip: text !important;
+          background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  text-shadow: 0 1px 0 rgba(0,0,0,.08), 0 8px 22px rgba(255,217,102,.38) !important;
-  -webkit-text-stroke: .6px rgba(130,20,20,.28) !important;
+  color: transparent !important;
+
+  /* 2) Base vàng kim + Glint mảnh chạy ngang (kim loại thật) */
+  background:
+    /* BASE vàng kim (không chuyển động) */
+    linear-gradient(180deg,
+      #FFF6D2 0%,     /* sáng nhất đỉnh chữ */
+      #FFE27A 28%,
+      #FFCA3A 52%,
+      #E5A616 66%,
+      #B87409 86%,
+      #8C5305 100%
+    ),
+    /* GLINT mảnh lướt ngang */
+    linear-gradient(112deg,
+      rgba(255,255,255,0) 47%,
+      rgba(255,255,255,.95) 50%,
+      rgba(255,255,255,0) 53%
+    );
+  background-size: 100% 100%, 260% 100%;
+  background-position: 0 0, -60% 0;
+
+  /* 3) Viền hairline + bóng nhỏ (sắc nét, không mờ) */
+  -webkit-text-stroke: 0.25px rgba(65,20,20,.28);
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.35),   /* viền sáng trên */
+    0 1.2px 0 #A45C00,               /* viền trong nâu vàng */
+    0 3px 6px rgba(0,0,0,.22);       /* bóng nhỏ dưới */
+
+  filter:none;                       /* loại glow gây mờ */
+  animation: goldGlint 5s linear infinite;
 }
-.btn-primary{
-  background:#FFD966 !important; color:#7E120F !important;
-  box-shadow:0 8px 24px rgba(255,217,102,.35);
-  border-radius:12px; font-weight:800;
+
+/* Chuyển động glint – phản chiếu ánh sáng */
+@keyframes goldGlint{
+  0%   { background-position: 0 0, -60% 0; }
+  100% { background-position: 0 0, 160% 0; }
 }
-.btn-primary:hover{ background:#FFE680 !important; box-shadow:0 10px 28px rgba(255,217,102,.48); }
+
+/* Cho mobile: được phép xuống dòng */
+@media (max-width:700px){
+  .home .hero h1{
+    white-space:normal;
+    line-height:1.12;
+    font-size:clamp(32px,9vw,64px);
+  }
+}
+
+/* Tôn trọng người dùng muốn giảm chuyển động */
+@media (prefers-reduced-motion: reduce){
+  .home .hero h1{ animation:none; }
+}
+
+/* ====== Tuỳ chọn: Aura vàng dịu quanh chữ (không làm mờ viền) ====== */
+.home .hero h1.glow{ position:relative; }
+.home .hero h1.glow::after{
+  content:"";
+  position:absolute; inset:-6px;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 48%,
+              rgba(255,217,102,.20) 0%,
+              rgba(255,217,102,.08) 40%,
+              rgba(255,217,102,0) 70%);
+  filter: blur(10px);
+  opacity:.9;
+  z-index:-1;
+}
+
+/* ===== Fallback – khi không hỗ trợ background-clip: text ===== */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){
+  .home .hero h1{
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    color: #FFD04D !important;         /* vàng ấm */
+    -webkit-text-stroke: 0;            /* bỏ viền hairline */
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.35),
+      0 2px 4px rgba(0,0,0,.24);
+  }
+}
+
+/* ============================================================
+   Đoạn mô tả dưới tiêu đề
+   ============================================================ */
+.home .hero p {
+  max-width: 860px;
+  margin: 0 auto 28px;
+  font-size: clamp(16px, 2.2vw, 20px);
+  line-height: 1.55;
+  opacity: .98;
+}
+
+/* ============================================================
+   Nút hành động
+   ============================================================ */
+.home .hero .hero__actions {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.home .hero .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 26px;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition: transform .08s ease,
+              box-shadow .25s ease,
+              background .25s ease,
+              color .25s ease,
+              border-color .25s ease;
+}
+
+.home .hero .btn--primary {
+  background: #FFD966;
+  color: #7E120F;
+  border: 0;
+  box-shadow: 0 10px 24px rgba(255,217,102,.35);
+}
+.home .hero .btn--primary:hover {
+  background: #FFE680;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(255,217,102,.48);
+}
+
+.home .hero .btn--ghost {
+  background: transparent;
+  color: #FFD966;
+  border: 2px solid #FFD966;
+  box-shadow: 0 6px 18px rgba(255,217,102,.18);
+}
+.home .hero .btn--ghost:hover {
+  background: #FFD966;
+  color: #7E120F;
+  transform: translateY(-1px);
+}
+
+.home .hero .btn:focus-visible {
+  outline: 2px solid #FFE680;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* ============================================================
+   Halo nền sau hero (phù hợp nền đỏ, không đè nội dung)
+   ============================================================ */
+.hero-media { display: none !important; }
+
+.home .hero::after {
+  content: "";
+  position: absolute;
+  right: min(8%, 120px);
+  bottom: 8%;
+  width: min(560px, 40vw);
+  height: min(560px, 40vw);
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 45% 45%,
+    rgba(255,217,102,.32) 0%,
+    rgba(255,217,102,.14) 28%,
+    rgba(255,217,102,0) 62%
+  );
+  filter: blur(44px);
+  opacity: .9;
+  animation: heroHalo 7s ease-in-out infinite alternate;
+  z-index: 0;
+}
+
+@keyframes heroHalo {
+  from { transform: translate(0,0) scale(1); opacity:.9; }
+  to   { transform: translate(-22px,-12px) scale(1.06); opacity:1; }
+}
+
+/* ===================== SOFT GOLD (giống ảnh mẫu) ===================== */
+/* Không “kim loại”; vàng mềm + halo mịn, tâm sáng – mép đậm */
+.home .hero h1.soft-gold{
+  /* base chữ */
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: .5px;
+
+  /* màu chữ = gradient vàng mềm */
+  background:
+    linear-gradient(180deg,
+      #FFF8CF 0%,
+      #FFE98F 38%,
+      #FFC941 72%,
+      #FFB82A 100%
+    );
+  -webkit-background-clip: text !important;
+          background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+
+  /* cạnh chữ sắc nhưng không “kim loại” – stroke rất mảnh */
+  -webkit-text-stroke: 0.18px rgba(150,40,10,.22);
+
+  /* bóng & phát sáng: viền sáng rất nhẹ + 2 lớp glow lan xa */
+  text-shadow:
+    0 1px 0 rgba(255,255,255,.30),        /* viền sáng mảnh cạnh trên */
+    0 2px 3px rgba(139,62,0,.18),         /* đổ bóng nhẹ dưới chữ */
+    0 0 14px rgba(255,220,110,.90),       /* halo vàng gần */
+    0 0 36px rgba(255,180,30,.55);        /* halo vàng xa */
+
+  /* bỏ glint chuyển động kim loại */
+  animation: none !important;
+  filter: none;
+}
+
+/* Aura dịu quanh chữ (tuỳ chọn), khớp nền đỏ – đã có class glow của anh */
+.home .hero h1.soft-gold.glow{ position: relative; }
+.home .hero h1.soft-gold.glow::after{
+  content:"";
+  position:absolute; inset:-8px;
+  pointer-events:none;
+  background: radial-gradient(60% 60% at 50% 48%,
+              rgba(255,217,102,.22) 0%,
+              rgba(255,217,102,.10) 42%,
+              rgba(255,217,102,0) 72%);
+  filter: blur(12px);
+  opacity:.95;
+  z-index:-1;
+}
+
+/* Fallback khi không hỗ trợ background-clip: text */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){
+  .home .hero h1.soft-gold{
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    color: #FFD35A !important;
+    -webkit-text-stroke: 0;
+    text-shadow:
+      0 1px 0 rgba(255,255,255,.30),
+      0 2px 3px rgba(139,62,0,.18),
+      0 0 14px rgba(255,220,110,.90),
+      0 0 36px rgba(255,180,30,.55);
+  }
+}
