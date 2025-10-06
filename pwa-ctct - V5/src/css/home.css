@@ -1,331 +1,177 @@
 /* ============================================================
-   HOME.CSS – PTKV3 (Final Polished Version – 2025-10-06)
-   Mục tiêu: Vàng kim 3D + glint mảnh cho H1, không ảnh hưởng phần khác
+   HOME.CSS – PTKV3 (Final – 2025-10-06)
+   Base: vàng kim + glint  •  Biến thể chuẩn ảnh: .soft-gold-v5
    ============================================================ */
 
 /* ===== HERO khung cơ bản ===== */
 .landing, .hero { margin: 0; }
 
-.home .hero {
+.home .hero{
   position: relative;
   min-height: calc(100vh - 64px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center; color: #fff;
   padding: 96px 20px 88px;
   overflow: visible; /* tránh cắt dấu tiếng Việt */
 }
+.home .hero > .container{ position:relative; z-index:2; max-width:1200px; margin:0 auto; }
 
-.home .hero > .container {
-  position: relative;
-  z-index: 2;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* ===== Badge nhỏ phía trên tiêu đề ===== */
-.home .hero .hero-badge,
-.home .hero .tagline {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-weight: 700;
-  color: #FFD966;
-  background: rgba(255,217,102,.14);
-  border: 1px solid rgba(255,217,102,.35);
-  backdrop-filter: blur(2px);
-  margin-bottom: 12px;
+/* ===== Badge ===== */
+.home .hero .hero-badge, .home .hero .tagline{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 14px; border-radius:999px; font-weight:700;
+  color:#FFD966; background:rgba(255,217,102,.14);
+  border:1px solid rgba(255,217,102,.35); backdrop-filter:blur(2px);
+  margin-bottom:12px;
 }
 
 /* ============================================================
-   Tiêu đề chính – BAN CHỈ HUY PTKV3 (Vàng kim 3D + glint mảnh)
+   BASE TITLE – chỉ áp khi KHÔNG dùng soft-gold
    ============================================================ */
-.home .hero h1{
-  display:inline-block;
+.home .hero h1:not(.soft-gold-v4):not(.soft-gold-v5){
+  display:inline-block; margin:10px 0 16px; padding-top:8px;
+  font-weight:900; letter-spacing:.6px; line-height:1.14;
+  font-size:clamp(42px,7.2vw,96px); white-space:nowrap; overflow:visible;
+  text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+
+  -webkit-background-clip:text !important; background-clip:text !important;
+  -webkit-text-fill-color:transparent !important; color:transparent !important;
+
+  background:
+    linear-gradient(180deg,#FFF6D2 0%,#FFE27A 28%,#FFCA3A 52%,#E5A616 66%,#B87409 86%,#8C5305 100%),
+    linear-gradient(112deg,rgba(255,255,255,0) 47%,rgba(255,255,255,.95) 50%,rgba(255,255,255,0) 53%);
+  background-size:100% 100%,260% 100%; background-position:0 0,-60% 0;
+
+  -webkit-text-stroke:.25px rgba(65,20,20,.28);
+  text-shadow:0 1px 0 rgba(255,255,255,.35),0 1.2px 0 #A45C00,0 3px 6px rgba(0,0,0,.22);
+
+  filter:none; animation:goldGlint 5s linear infinite;
+}
+@keyframes goldGlint{0%{background-position:0 0,-60% 0}100%{background-position:0 0,160% 0}}
+
+@media (max-width:700px){
+  .home .hero h1{ white-space:normal; line-height:1.12; font-size:clamp(32px,9vw,64px); }
+}
+@media (prefers-reduced-motion: reduce){
+  .home .hero h1:not(.soft-gold-v4):not(.soft-gold-v5){ animation:none; }
+}
+
+/* ===== Fallback BASE khi không hỗ trợ background-clip:text ===== */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){
+  .home .hero h1:not(.soft-gold-v4):not(.soft-gold-v5){
+    background:none !important; -webkit-text-fill-color:initial !important; color:#FFD04D !important;
+    -webkit-text-stroke:0; text-shadow:0 1px 0 rgba(255,255,255,.35),0 2px 4px rgba(0,0,0,.24);
+  }
+}
+
+/* ============================================================
+   SOFT-GOLD v5 – chuẩn ảnh mẫu (không glint)
+   ============================================================ */
+.home .hero h1.soft-gold-v5{
+  position:relative;
   margin:10px 0 16px;
-  padding-top:8px;                       /* tránh cắt dấu hỏi/ắc-xăng */
+  padding-top:12px;
   font-weight:900;
-  letter-spacing:.6px;
+  letter-spacing:.55px;
   line-height:1.14;
   font-size:clamp(42px,7.2vw,96px);
-  white-space:nowrap;                    /* desktop không xuống dòng */
-  overflow:visible;
-  text-overflow:clip;
-
-  /* Chống răng cưa & cân sáng chữ */
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* 1) Dùng nền gradient làm “màu chữ” */
-  -webkit-background-clip: text !important;
-          background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-
-  /* 2) Base vàng kim + Glint mảnh chạy ngang (kim loại thật) */
-  background:
-    /* BASE vàng kim (không chuyển động) */
-    linear-gradient(180deg,
-      #FFF6D2 0%,     /* sáng nhất đỉnh chữ */
-      #FFE27A 28%,
-      #FFCA3A 52%,
-      #E5A616 66%,
-      #B87409 86%,
-      #8C5305 100%
-    ),
-    /* GLINT mảnh lướt ngang */
-    linear-gradient(112deg,
-      rgba(255,255,255,0) 47%,
-      rgba(255,255,255,.95) 50%,
-      rgba(255,255,255,0) 53%
-    );
-  background-size: 100% 100%, 260% 100%;
-  background-position: 0 0, -60% 0;
-
-  /* 3) Viền hairline + bóng nhỏ (sắc nét, không mờ) */
-  -webkit-text-stroke: 0.25px rgba(65,20,20,.28);
-  text-shadow:
-    0 1px 0 rgba(255,255,255,.35),   /* viền sáng trên */
-    0 1.2px 0 #A45C00,               /* viền trong nâu vàng */
-    0 3px 6px rgba(0,0,0,.22);       /* bóng nhỏ dưới */
-
-  filter:none;                       /* loại glow gây mờ */
-  animation: goldGlint 5s linear infinite;
-}
-
-/* Chuyển động glint – phản chiếu ánh sáng */
-@keyframes goldGlint{
-  0%   { background-position: 0 0, -60% 0; }
-  100% { background-position: 0 0, 160% 0; }
-}
-
-/* Cho mobile: được phép xuống dòng */
-@media (max-width:700px){
-  .home .hero h1{
-    white-space:normal;
-    line-height:1.12;
-    font-size:clamp(32px,9vw,64px);
-  }
-}
-
-/* Tôn trọng người dùng muốn giảm chuyển động */
-@media (prefers-reduced-motion: reduce){
-  .home .hero h1{ animation:none; }
-}
-
-/* ====== Tuỳ chọn: Aura vàng dịu quanh chữ (không làm mờ viền) ====== */
-.home .hero h1.glow{ position:relative; }
-.home .hero h1.glow::after{
-  content:"";
-  position:absolute; inset:-6px;
-  pointer-events:none;
-  background: radial-gradient(60% 60% at 50% 48%,
-              rgba(255,217,102,.20) 0%,
-              rgba(255,217,102,.08) 40%,
-              rgba(255,217,102,0) 70%);
-  filter: blur(10px);
-  opacity:.9;
-  z-index:-1;
-}
-
-/* ===== Fallback – khi không hỗ trợ background-clip: text ===== */
-@supports not ((-webkit-background-clip: text) or (background-clip: text)){
-  .home .hero h1{
-    background: none !important;
-    -webkit-text-fill-color: initial !important;
-    color: #FFD04D !important;         /* vàng ấm */
-    -webkit-text-stroke: 0;            /* bỏ viền hairline */
-    text-shadow:
-      0 1px 0 rgba(255,255,255,.35),
-      0 2px 4px rgba(0,0,0,.24);
-  }
-}
-
-/* ============================================================
-   Đoạn mô tả dưới tiêu đề
-   ============================================================ */
-.home .hero p {
-  max-width: 860px;
-  margin: 0 auto 28px;
-  font-size: clamp(16px, 2.2vw, 20px);
-  line-height: 1.55;
-  opacity: .98;
-}
-
-/* ============================================================
-   Nút hành động
-   ============================================================ */
-.home .hero .hero__actions {
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.home .hero .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 14px 26px;
-  border-radius: 14px;
-  font-weight: 800;
-  font-size: 18px;
-  cursor: pointer;
-  user-select: none;
-  text-decoration: none;
-  transition: transform .08s ease,
-              box-shadow .25s ease,
-              background .25s ease,
-              color .25s ease,
-              border-color .25s ease;
-}
-
-.home .hero .btn--primary {
-  background: #FFD966;
-  color: #7E120F;
-  border: 0;
-  box-shadow: 0 10px 24px rgba(255,217,102,.35);
-}
-.home .hero .btn--primary:hover {
-  background: #FFE680;
-  transform: translateY(-1px);
-  box-shadow: 0 12px 30px rgba(255,217,102,.48);
-}
-
-.home .hero .btn--ghost {
-  background: transparent;
-  color: #FFD966;
-  border: 2px solid #FFD966;
-  box-shadow: 0 6px 18px rgba(255,217,102,.18);
-}
-.home .hero .btn--ghost:hover {
-  background: #FFD966;
-  color: #7E120F;
-  transform: translateY(-1px);
-}
-
-.home .hero .btn:focus-visible {
-  outline: 2px solid #FFE680;
-  outline-offset: 2px;
-  border-radius: 12px;
-}
-
-/* ============================================================
-   Halo nền sau hero (phù hợp nền đỏ, không đè nội dung)
-   ============================================================ */
-.hero-media { display: none !important; }
-
-.home .hero::after {
-  content: "";
-  position: absolute;
-  right: min(8%, 120px);
-  bottom: 8%;
-  width: min(560px, 40vw);
-  height: min(560px, 40vw);
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at 45% 45%,
-    rgba(255,217,102,.32) 0%,
-    rgba(255,217,102,.14) 28%,
-    rgba(255,217,102,0) 62%
+  text-transform:uppercase;
+  white-space:nowrap;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow: visible;
+  /* thân chữ vàng ấm – mép cam */
+  background:linear-gradient(180deg,
+    #FFF6C6 0%,   /* ấm hơn #FFEFA8 */
+    #FFE66E 36%,
+    #FFC94A 70%,  /* đẩy vàng cam */
+    #FFB020 100%  /* mép cam sâu hơn */
   );
-  filter: blur(44px);
-  opacity: .9;
-  animation: heroHalo 7s ease-in-out infinite alternate;
-  z-index: 0;
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+  color:transparent;
+
+  -webkit-text-stroke: 0.18px rgba(120,35,10,.22);
+
+
+  animation:none !important; filter:none !important;
 }
-
-@keyframes heroHalo {
-  from { transform: translate(0,0) scale(1); opacity:.9; }
-  to   { transform: translate(-22px,-12px) scale(1.06); opacity:1; }
+/* aura nền ôm sát chữ */
+.home .hero h1.soft-gold-v5::after{
+  content:""; position:absolute; inset:-10px; pointer-events:none;
+  background:radial-gradient(58% 60% at 50% 48%, rgba(255,212,95,.28) 0%, rgba(255,192,70,.16) 40%, rgba(255,170,50,.08) 64%, rgba(255,170,50,0) 78%);
+  filter:blur(11px); opacity:.70; z-index:-1;
 }
-
-/* ===================== SOFT GOLD (giống ảnh mẫu) ===================== */
-/* ===================== SOFT GOLD v3 (chuẩn ảnh mẫu) ===================== */
-/* Vàng ấm mềm, tâm sáng – mép cam, halo tập trung & loang mịn (không glint) */
-.home .hero h1.soft-gold-v3{
-  position: relative;
-  margin: 10px 0 16px;
-  padding-top: 8px;             /* tránh cắt dấu tiếng Việt */
-  font-weight: 900;
-  letter-spacing: .55px;
-  line-height: 1.10;
-  font-size: clamp(42px, 7.2vw, 96px);
-  text-transform: uppercase;
-  white-space: nowrap;
-
-  /* khử răng cưa */
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  /* màu thân chữ: vàng ấm – cam ở chân (không ám xanh) */
-  background: linear-gradient(180deg,
-    #FFF3B0 0%,   /* sáng dịu ở đỉnh */
-    #FFE36C 38%,  /* vàng ấm */
-    #FFC641 72%,  /* vàng cam */
-    #FFB22A 100%  /* mép cam đậm */
-  );
-  -webkit-background-clip: text !important;
-          background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  color: transparent !important;
-
-  /* viền hairline rất mảnh để thân chữ không “bèo” */
-  -webkit-text-stroke: 0.18px rgba(120, 35, 10, .22);
-
-  /* BÓNG & HALO – tập trung gần chữ, loang ra xa */
+/* tuỳ chọn: gọn halo khi nền đã sáng */
+.home .hero h1.soft-gold-v5.sg-compact{
   text-shadow:
-    0 0 1px   rgba(255,244,200,.90),  /* quầng sáng sát mép */
-    0 1px 2px rgba(90,  20,  0, .16), /* bóng rất nhẹ dưới */
-    0 0 14px  rgba(255,205,90, .85),  /* halo gần (đậm hơn) */
-    0 0 34px  rgba(255,170,40, .55),  /* halo trung bình */
-    0 0 60px  rgba(255,140,30, .35);  /* halo xa (ấm) */
+    0 0 2px  rgba(255,245,190,.90),
+    0 1px 2px rgba(90,20,0,.14),
+    0 0 12px rgba(255,210,95,.82),
+    0 0 22px rgba(255,170,55,.54),
+    0 0 36px rgba(255,120,25,.30);
 
-  /* đảm bảo không còn glint/animation cũ */
-  animation: none !important;
-  filter: none !important;
+  filter: none;
+  animation: none;
 }
-
-/* Aura nền phụ (đúng kiểu “đèn pha” trên nền đỏ) */
-.home .hero h1.soft-gold-v3::after{
+.home .hero h1.soft-gold-v6::after {
   content: "";
-  position: absolute; inset: -10px;
+  position: absolute; inset: -12px;
   pointer-events: none;
-  background: radial-gradient(58% 60% at 50% 48%,
-              rgba(255,215,100,.30) 0%,
-              rgba(255,195,70,.16) 40%,
-              rgba(255,170,50,.08) 64%,
-              rgba(255,170,50,0) 78%);
+  background: radial-gradient(58% 62% at 50% 50%,
+              rgba(255,225,120,.28) 0%,
+              rgba(255,180,50,.16) 45%,
+              rgba(255,130,30,.08) 65%,
+              rgba(255,130,30,0) 80%);
   filter: blur(12px);
-  opacity: .95;
+  opacity: .9;
   z-index: -1;
 }
+.home .hero h1.soft-gold-v5.sg-compact::after{ opacity:.70; }
 
-/* Mobile: cho xuống dòng nếu chật */
-@media (max-width:700px){
-  .home .hero h1.soft-gold-v3{ white-space: normal; line-height: 1.08; }
+/* Fallback soft-gold khi không hỗ trợ background-clip:text */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){
+  .home .hero h1.soft-gold-v5{
+    background:none !important; 
+    -webkit-text-fill-color:initial !important; 
+    color:#FFD04D !important;
+    -webkit-text-stroke:0;
+    text-shadow:
+    0 1px 2px rgba(90,20,0,.14),
+    0 0 12px rgba(255,198,78,.78),
+    0 0 22px rgba(255,165,40,.55);
+  }
 }
 
-/* Fallback khi không hỗ trợ background-clip:text */
-@supports not ((-webkit-background-clip: text) or (background-clip: text)){
-  .home .hero h1.soft-gold-v3{
-    background: none !important;
-    -webkit-text-fill-color: initial !important;
-    color: #FFD35A !important;
-    -webkit-text-stroke: 0;
-    text-shadow:
-      0 0 1px   rgba(255,244,200,.90),
-      0 1px 2px rgba(90,20,0,.16),
-      0 0 14px  rgba(255,205,90,.85),
-      0 0 34px  rgba(255,170,40,.55),
-      0 0 60px  rgba(255,140,30,.35);
-  }
+/* ===== Mô tả, nút, halo nền sau hero (giữ nguyên) ===== */
+.home .hero p{ max-width:860px; margin:0 auto 28px; font-size:clamp(16px,2.2vw,20px); line-height:1.55; opacity:.98; }
+
+.home .hero .hero__actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+.home .hero .btn{ display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:14px 26px; border-radius:14px; font-weight:800; font-size:18px; cursor:pointer; user-select:none; text-decoration:none; transition:transform .08s ease, box-shadow .25s ease, background .25s ease, color .25s ease, border-color .25s ease; }
+.home .hero .btn--primary{ background:#FFD966; color:#7E120F; border:0; box-shadow:0 10px 24px rgba(255,217,102,.35); }
+.home .hero .btn--primary:hover{ background:#FFE680; transform:translateY(-1px); box-shadow:0 12px 30px rgba(255,217,102,.48); }
+.home .hero .btn--ghost{ background:transparent; color:#FFD966; border:2px solid #FFD966; box-shadow:0 6px 18px rgba(255,217,102,.18); }
+.home .hero .btn--ghost:hover{ background:#FFD966; color:#7E120F; transform:translateY(-1px); }
+.home .hero .btn:focus-visible{ outline:2px solid #FFE680; outline-offset:2px; border-radius:12px; }
+
+.hero-media{ display:none !important; }
+.home .hero::after{
+  content:""; position:absolute; right:min(8%,120px); bottom:8%;
+  width:min(560px,40vw); height:min(560px,40vw); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle at 45% 45%, rgba(255,217,102,.32) 0%, rgba(255,217,102,.14) 28%, rgba(255,217,102,0) 62%);
+  filter:blur(44px); opacity:.9; animation:heroHalo 7s ease-in-out infinite alternate; z-index:0;
+}
+@keyframes heroHalo{ from{transform:translate(0,0) scale(1); opacity:.9} to{transform:translate(-22px,-12px) scale(1.06); opacity:1} }
+
+/* 3) Mobile giữ độ thoáng dấu */
+@media (max-width: 700px){
+  .home .hero h1.soft-gold-v5{
+  white-space: normal;
+  line-height: 1.08;
+  padding-top: 10px;
+  font-size: clamp(32px, 9vw, 64px);
+}
+  .home .hero h1.soft-gold-v5.sg-compact{ line-height: 1.12; padding-top: 10px; }
 }

@@ -4,7 +4,7 @@
 
 window.CTCT_CONFIG = {
   // URL /exec của Apps Script (đặt chế độ Anyone)
-  SHEET_API: 'https://script.google.com/macros/s/AKfycbytBzm9b5Yd9aU2RWEjGFimkzPQTsigPpaJpHfAn5I_twfimv9FlvJ1TqYLNh-34OUIwA/exec',
+  SHEET_API: 'https://script.google.com/macros/s/AKfycbydHnxla7Tqc3QI2kUSzbRe7ZIzoi7rY9fRbgHokZnCObQRXUZNkTRMZZppCNthANN_9A/exec',
 
   // Thư mục ngân hàng câu hỏi (Drive)
   BANKS_FOLDER_ID: '1_-YhEHfYfF957yC6o-xyiPk06XRheKb6',

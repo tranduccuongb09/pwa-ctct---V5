@@ -5,10 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Tài liệu học tập – PTKV3</title>
 
-<!-- Global styles -->
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/nav.css?v=20251006">
+<!-- Font chung toàn site -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/materials.plus.css?v=final">
 
 <style>
+:root {
+    --app-font: "Be Vietnam Pro", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    --brand: #A41919;
+    --brand-600: #8B1616;
+    --bg: #f6f7fb;
+    --card: #fff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --pill: #f1f5f9;
+  }
+
+  /* Toàn bộ trang dùng font chung */
+  body.materials,
+  body.materials *:not(code):not(kbd):not(pre) {
+    font-family: var(--app-font) !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;}
+  body.materials button,
+  body.materials input,
+  body.materials select,
+  body.materials textarea {font-family: inherit !important;}
+
 /* ===== MATERIALS-ONLY (không ảnh hưởng trang khác) ===== */
 
 /* 2.1 Màu chữ menu trên nền sáng ở trang Tài liệu học tập */
@@ -21,7 +48,7 @@ body.materials .nav.nav-dark .nav__links a.is-active {
 }
 /* Giữ dropdown nền tối, chữ trắng để tương phản tốt */
 body.materials .nav .dropdown{
-  background:rgba(0,0,0,.90);
+  background:rgba(16, 3, 133, 0.9);
   border:1px solid rgba(255,255,255,.08);
 }
 body.materials .nav .dropdown a{
@@ -30,7 +57,7 @@ body.materials .nav .dropdown a{
 }
 body.materials .nav .dropdown a:hover{
   background:rgba(255,255,255,.10);
-  color:#FFD966 !important;
+  color:#f3bf21 !important;
 }
 /* 2.2 Ẩn nút hamburger/close trên desktop để không còn dấu “×” góc trái */
 @media (min-width:769px){
@@ -48,112 +75,94 @@ body.materials .modal {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.6);
-  display: none;               /* ẩn mặc định */
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
+  display: none;            
+  align-items: center; justify-content: center; z-index: 2000;}
 body.materials .modal.show { display:flex; }
-
 body.materials .modal__in {background: #fff; border-radius: 12px; max-width: 800px;
   width: 90%; max-height: 90%; display: flex; flex-direction: column; overflow: hidden;}
-
 body.materials .modal__hd {display:flex; justify-content: space-between;align-items:center;
   padding:12px 16px; border-bottom:1px solid #e5e7eb; background:#f9fafb;}
-
 body.materials .modal__hd h3 {font-size:18px; font-weight:800; margin:0;}
-
 body.materials .modal__hd .x { border:none; background:none; font-size:14px; font-weight:600;
   color:#a41919; cursor:pointer;}
 
-</style>
+  /* ===== LAYOUT CHÍNH ===== */
+html, body { margin: 0; background: var(--bg); color: var(--text); }
+  a { text-decoration: none; color: inherit; }
+  * { box-sizing: border-box; }
 
-<script src="navbar.js?v=20250930" defer></script>
-
-<style>
-  :root{
-    --brand:#A41919; --brand-600:#8B1616;
-    --bg:#f6f7fb; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
-    --pill:#f1f5f9;
-  }
-  *{box-sizing:border-box}
-  html,body{ margin:0; background:var(--bg); color:var(--text); }
-  a{text-decoration:none;color:inherit}
-
-  /* ====== (Giữ nguyên các style phần materials như anh đang có) ====== */
-
-  .container{max-width:1120px;margin:16px auto;padding:0 12px}
+.container { max-width: 1120px; margin: 16px auto; padding: 0 12px; }
 
   /* ===== NEWS ===== */
-  .news{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);padding:12px}
-  .news__hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
-  .news__title{display:flex;align-items:center;gap:8px;font-weight:900}
-  .news__badge{background:#eef2ff;border:1px solid #e5e7eb;border-radius:999px;padding:3px 8px;font-size:12px;color:#1f2937}
+.news {
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+    padding:12px;
+}
+.news__hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.news__title{display:flex;align-items:center;gap:8px;font-weight:900}
+.news__badge{background:#eef2ff;border:1px solid #e5e7eb;border-radius:999px;padding:3px 8px;font-size:12px;color:#1f2937}
 
-  .news__toolbar{display:flex;gap:12px;align-items:center;margin:8px 0 12px}
-  .chip-date{display:inline-flex;align-items:center;gap:12px;height:44px;padding:6px 12px;background:#f3f4f6;border:1px solid var(--border);border-radius:4px;font-size:13px}
-  .cal-ico{display:inline-block;width:16px;height:16px}
-  .cal-ico svg{width:16px;height:16px;display:block}
+.news__toolbar{display:flex;gap:12px;align-items:center;margin:8px 0 12px}
+.chip-date{display:inline-flex;align-items:center;gap:12px;height:44px;padding:6px 12px;background:#f3f4f6;border:1px solid var(--border);border-radius:4px;font-size:13px}
+.cal-ico svg{width:16px;height:16px;display:block}
 
-  .inline-ticker{position:relative;height:44px;flex:1;min-width:260px;border:1px solid var(--border);border-radius:4px;background:#fff;overflow:hidden}
-  .inline-track{position:absolute;inset:0 auto 0 0;display:flex;align-items:center;gap:30px;white-space:nowrap;padding:0 12px;height:44px;animation:tickerMove 40s linear infinite}
-  @keyframes tickerMove{from{transform:translateX(0)} to{transform:translateX(-50%)}}
-  .inline-ticker:hover .inline-track,.inline-ticker:focus-within .inline-track{animation-play-state:paused}
-  @media (prefers-reduced-motion:reduce){.inline-track{animation:none;position:static;overflow:auto}}
+.inline-ticker{position:relative;height:44px;flex:1;min-width:260px;border:1px solid var(--border);border-radius:4px;background:#fff;overflow:hidden}
+.inline-track{position:absolute;inset:0 auto 0 0;display:flex;align-items:center;gap:30px;white-space:nowrap;padding:0 12px;height:44px;animation:tickerMove 40s linear infinite}
+@keyframes tickerMove{from{transform:translateX(0)} to{transform:translateX(-50%)}}
 
-  .titem{display:inline-flex;align-items:center;gap:10px}
-  .t-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block}
-  .t-link{font-weight:700;font-size:15px;line-height:1.1}
-  .t-burst{display:inline-block;width:18px;height:18px;vertical-align:middle}
-  .t-burst svg{display:block;width:18px;height:18px}
-  .t-burst text{font-size:8px;font-weight:900;fill:#ffd966}
+.titem{display:inline-flex;align-items:center;gap:10px}
+.t-dot{width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block}
+.t-link{font-weight:700;font-size:15px;line-height:1.1}
 
-  .news__grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
-  @media (max-width:980px){.news__grid{grid-template-columns:repeat(2,1fr)}}
-  @media (max-width:640px){.news__grid{grid-template-columns:1fr}}
-  .news__card{display:grid;grid-template-columns:112px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
-  .news__thumb{width:112px;height:86px;object-fit:cover;background:#f3f4f6;display:block}
-  .news__info{padding:10px 10px 10px 0;display:flex;flex-direction:column}
-  .news__titlelink{font-weight:800;line-height:1.28;margin:0 0 6px}
-  .news__meta{margin-top:auto;font-size:12px;color:#64748b;display:flex;gap:12px;align-items:center}
-  .news__skeleton{height:86px;border:1px dashed var(--border);border-radius:12px;background:#fafafa}
+.news__grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
+@media (max-width:980px){.news__grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.news__grid{grid-template-columns:1fr}}
+.news__card{display:grid;grid-template-columns:112px 1fr;gap:10px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}
+.news__thumb{width:112px;height:86px;object-fit:cover;background:#f3f4f6;display:block}
+.news__info{padding:10px 10px 10px 0;display:flex;flex-direction:column}
+.news__titlelink{font-weight:800;line-height:1.28;margin:0 0 6px}
+.news__meta{margin-top:auto;font-size:12px;color:#64748b;display:flex;gap:12px;align-items:center}
 
-  /* ===== Toolbar & cards ===== */
-  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
-  .input,.select{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px}
-  .input{flex:1;min-width:240px}
-  .btn{padding:12px 18px;border-radius:12px;border:none;font-weight:800;font-size:16px;background:var(--brand);color:#fff;cursor:pointer}
-  .btn:hover{background:var(--brand-600)}
-  .pill{display:inline-flex;align-items:center;gap:8px;background:var(--pill);color:#0f172a;border:1px solid #e2e8f0;border-radius:999px;padding:6px 10px;font-size:13px}
+/* ===== TOOLS & CARDS ===== */
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.input,.select{padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#fff;font-size:16px}
+.btn{padding:12px 18px;border-radius:12px;border:none;font-weight:800;font-size:16px;background:var(--brand);color:#fff;cursor:pointer}
+.btn:hover{background:var(--brand-600)}
+.pill{display:inline-flex;align-items:center;gap:8px;background:var(--pill);color:#0f172a;border:1px solid #e2e8f0;border-radius:999px;padding:6px 10px;font-size:13px}
 
-  .topic{margin:18px 0}
-  .topic__head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:12px}
-  .topic__title{margin:0;font-size:18px;font-weight:900}
-  .grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
-  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+.topic{margin:18px 0}
+.topic__head{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:12px}
+.topic__title{margin:0;font-size:18px;font-weight:900}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(2,1fr)}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
 
-  .card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px;display:flex;gap:12px}
-  .ico{width:56px;height:56px;border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px}
-  .info{flex:1;min-width:0}
-  .title{margin:0 0 4px;font-weight:800;line-height:1.35}
-  .meta{margin:0 0 8px;color:var(--muted);font-size:13px}
-  .actions{display:flex;gap:8px;flex-wrap:wrap}
-  .btn-ghost{padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:700;cursor:pointer}
-  .btn-ghost:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
-  .empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:#64748b}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);padding:14px;display:flex;gap:12px}
+.ico{width:56px;height:56px;border-radius:12px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px}
+.title{margin:0 0 4px;font-weight:800;line-height:1.35}
+.meta{margin:0 0 8px;color:var(--muted);font-size:13px}
+.btn-ghost{padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-weight:700;cursor:pointer}
+.btn-ghost:hover{box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.info{flex:1;min-width:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:24px;text-align:center;color:#64748b}
 
-  /* Ẩn badge đếm bài nếu không dùng */
-  #newsCount{display:none!important}
+/* Ẩn badge đếm bài nếu không dùng */
+#newsCount{display:none!important}
 
-  /* (Giữ nhỏ tiêu đề tin như anh đang dùng) */
-  #newsGrid .news__titlelink{font-size:15px;line-height:1.4}
+/* (Giữ nhỏ tiêu đề tin như anh đang dùng) */
+#newsGrid .news__titlelink{font-size:15px;line-height:1.4}
 </style>
+
+<script src="../js/navbar.js?v=20251006" defer></script>
+
 </head>
 <body class="materials">
-
 <!-- ====== HEADER CHUẨN CÁCH 1 (KHÔNG mbar) ====== -->
 <header class="nav nav-dark">
-  <div class="nav__inner">
+  <div class="nav__inner container">
     <!-- Logo -->
     <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
 
@@ -239,7 +248,7 @@ body.materials .modal__hd .x { border:none; background:none; font-size:14px; fon
 </div>
 
 <!-- Cấu hình dùng chung -->
-<script src="config.js"></script>
+<script src="../js/config.js"></script>
 
 <script>
 /* ================== Hôm nay + ticker + news (giữ như anh) ================== */
@@ -537,6 +546,6 @@ if (modal && closeBtn) {
   });
 }
 </script>
-
+<script src="../js/materials.plus.js?v=final" defer></script>
 </body>
 </html>

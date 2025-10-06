@@ -1,0 +1,132 @@
+/* ==========================================================================
+   PTKV3 – materials.plus.css (FINAL)
+   Scope: chỉ áp dụng cho trang materials.html
+   Không thay đổi font, chỉ nâng cấp UI theo namespace .mp-*
+   ========================================================================== */
+
+:root{
+  --mp-brand: #A41919;
+  --mp-brand-600: #8B1616;
+  --mp-bg: #f6f7fb;
+  --mp-card: #fff;
+  --mp-text: #111827;
+  --mp-muted: #6b7280;
+  --mp-border: #e5e7eb;
+  --mp-gold: #FFD966;
+}
+
+/* ============ Utility (không đụng style chung của site) ============ */
+.mp-hidden{ display:none !important; }
+.mp-sr{ position:absolute !important; width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0;padding:0;margin:-1px; }
+
+/* ========= Block: Hero News Carousel (progressive enhancement) ======== */
+#newsBlock{ position: relative; }
+.mp-hero{
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--mp-card);
+  border: 1px solid var(--mp-border);
+}
+@media (max-width: 640px){ .mp-hero{ border-radius: 12px; } }
+
+.mp-track{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 85%;
+  gap: 14px;
+  padding: 10px;
+  scroll-snap-type: x mandatory;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+@media (min-width: 900px){
+  .mp-track{ grid-auto-columns: 32%; }
+}
+
+.mp-slide{
+  scroll-snap-align: start;
+  background: #fff;
+  border: 1px solid var(--mp-border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 10px;
+}
+.mp-slide .news__thumb{ width:112px;height:86px; object-fit:cover; display:block; background:#f3f4f6; }
+.mp-slide .news__info{ padding: 8px 10px 10px 0; display:flex;flex-direction:column; }
+.mp-slide .news__titlelink{ font-weight:800; line-height:1.28; margin:0 0 6px; font-size:15px; color:var(--mp-text); }
+.mp-slide .news__titlelink:hover{ text-decoration: underline; }
+.mp-slide .news__meta{ margin-top:auto; font-size:12px; color:#64748b; display:flex; gap:10px; }
+
+.mp-dots{
+  display:flex; gap:8px; justify-content:center; align-items:center;
+  padding: 8px 0 10px;
+}
+.mp-dot{
+  width:8px; height:8px; border-radius:999px;
+  background:#e5e7eb; cursor:pointer; border:none;
+}
+.mp-dot[aria-current="true"]{ background: var(--mp-brand); }
+
+/* ========= Block: Tools row (spacing tinh gọn) ========= */
+.tools{ row-gap:10px; }
+.tools .btn{
+  background: var(--mp-brand);
+  border:none;
+}
+.tools .btn:hover{ background: var(--mp-brand-600); }
+
+/* ========= Block: Cards Grid (materials) ========= */
+.topic{ margin:18px 0; }
+.topic__head{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px; background:var(--mp-card);
+  border:1px solid var(--mp-border); border-radius:12px;
+}
+.topic__title{ margin:0; font-size:18px; font-weight:900; color:var(--mp-text); }
+
+.grid{
+  display:grid; gap:14px; grid-template-columns:repeat(2,1fr);
+}
+@media (max-width:980px){ .grid{ grid-template-columns:1fr; } }
+
+.card{
+  background: var(--mp-card);
+  border:1px solid var(--mp-border);
+  border-radius:16px;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+  padding:14px; display:flex; gap:12px;
+}
+.card .ico{ width:56px;height:56px;border-radius:12px;border:1px solid var(--mp-border); display:flex;align-items:center;justify-content:center;font-size:24px; }
+.card .title{ margin:0 0 4px; font-weight:800; line-height:1.35; color:var(--mp-text); }
+.card .meta{ margin:0 0 8px; color:var(--mp-muted); font-size:13px; }
+.card .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+.card .btn{ padding:10px 16px; border-radius:12px; border:none; background:var(--mp-brand); color:#fff; font-weight:800; }
+.card .btn:hover{ background:var(--mp-brand-600); }
+.card .btn-ghost{ padding:9px 12px; border-radius:10px; border:1px solid var(--mp-border); background:#fff; font-weight:700; }
+.card .btn-ghost:hover{ box-shadow:0 2px 6px rgba(0,0,0,.08); }
+
+/* ========= “Back to top” nhỏ gọn ========= */
+.mp-backtop{
+  position: fixed; right: 18px; bottom: 18px; z-index: 30;
+  width: 42px; height: 42px; border-radius: 999px;
+  background: var(--mp-brand); color: #fff; border: none; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 8px 22px rgba(164,25,25,.25);
+}
+.mp-backtop.show{ display:flex; }
+.mp-backtop:active{ transform: translateY(1px); }
+
+/* ========= Nút nhảy mục (nếu dùng) ========= */
+.mp-anchor-btn{
+  appearance:none; border:1px solid var(--mp-border);
+  background:#fff; color:var(--mp-text); padding:8px 12px; border-radius:10px; font-weight:700;
+}
+.mp-anchor-btn:hover{ box-shadow:0 2px 6px rgba(0,0,0,.08); }
+
+/* ========= Tinh chỉnh nhỏ cho news block khi có hero ========= */
+#newsGrid.mp-as-hero{ display:none; }
